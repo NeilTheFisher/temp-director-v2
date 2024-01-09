@@ -1,0 +1,24 @@
+type User = {
+    id: number;
+    name: string | null;
+    email: string | null;
+    email_verified_at: Date | null;
+    password: string;
+    remember_token: string | null;
+    created_at: Date;
+    updated_at: Date;
+    created_by: string | null;
+    msisdn: string;
+    otp: string;
+    otp_created_at: Date;
+    personal_group_id: number;
+    image_uid: string | null;
+    verif_code: string | null;
+    verif_expir: Date | null;
+    type: string;
+    timezone: string | null;
+    avatar_url: string | null;
+    account_type: number;
+    is_deleted: number;
+    deleted_timestamp: Date | null;
+};
