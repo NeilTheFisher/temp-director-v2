@@ -208,8 +208,14 @@ export class AcsService {
 				strOtp,
 				countrycode
 			)
+			console.log('----------------', objRequest)
+			if (!objRequest.soapClient) {
+				throw new Error('soapClient is not defined in objRequest')
+			}
 			const { response } = await objRequest.soapClient
+			console.log('*************', response.body)
 			const xmlString = response.body
+
 			let errorCode = -1
 			let errorMessage = ''
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
