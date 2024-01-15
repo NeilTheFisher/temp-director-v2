@@ -18,6 +18,6 @@ COPY --from=builder /usr/src/app/build ./dist
 COPY --from=builder /usr/src/app/priv ./priv
 RUN npm ci --omit=dev
 
-EXPOSE 3000
+# EXPOSE 3000
 
 CMD ["node", "dist/app.js"]

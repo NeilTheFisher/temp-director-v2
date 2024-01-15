@@ -6,8 +6,8 @@ import { RequestManager } from './controller/requestManager'
 import { DbManager } from './utils/dbmanager'
 import { Settings } from './utils/Settings'
 import isoCountries from 'i18n-iso-countries'
-import https from 'https'
-import fs from 'fs'
+// import https from 'https'
+// import fs from 'fs'
 
 export class DirectorApi {
 	private dbManager: DbManager
@@ -76,15 +76,17 @@ export class DirectorApi {
 				})
 		})
 
-		const privateKey = fs.readFileSync('priv/private-key.pem', 'utf8')
-		const certificate = fs.readFileSync('priv/certificate.pem', 'utf8')
-		const credentials = { key: privateKey, cert: certificate }
-
-		const httpsServer = https.createServer(credentials, app)
-
-		httpsServer.listen(port, () => {
-			console.log(`Server is running on port ${port}`)
+		app.listen(port, '0.0.0.0', () => {
+			console.log(`HTTP Server is running on port ${port}`)
 		})
+
+		// const privateKey = fs.readFileSync('priv/private-key.pem', 'utf8')
+		// const certificate = fs.readFileSync('priv/certificate.pem', 'utf8')
+		// const credentials = { key: privateKey, cert: certificate }
+		// const httpsServer = https.createServer(credentials, app)
+		// httpsServer.listen(port, () => {
+		// 	console.log(`Server is running on port ${port}`)
+		// })
 	}
 
 	public getSettings() {
