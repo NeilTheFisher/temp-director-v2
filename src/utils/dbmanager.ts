@@ -9,14 +9,16 @@ export class DbManager {
 
 	private async connect() {
 		try {
+			let host = process.env.MYSQL_SOCKET_ADDRESS ?? 'localhost:3306'
+			host = host.replace(/:\d+$/, '') // This regex removes the last : and numbers if present
 			const connectionConfig = {
-				host: process.env.MYSQL_SOCKET_ADDRESS ?? 'localhost',
+				host: host,
 				port: Number(process.env.MYSQL_SOCKET_PORT) || 3306,
 				user: process.env.MYSQL_USER ?? 'root',
 				password: process.env.MYSQL_PASSWORD ?? 'password',
 				database: process.env.MYSQL_DATABASE ?? 'db_director',
 			}
-			console.log('Connection details:', connectionConfig)
+			console.log('MYSQL Connection details:', connectionConfig)
 
 			this.connection = await mysql.createConnection(connectionConfig)
 
