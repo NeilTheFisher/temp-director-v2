@@ -4,7 +4,7 @@ import { create } from 'xmlbuilder2'
 import { randomString } from './utils'
 
 export class AcsService {
-	constructor() {}
+	constructor() { /* TODO document why this constructor is empty */ }
 
 	private createSoapClientRequest(
 		method: string,
@@ -208,7 +208,17 @@ export class AcsService {
 				strOtp,
 				countrycode
 			)
-			console.log('----------------', objRequest)
+
+			console.log('---------------- SOAP Request ----------------')
+			if (objRequest?. soapClient) {
+				console.log('URL:', objRequest.soapClient.url)
+				console.log('Headers:', objRequest.soapClient.headers)
+				console.log('XML:', objRequest.soapClient.xml)
+			} else {
+				console.error('Error: objRequest.soapClient is undefined or null')
+			}
+			console.log('-----------------------------------------------')
+
 			if (!objRequest.soapClient) {
 				throw new Error('soapClient is not defined in objRequest')
 			}
