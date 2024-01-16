@@ -164,7 +164,7 @@ export class RequestManager {
 							console.log(`RequestManager.odience: insertRoleSuccess(${role})?: ${insertRoleSuccess}`)
 						}))
 					} else {
-						group = groups[0] as group
+						group = groups[0]
 						group = await this.dbManager.updateData(
 							'group',
 							'id',
@@ -310,7 +310,7 @@ export class RequestManager {
 				this.dbManager
 			)
 			const rows: RowDataPacket[] = (await this.dbManager.query(
-				'SELECT * FROM db_spotlight.user WHERE id = ?',
+				'SELECT * FROM user WHERE id = ?',
 				[userId]
 			)) as RowDataPacket[]
 			let user: User | undefined

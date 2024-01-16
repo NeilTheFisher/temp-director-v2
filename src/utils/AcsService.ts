@@ -4,7 +4,6 @@ import { create } from 'xmlbuilder2'
 import { randomString } from './utils'
 
 export class AcsService {
-	constructor() { /* TODO document why this constructor is empty */ }
 
 	private createSoapClientRequest(
 		method: string,
@@ -23,11 +22,9 @@ export class AcsService {
 		const strImpuTemplate: string = process.env.ACS_API_IMPU_TEMPLATE ?? ''
 		const strImpiTemplate: string = process.env.ACS_API_IMPI_TEMPLATE ?? ''
 
-		console.log('#before', strUrl, strImpuTemplate, strImpiTemplate)
-
-		if (!strUrl || strImpuTemplate.trim() === '' || strImpiTemplate.trim() === '') {
+		if (strImpuTemplate.trim() === '' || strImpiTemplate.trim() === '') {
 			return {
-				message: 'Missing one or more required configs: ACS_API_ENDPOINT, ACS_API_IMPU_TEMPLATE, ACS_API_IMPI_TEMPLATE',
+				message: 'Missing one or more required configs: ACS_API_IMPU_TEMPLATE, ACS_API_IMPI_TEMPLATE',
 				code: 500,
 			}
 		}
@@ -212,17 +209,10 @@ export class AcsService {
 				countrycode
 			)
 
-			setTimeout(() => {
-				console.log('---------------- SOAP Request ----------------')
-				console.log('soapClient:', objRequest.soapClient)
-				console.log('-----------------------------------------------')
-			}, 1000)
-
 			if (!objRequest.soapClient) {
 				throw new Error('soapClient is not defined in objRequest')
 			}
 			const { response } = await objRequest.soapClient
-			console.log('*************', response.message)
 			const xmlString = response.body
 
 			let errorCode = -1
