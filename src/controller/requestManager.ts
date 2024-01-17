@@ -275,6 +275,7 @@ export class RequestManager {
 						)
 				}
 			} else {
+				console.log(objValidateMsisdn.valid, objValidateMsisdn.error)
 				return res
 					.status(400)
 					.send(
