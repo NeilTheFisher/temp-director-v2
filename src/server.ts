@@ -9,6 +9,9 @@ import isoCountries from 'i18n-iso-countries'
 // import https from 'https'
 // import fs from 'fs'
 
+const ROUTE_PATH_PROVISIONING = '/odience'
+const ROUTE_PATH_GETEVENTSLIST = '/api/getEventsList'
+const ROUTE_PATH_GETUSERINFO = '/api/getUserInfo'
 export class DirectorApi {
 	private dbManager: DbManager
 	private settings: Settings
@@ -42,7 +45,7 @@ export class DirectorApi {
 		app.use(passport.session())
 		app.use(cors())
 
-		app.get('/odience', (req, res) => {
+		app.get(ROUTE_PATH_PROVISIONING, (req, res) => {
 			this.requestManager.odience(req, res)
 				.then(() => {
 				// Handle success if needed
@@ -53,7 +56,7 @@ export class DirectorApi {
 					res.status(500).send('Internal Server Error')
 				})
 		})
-		app.get('/api/getEventsList', (req, res) => {
+		app.get(ROUTE_PATH_GETEVENTSLIST, (req, res) => {
 			this.requestManager.getEventsList(req, res)
 				.then(() => {
 				// Handle success if needed
@@ -64,7 +67,7 @@ export class DirectorApi {
 					res.status(500).send('Internal Server Error')
 				})
 		})
-		app.get('/api/getUserInfo', (req, res) => {
+		app.get(ROUTE_PATH_GETUSERINFO, (req, res) => {
 			this.requestManager.getUserInfo(req, res)
 				.then(() => {
 				// Handle success if needed
