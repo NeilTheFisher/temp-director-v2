@@ -29,7 +29,7 @@ export async function verifyAccess(authHeader: string, dbManager: DbManager): Pr
 
 	// validate client_id and client_secret
 
-	const publicKey = fs.readFileSync('./priv/public', 'utf8')
+	const publicKey = fs.readFileSync('./priv/public.key', 'utf8')
 
 	// const authHeader = request.headers['authorization'];
 	const token = authHeader?.split(' ')[1]
