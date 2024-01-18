@@ -53,7 +53,7 @@ describe('test_routes', () => {
 
 	test('get_user_info_unknown_user', (done) => {
 
-		jest.spyOn(Utils, 'verifyAccess').mockImplementation((_a, _b) => {
+		jest.spyOn(Utils, 'verifyAccess').mockImplementation((_a: any) => {
 			return new Promise<string>((resolve, _reject) => {
 				resolve('3')
 			})
@@ -73,7 +73,7 @@ describe('test_routes', () => {
 	})
 
 	test('success_get_user_info', (done) => {
-		jest.spyOn(Utils, 'verifyAccess').mockImplementation((_a, _b) => {
+		jest.spyOn(Utils, 'verifyAccess').mockImplementation((_a: any) => {
 			return new Promise<string>((resolve, _reject) => {
 				resolve('1')
 			})

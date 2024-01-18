@@ -1,18 +1,19 @@
 import mysql, { RowDataPacket } from 'mysql2/promise'
 
 export class DbManager {
-	private connection: mysql.Connection | any | null = null
+	private connection: mysql.Pool | any | null = null
 
 	public async connect(pConnection: any | undefined = undefined) {
 		try {
-
 			if (pConnection) {
 				this.connection = pConnection
 				console.log('Already connected to the database.')
 			} else {
 				let host = process.env.MYSQL_SOCKET_ADDRESS ?? 'localhost:3306'
 				host = host.replace(/:\d+$/, '') // This regex removes the last : and numbers if present
+
 				const connectionConfig = {
+					connectionLimit: 50,
 					host: host,
 					port: Number(process.env.MYSQL_SOCKET_PORT) || 3306,
 					user: process.env.MYSQL_USER ?? 'root',
@@ -21,9 +22,9 @@ export class DbManager {
 				}
 				console.log('MYSQL Connection details:', connectionConfig)
 
-				this.connection = await mysql.createConnection(connectionConfig)
+				this.connection = mysql.createPool(connectionConfig)
 
-				console.log('Connected to the database.')
+				console.log('Created a mysql pool')
 			}
 		} catch (error) {
 			console.error('Error connecting to the database:', error)
@@ -31,14 +32,8 @@ export class DbManager {
 	}
 
 	public async query(sql: string, values?: string[]) {
-		if (!this.connection) {
-			// Reconnect if the connection is not available
-			await this.connect()
-		}
-		await this.connection?.ping()
-
 		try {
-			const [rows] = await this.connection!.query(sql, values)
+			const [rows] = await this.connection.query(sql, values)
 			return rows
 		} catch (error) {
 			console.error('Error executing SQL query:', error)
@@ -53,33 +48,22 @@ export class DbManager {
 		}
 	}
 
-	public async fetchData(
-		tableName: string,
-		key: string,
-		valueCondition: string,
-		columnWanted: string
-	) {
-		const result: RowDataPacket[] = await this.query(
-			`SELECT ${columnWanted} FROM ?? WHERE ?? = ?`,
-			[tableName, key, valueCondition]
-		) as RowDataPacket[]
+	public async fetchData(tableName: string, key: string, valueCondition: string, columnWanted: string) {
+		const result: RowDataPacket[] = (await this.query(`SELECT ${columnWanted} FROM ?? WHERE ?? = ?`, [
+			tableName,
+			key,
+			valueCondition,
+		])) as RowDataPacket[]
 		console.log('fetchData result: ', result)
 		return result
 	}
 
-	public async insertData(
-		tableName: string,
-		keys: string[],
-		values: string[]
-	): Promise<boolean> {
+	public async insertData(tableName: string, keys: string[], values: string[]): Promise<boolean> {
 		try {
 			const keysString = keys.join(', ')
 			const valuesString = values.map(() => '?').join(', ')
 
-			const result = await this.query(
-				`INSERT INTO \`${tableName}\` (${keysString}) VALUES (${valuesString})`,
-				values
-			)
+			const result = await this.query(`INSERT INTO \`${tableName}\` (${keysString}) VALUES (${valuesString})`, values)
 			console.log('insertData result:', result)
 			return true
 		} catch (error) {
@@ -107,13 +91,10 @@ export class DbManager {
 
 			const updateValues2 = updateValues.map((item: string) => Object.values(item)).flat()
 
-			const result = await this.query(
-				`UPDATE ${tableName} SET ${updateString} WHERE ${primaryKey} = ?`,
-				[
-					...updateValues2,
-					id,
-				]
-			)
+			const result = await this.query(`UPDATE ${tableName} SET ${updateString} WHERE ${primaryKey} = ?`, [
+				...updateValues2,
+				id,
+			])
 			console.log('updateData: result:', result)
 			return true
 		} catch (error) {
