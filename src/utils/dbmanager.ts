@@ -1,28 +1,30 @@
 import mysql, { RowDataPacket } from 'mysql2/promise'
 
 export class DbManager {
-	private connection: mysql.Connection | null = null
+	private connection: mysql.Connection | any | null = null
 
-	constructor() {
-		this.connect()
-	}
-
-	private async connect() {
+	public async connect(pConnection: any | undefined = undefined) {
 		try {
-			let host = process.env.MYSQL_SOCKET_ADDRESS ?? 'localhost:3306'
-			host = host.replace(/:\d+$/, '') // This regex removes the last : and numbers if present
-			const connectionConfig = {
-				host: host,
-				port: Number(process.env.MYSQL_SOCKET_PORT) || 3306,
-				user: process.env.MYSQL_USER ?? 'root',
-				password: process.env.MYSQL_PASSWORD ?? 'password',
-				database: process.env.MYSQL_DATABASE ?? 'db_director',
+
+			if (pConnection) {
+				this.connection = pConnection
+				console.log('Already connected to the database.')
+			} else {
+				let host = process.env.MYSQL_SOCKET_ADDRESS ?? 'localhost:3306'
+				host = host.replace(/:\d+$/, '') // This regex removes the last : and numbers if present
+				const connectionConfig = {
+					host: host,
+					port: Number(process.env.MYSQL_SOCKET_PORT) || 3306,
+					user: process.env.MYSQL_USER ?? 'root',
+					password: process.env.MYSQL_PASSWORD ?? 'password',
+					database: process.env.MYSQL_DATABASE ?? 'db_director',
+				}
+				console.log('MYSQL Connection details:', connectionConfig)
+
+				this.connection = await mysql.createConnection(connectionConfig)
+
+				console.log('Connected to the database.')
 			}
-			console.log('MYSQL Connection details:', connectionConfig)
-
-			this.connection = await mysql.createConnection(connectionConfig)
-
-			console.log('Connected to the database.')
 		} catch (error) {
 			console.error('Error connecting to the database:', error)
 		}

@@ -5,7 +5,6 @@ import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber' // Im
 import * as isoCountries from 'i18n-iso-countries'
 import jwt from 'jsonwebtoken'
 import { Settings } from './Settings'
-import { DbManager } from './dbmanager'
 
 interface ValidationResult {
 	msisdn: string;
@@ -24,8 +23,8 @@ interface Country {
 
 type CountryMap = { [code: string]: Country };
 
-export async function verifyAccess(authHeader: string, dbManager: DbManager): Promise<string> {
-	console.log('Got getToken request', dbManager)
+export async function verifyAccess(authHeader: string): Promise<string> {
+	console.log('verifyAccess')
 
 	// validate client_id and client_secret
 

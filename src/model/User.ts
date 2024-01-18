@@ -1,24 +1,24 @@
-type User = {
-    id: number;
+export type User = {
+    id: number | null;
     name: string | null;
     email: string | null;
     email_verified_at: Date | null;
-    password: string;
+    password: string | null;
     remember_token: string | null;
-    created_at: Date;
-    updated_at: Date;
+    created_at: Date | null;
+    updated_at: Date | null;
     created_by: string | null;
     msisdn: string;
-    otp: string;
-    otp_created_at: Date;
-    personal_group_id: number;
+    otp: string | null;
+    otp_created_at: Date | null;
+    personal_group_id: number | null;
     image_uid: string | null;
     verif_code: string | null;
     verif_expir: Date | null;
-    type: string;
+    type: string | null;
     timezone: string | null;
     avatar_url: string | null;
-    account_type: number;
-    is_deleted: number;
+    account_type: number | null;
+    is_deleted: number | null;
     deleted_timestamp: Date | null;
 };
