@@ -56,7 +56,7 @@ export class RequestManager {
 					const password = randomString(60)
 					console.log('password generated:', password)
 					const hashedPassword = bcrypt.hashSync(password, salt)
-					const insertSuccess = this.dbManager.insertData(
+					const insertSuccess = await this.dbManager.insertData(
 						'user',
 						['msisdn', 'password', 'type', 'created_at', 'updated_at'],
 						[
