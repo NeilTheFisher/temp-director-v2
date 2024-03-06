@@ -9,6 +9,7 @@ import { DbManager } from './utils/dbmanager'
 // import https from 'https'
 // import fs from 'fs'
 
+const ROUTE_PATH_HEALTH = '/health'
 const ROUTE_PATH_PROVISIONING = '/odience'
 const ROUTE_PATH_GETEVENTSLIST = '/api/getEventsList'
 const ROUTE_PATH_GETUSERINFO = '/api/getUserInfo'
@@ -51,6 +52,9 @@ export class DirectorApi {
 		app.use(passport.session())
 		app.use(cors())
 
+		app.get(ROUTE_PATH_HEALTH, (req, res) => {
+			res.status(200).send('OK')
+		})
 		app.get(ROUTE_PATH_PROVISIONING, (req, res) => {
 			this.requestManager
 				.odience(req, res)
