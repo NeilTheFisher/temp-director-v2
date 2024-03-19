@@ -4,6 +4,7 @@ import session from 'express-session'
 import isoCountries from 'i18n-iso-countries'
 import passport from 'passport'
 import { RequestManager } from './controller/requestManager'
+import { routes as apiRoutes } from './routes/index'
 import { Settings } from './utils/Settings'
 import { DbManager } from './utils/dbmanager'
 // import https from 'https'
@@ -12,7 +13,6 @@ import { DbManager } from './utils/dbmanager'
 const ROUTE_PATH_HEALTH = '/health'
 const ROUTE_PATH_PROVISIONING = '/odience'
 const ROUTE_PATH_GETEVENTSLIST = '/api/getEventsList'
-const ROUTE_PATH_GETUSERINFO = '/api/getUserInfo'
 export class DirectorApi {
 	private dbManager: DbManager
 	private settings: Settings
@@ -51,7 +51,7 @@ export class DirectorApi {
 		app.use(passport.initialize())
 		app.use(passport.session())
 		app.use(cors())
-
+		app.use('/api', apiRoutes)
 		app.get(ROUTE_PATH_HEALTH, (req, res) => {
 			res.status(200).send('OK')
 		})
@@ -79,19 +79,6 @@ export class DirectorApi {
 					res.status(500).send('Internal Server Error')
 				})
 		})
-		app.get(ROUTE_PATH_GETUSERINFO, (req, res) => {
-			this.requestManager
-				.getUserInfo(req, res)
-				.then(() => {
-					// Handle success if needed
-				})
-				.catch((error) => {
-					// Handle errors appropriately
-					console.error(error)
-					res.status(500).send('Internal Server Error')
-				})
-		})
-
 		this.server = app.listen(port, '0.0.0.0')
 		console.log(`HTTP Server is running on port ${port}`)
 	}

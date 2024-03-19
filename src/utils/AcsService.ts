@@ -4,21 +4,15 @@ import { create } from 'xmlbuilder2'
 import { randomString } from './utils'
 
 export class AcsService {
-
 	private createSoapClientRequest(
 		method: string,
 		strMsisdn: string,
 		strOtp: string,
 		countryCode = 'CA',
 		strPassword?: string
-	)
-	{
-		const strUrl: string = `${process.env.ACS_API_ENDPOINT ?? ''}${
-			process.env.ACS_PROVISIONING_PATH ?? '/soap/?wsdl'
-		}`
-		console.info(
-			`AcsService.createSoapClientRequest: provisionUser.url: ${strUrl}`
-		)
+	) {
+		const strUrl: string = `${process.env.ACS_API_ENDPOINT ?? ''}${process.env.ACS_PROVISIONING_PATH ?? '/soap/?wsdl'}`
+		console.info(`AcsService.createSoapClientRequest: provisionUser.url: ${strUrl}`)
 		const strImpuTemplate: string = process.env.ACS_API_IMPU_TEMPLATE ?? ''
 		const strImpiTemplate: string = process.env.ACS_API_IMPI_TEMPLATE ?? ''
 
@@ -27,8 +21,7 @@ export class AcsService {
 				message: 'Missing one or more required configs: ACS_API_IMPU_TEMPLATE, ACS_API_IMPI_TEMPLATE',
 				code: 500,
 			}
-		}
-		else {
+		} else {
 			let type: string = 'createSubscriber'
 			if (method === 'update') {
 				type = 'updateSubscriber'
@@ -42,9 +35,7 @@ export class AcsService {
 			const arrRequest = {
 				msisdn: strMsisdn,
 				impi: strImpiTemplate.replace('<MDN>', strMsisdn),
-				impu: strImpuTemplate
-					.split(',')
-					.map((item: string) => item.replace('<MDN>', strMsisdn)),
+				impu: strImpuTemplate.split(',').map((item: string) => item.replace('<MDN>', strMsisdn)),
 				countryCode,
 				imei: '',
 				imsi: '',
@@ -61,20 +52,18 @@ export class AcsService {
 					'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
 					'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
 					'xmlns:SOAP-ENC': 'http://schemas.xmlsoap.org/soap/encoding/',
-					'SOAP-ENV:encodingStyle':
-					'http://schemas.xmlsoap.org/soap/encoding/',
+					'SOAP-ENV:encodingStyle': 'http://schemas.xmlsoap.org/soap/encoding/',
 				})
 				.ele('SOAP-ENV:Header')
 				.up()
 				.ele('SOAP-ENV:Body')
 				.ele(`ns1:${type}`)
 			if (method === 'update') {
-				xml.ele('MSISDN', { 'xsi:type': 'xsd:string' })
-					.txt(arrRequest.msisdn)
-					.up()
+				xml.ele('MSISDN', { 'xsi:type': 'xsd:string' }).txt(arrRequest.msisdn).up()
 			}
 
-			xml.ele('SubscriberData', { 'xsi:type': 'ns1:Subscriber' })
+			xml
+				.ele('SubscriberData', { 'xsi:type': 'ns1:Subscriber' })
 				.ele('msisdn', { 'xsi:type': 'xsd:string' })
 				.txt(arrRequest.msisdn)
 				.up()
@@ -139,14 +128,7 @@ export class AcsService {
 	) {
 		try {
 			console.info(`AcsService.createUser: creating user ${strMsisdn}`)
-			objRequest =
-			objRequest ||
-			this.createSoapClientRequest(
-				'create',
-				strMsisdn,
-				strOtp,
-				countrycode
-			)
+			objRequest = objRequest || this.createSoapClientRequest('create', strMsisdn, strOtp, countrycode)
 			const { response } = await objRequest.soapClient
 
 			const xmlString = response.body
@@ -159,13 +141,13 @@ export class AcsService {
 					return
 				}
 				errorCode =
-					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0][
-						'ns1:createSubscriberResponse'
-					][0]['return'][0]['errorCode'][0]._
+					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0]['ns1:createSubscriberResponse'][0]['return'][0][
+						'errorCode'
+					][0]._
 				errorMessage =
-					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0][
-						'ns1:createSubscriberResponse'
-					][0]['return'][0]['errorMessage'][0]._
+					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0]['ns1:createSubscriberResponse'][0]['return'][0][
+						'errorMessage'
+					][0]._
 			})
 
 			if (errorCode == 0) {
@@ -179,7 +161,7 @@ export class AcsService {
 					code: 403,
 				}
 			}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			const strError = error.message
 			console.error('AcsService.createUser:', strError)
@@ -196,18 +178,10 @@ export class AcsService {
 		countrycode: string,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		objRequest?: any
-	)
-	{
+	) {
 		try {
 			console.info(`AcsService.updateUser: updating user ${strMsisdn}`)
-			objRequest =
-			objRequest ||
-			this.createSoapClientRequest(
-				'update',
-				strMsisdn,
-				strOtp,
-				countrycode
-			)
+			objRequest = objRequest || this.createSoapClientRequest('update', strMsisdn, strOtp, countrycode)
 
 			if (!objRequest.soapClient) {
 				throw new Error('soapClient is not defined in objRequest')
@@ -224,13 +198,13 @@ export class AcsService {
 					return
 				}
 				errorCode =
-					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0][
-						'ns1:updateSubscriberResponse'
-					][0]['return'][0]['errorCode'][0]._
+					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0]['ns1:updateSubscriberResponse'][0]['return'][0][
+						'errorCode'
+					][0]._
 				errorMessage =
-					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0][
-						'ns1:updateSubscriberResponse'
-					][0]['return'][0]['errorMessage'][0]._
+					result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0]['ns1:updateSubscriberResponse'][0]['return'][0][
+						'errorMessage'
+					][0]._
 			})
 
 			if (errorCode == 0) {
@@ -244,7 +218,7 @@ export class AcsService {
 					code: 403,
 				}
 			}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			const strError = error.message
 			console.error('AcsService.updateUser: error ->', strError)

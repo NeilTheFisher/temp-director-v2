@@ -1,55 +1,55 @@
 {
-  "extends": "gts/tslint.json",
-  "rules": {
-    "no-any": false,
-    "no-consecutive-blank-lines": true,
-    "linebreak-style": [true, "LF"],
-    "max-line-length": {
-      "options": [120]
-    },
-    "static-this": true,
-    "object-literal-shorthand": false,
-    "no-inferrable-types": false,
-    "quotemark": [true, "double", "jsx-double"],
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-module",
-      "check-separator",
-      "check-rest-spread",
-      "check-type",
-      "check-typecast",
-      "check-type-operator",
-      "check-preblock"
-    ]
-  },
-  "jsRules": {
-    "no-consecutive-blank-lines": true,
-    "linebreak-style": [true, "LF"],
-    "max-line-length": {
-      "options": [120]
-    },
-    "static-this": true,
-    "object-literal-shorthand": false,
-    "no-inferrable-types": false,
-    "quotemark": [true, "double", "jsx-double"],
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-module",
-      "check-separator",
-      "check-rest-spread",
-      "check-type",
-      "check-typecast",
-      "check-type-operator",
-      "check-preblock"
-    ]
-  },
-  "linterOptions": {
-    "exclude": ["**/*.json", "**/*.json.ts"]
-  }
+	"extends": "gts/tslint.json",
+	"rules": {
+		"no-any": false,
+		"no-consecutive-blank-lines": true,
+		"linebreak-style": [true, "LF"],
+		"max-line-length": {
+			"options": [120]
+		},
+		"static-this": true,
+		"object-literal-shorthand": false,
+		"no-inferrable-types": false,
+		"quotemark": [true, "double", "jsx-double"],
+		"whitespace": [
+			true,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-module",
+			"check-separator",
+			"check-rest-spread",
+			"check-type",
+			"check-typecast",
+			"check-type-operator",
+			"check-preblock"
+		]
+	},
+	"jsRules": {
+		"no-consecutive-blank-lines": true,
+		"linebreak-style": [true, "LF"],
+		"max-line-length": {
+			"options": [120]
+		},
+		"static-this": true,
+		"object-literal-shorthand": false,
+		"no-inferrable-types": false,
+		"quotemark": [true, "double", "jsx-double"],
+		"whitespace": [
+			true,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-module",
+			"check-separator",
+			"check-rest-spread",
+			"check-type",
+			"check-typecast",
+			"check-type-operator",
+			"check-preblock"
+		]
+	},
+	"linterOptions": {
+		"exclude": ["**/*.json", "**/*.json.ts"]
+	}
 }

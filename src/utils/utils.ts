@@ -7,21 +7,21 @@ import jwt from 'jsonwebtoken'
 import { Settings } from './Settings'
 
 interface ValidationResult {
-	msisdn: string;
-	code: number;
-	error: string;
-	formatted: string;
-	valid: boolean;
-	country_code: string;
+	msisdn: string
+	code: number
+	error: string
+	formatted: string
+	valid: boolean
+	country_code: string
 }
 
 interface Country {
-	code: string;
-	name: string;
-	number: number;
+	code: string
+	name: string
+	number: number
 }
 
-type CountryMap = { [code: string]: Country };
+type CountryMap = { [code: string]: Country }
 
 export async function verifyAccess(authHeader: string): Promise<string> {
 	console.log('verifyAccess')
@@ -49,7 +49,7 @@ export async function verifyAccess(authHeader: string): Promise<string> {
 export async function validateAndFormatPhoneNumber(
 	settings: Settings,
 	strMsisdn: string,
-	strCountryCode: string = '',
+	strCountryCode: string = ''
 	// boolAddCountryCode: boolean = true
 ): Promise<ValidationResult> {
 	const phoneUtil = PhoneNumberUtil.getInstance()
@@ -70,22 +70,19 @@ export async function validateAndFormatPhoneNumber(
 		const accountSid = await settings.getSystemSetting(Settings.TWILIO_ACCOUNT_SID)
 		const authToken = await settings.getSystemSetting(Settings.TWILIO_AUTH_TOKEN)
 		console.log('SID:', accountSid)
-		const response = await axios.get(
-			`https://lookups.twilio.com/v1/PhoneNumbers/+${strMsisdn}`,
-			{
-				auth: {
-					username: String(accountSid),
-					password: String(authToken),
-				},
-			}
-		)
+		const response = await axios.get(`https://lookups.twilio.com/v1/PhoneNumbers/+${strMsisdn}`, {
+			auth: {
+				username: String(accountSid),
+				password: String(authToken),
+			},
+		})
 
 		const objPhoneNumber = response.data
 		console.log('Utils.validateAndFormatPhoneNumber: response from twilio:', objPhoneNumber)
 		result.formatted = objPhoneNumber.phone_number.replace(/\D/g, '')
 		result.country_code = objPhoneNumber.country_code
 		result.valid = true
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (objException: any) {
 		console.error(
 			`Utils.validateAndFormatPhoneNumber: strMsisdn: ${strMsisdn}, error => ${objException.message}, statusCode => ${objException.code}`
@@ -103,10 +100,7 @@ export async function validateAndFormatPhoneNumber(
 			console.log('Got country ', country)
 
 			const phoneNumber = phoneUtil.parse(strMsisdn, country?.code ?? 'CA')
-			const formattedNumber = phoneUtil.format(
-				phoneNumber,
-				PhoneNumberFormat.E164
-			)
+			const formattedNumber = phoneUtil.format(phoneNumber, PhoneNumberFormat.E164)
 
 			if (phoneUtil.isValidNumberForRegion(phoneNumber, country?.code)) {
 				result.formatted = formattedNumber.replace(/\D/g, '')
@@ -118,7 +112,7 @@ export async function validateAndFormatPhoneNumber(
 				result.code = 500
 				result.valid = false
 			}
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (objException: any) {
 			console.error(
 				`Utils.validateAndFormatPhoneNumber.phoneUtil: strMsisdn: ${strMsisdn}, error => ${objException.message}`
@@ -149,6 +143,7 @@ function getCountryByNumber(countryNumber: string, countryMap: CountryMap): Coun
 			return country
 		}
 	}
+	return undefined
 }
 
 function getCountryCodesList(): CountryMap {
@@ -157,8 +152,7 @@ function getCountryCodesList(): CountryMap {
 	const arrCountryCodes: CountryMap = {}
 
 	for (const strRegion of arrRawCountryCodes) {
-		const countryCode =
-			phoneNumberUtil.getCountryCodeForRegion(strRegion)
+		const countryCode = phoneNumberUtil.getCountryCodeForRegion(strRegion)
 		const strCountryName = getCountryNameFromCode(strRegion) ?? '' // Assuming you have a function getCountryNameFromCode()
 
 		arrCountryCodes[strRegion] = {
@@ -190,14 +184,10 @@ function sortCountryCodeList(countryMap: CountryMap): CountryMap {
 	arrList.sort(([, a], [, b]) => a.number - b.number)
 
 	// Filter specific entries for countries 'ca' and 'us'
-	const specificEntries = arrList.filter(([, item]) =>
-		['ca', 'us'].includes(item.code.toLowerCase())
-	)
+	const specificEntries = arrList.filter(([, item]) => ['ca', 'us'].includes(item.code.toLowerCase()))
 
 	// Filter non-specific entries (countries other than 'ca' and 'us')
-	const nonSpecificEntries = arrList.filter(
-		([, item]) => !['ca', 'us'].includes(item.code.toLowerCase())
-	)
+	const nonSpecificEntries = arrList.filter(([, item]) => !['ca', 'us'].includes(item.code.toLowerCase()))
 
 	// Merge specific and non-specific entries and convert back to an object
 	return Object.fromEntries(specificEntries.concat(nonSpecificEntries))
@@ -216,10 +206,7 @@ export function randomString(length: number): string {
 		const bytes = randomBytes(remainingSize)
 
 		// Remove unwanted characters and concatenate to the result
-		result += Buffer.from(bytes)
-			.toString('base64')
-			.replace(/[+=.]/g, '')
-			.substr(0, remainingSize)
+		result += Buffer.from(bytes).toString('base64').replace(/[+=.]/g, '').substr(0, remainingSize)
 	}
 
 	return result

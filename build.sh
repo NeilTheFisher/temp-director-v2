@@ -11,5 +11,5 @@ tag="${tag:-0.0.0-debug}"
 tag2="${tag2:-0.0.0-${git}-debug}"
 
 docker build --build-arg json_build_info="${json_build_info}" -t summittech/summit-tech-odience-director-api:${tag} -t summittech/summit-tech-odience-director-api:${tag2} -f Dockerfile .
-docker push summittech/summit-tech-odience-director-api:${tag}
-docker push summittech/summit-tech-odience-director-api:${tag2}
+# docker push summittech/summit-tech-odience-director-api:${tag}
+# docker push summittech/summit-tech-odience-director-api:${tag2}

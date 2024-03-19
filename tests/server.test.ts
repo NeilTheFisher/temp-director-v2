@@ -1,14 +1,13 @@
 jest.mock('../src/utils/dbmanager.ts')
 
-import { DirectorApi } from '../src/server'
-import { InMemoryDatabase } from './utils/sqlite_test'
-import { User } from '../src/model/User'
-import * as Utils from '../src/utils/utils'
 import { Group } from '../src/model/Group'
-import { Role } from '../src/model/Role'
 import { GroupUser } from '../src/model/GroupUser'
 import { ModelRole } from '../src/model/ModelRole'
-
+import { Role } from '../src/model/Role'
+import { User } from '../src/model/User'
+import { DirectorApi } from '../src/server'
+import * as Utils from '../src/utils/utils'
+import { InMemoryDatabase } from './utils/sqlite_test'
 
 describe('test_routes', () => {
 	let directorApiServer: DirectorApi
@@ -41,8 +40,8 @@ describe('test_routes', () => {
 		fetch(new URL('/api/getUserInfo', 'http://127.0.0.1:12345'), {
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer invalidToken'
-			}
+				Authorization: 'Bearer invalidToken',
+			},
 		}).then((Response) => {
 			console.log('Received response -> ', Response.status, Response.statusText)
 			expect(Response.ok).toBe(false)
@@ -52,7 +51,6 @@ describe('test_routes', () => {
 	})
 
 	test('get_user_info_unknown_user', (done) => {
-
 		jest.spyOn(Utils, 'verifyAccess').mockImplementation((_a: any) => {
 			return new Promise<string>((resolve, _reject) => {
 				resolve('3')
@@ -62,8 +60,8 @@ describe('test_routes', () => {
 		fetch(new URL('/api/getUserInfo', 'http://127.0.0.1:12345'), {
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer invalidToken'
-			}
+				Authorization: 'Bearer invalidToken',
+			},
 		}).then((Response) => {
 			console.log('Received response -> ', Response.status, Response.statusText)
 			expect(Response.ok).toBe(false)
@@ -82,8 +80,8 @@ describe('test_routes', () => {
 		fetch(new URL('/api/getUserInfo', 'http://127.0.0.1:12345'), {
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer validToken'
-			}
+				Authorization: 'Bearer validToken',
+			},
 		}).then((Response) => {
 			console.log('Received response -> ', Response.status, Response.statusText)
 			if (Response.ok) {
@@ -99,16 +97,12 @@ describe('test_routes', () => {
 							pns_event_created: true,
 							pns_event_updated: true,
 							pns_event_registered: true,
-							pns_event_mention: true
+							pns_event_mention: true,
 						},
 						usersReported: [],
 						usersBlocked: [],
 						usersBlockedBy: [],
-						roles: { super_admin: false, organizations: { '1': [
-							'admin',
-							'manager',
-							'moderator'
-						] } }
+						roles: { super_admin: false, organizations: { '1': ['admin', 'manager', 'moderator'] } },
 					}
 					expect(jsonResponse).toEqual(expected)
 					done()
@@ -122,7 +116,6 @@ describe('test_routes', () => {
 		jest.restoreAllMocks()
 	})
 })
-
 
 async function fill_up_db(inMemoryDb: InMemoryDatabase) {
 	// Add some tests data
@@ -148,7 +141,7 @@ async function fill_up_db(inMemoryDb: InMemoryDatabase) {
 		verif_expir: null,
 		timezone: null,
 		avatar_url: null,
-		deleted_timestamp: null
+		deleted_timestamp: null,
 	}
 	const userLastId = await inMemoryDb.insertUser(user)
 	console.log('User created with ID:', userLastId)
@@ -161,7 +154,7 @@ async function fill_up_db(inMemoryDb: InMemoryDatabase) {
 		is_public: 0,
 		owner_id: null,
 		image_uid: null,
-		image_url: null
+		image_url: null,
 	}
 	const groupLastId = await inMemoryDb.insertGroup(group)
 	console.log('Group created with ID:', groupLastId)
@@ -169,39 +162,39 @@ async function fill_up_db(inMemoryDb: InMemoryDatabase) {
 	const userGroup: GroupUser = {
 		group_id: groupLastId,
 		user_id: userLastId,
-		id: 1
+		id: 1,
 	}
 	await inMemoryDb.insertGroupUser(userGroup)
 
 	const role1: Role = {
 		id: 1,
 		name: JSON.stringify({
-			'r': 'admin',
-			'g': 1
+			r: 'admin',
+			g: 1,
 		}),
 		guard_name: 'web',
 		created_at: new Date(),
-		updated_at: new Date()
+		updated_at: new Date(),
 	}
 	const role2: Role = {
 		id: 2,
 		name: JSON.stringify({
-			'r': 'manager',
-			'g': 1
+			r: 'manager',
+			g: 1,
 		}),
 		guard_name: 'web',
 		created_at: new Date(),
-		updated_at: new Date()
+		updated_at: new Date(),
 	}
 	const role3: Role = {
 		id: 3,
 		name: JSON.stringify({
-			'r': 'moderator',
-			'g': 1
+			r: 'moderator',
+			g: 1,
 		}),
 		guard_name: 'web',
 		created_at: new Date(),
-		updated_at: new Date()
+		updated_at: new Date(),
 	}
 	await inMemoryDb.insertRole(role1)
 	await inMemoryDb.insertRole(role2)

@@ -1,17 +1,12 @@
 import * as bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
-import { RowDataPacket } from 'mysql2'
 import { Group } from '../model/Group'
-import { GroupUser } from '../model/GroupUser'
 import { OwnedGroups } from '../model/OwnedGroups'
-import { Role } from '../model/Role'
 import { User } from '../model/User'
-import { UserBlocked } from '../model/UserBlocked'
-import { UserReported } from '../model/UserReported'
 import { DirectorApi } from '../server'
 import { AcsService } from '../utils/AcsService'
 import { DbManager } from '../utils/dbmanager'
-import { randomString, validateAndFormatPhoneNumber, verifyAccess } from '../utils/utils'
+import { randomString, validateAndFormatPhoneNumber } from '../utils/utils'
 
 export class RequestManager {
 	private directorApiServer: DirectorApi
@@ -125,9 +120,7 @@ export class RequestManager {
 						)
 					} else {
 						group = groups[0]
-						group = (await this.dbManager.updateData('group', 'id', String(group?.id), [
-							{ owner_id: userId },
-						])) as Group
+						group = (await this.dbManager.updateData('group', 'id', String(group?.id), [{ owner_id: userId }])) as Group
 						console.log('updated group, result ->', group)
 					}
 
@@ -208,171 +201,11 @@ export class RequestManager {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error(`RequestManager.odience: for msisdn: ${rawMsisdn || ''}, error => ${error.message || ''}`)
-			return res
-				.status(500)
-				.send(`Odience.index. msisdn: ${rawMsisdn || ''} failed with error: ${error.message || ''}`)
+			return res.status(500).send(`Odience.index. msisdn: ${rawMsisdn || ''} failed with error: ${error.message || ''}`)
 		}
 	}
 
 	public async getEventsList(req: Request, res: Response) {
 		console.log(req, res)
-	}
-
-	public async getUserInfo(req: Request, res: Response) {
-		console.log('RequestManager.getUserInfo:')
-		if (req.headers.authorization) {
-			const userId = await verifyAccess(req.headers.authorization)
-			console.log('Jwt verify returned userId:', userId)
-			const rows: RowDataPacket[] = (await this.dbManager.query('SELECT * FROM user WHERE id = ?', [
-				userId,
-			])) as RowDataPacket[]
-			let user: User | undefined
-			if (rows && rows.length > 0) {
-				user = rows[0] as User
-			} else {
-				return res.status(401).json('User not found or not authenticated')
-			}
-			if (!user) {
-				console.log('RequestManager.getUserInfo: Authorization failed')
-				return res.status(401).json('User not found or not authenticated')
-			}
-			let usersReported: UserReported[] = []
-			const rowsUsersReported: RowDataPacket[] = (await this.dbManager.query(
-				'SELECT * FROM users_reported_by_users where user_id = ?',
-				[userId]
-			)) as RowDataPacket[]
-			if (rowsUsersReported.length > 0) {
-				usersReported = rowsUsersReported as UserReported[]
-			}
-
-			let usersBlocked: UserBlocked[] = []
-			const rowsUsersBlocked: RowDataPacket[] = (await this.dbManager.query(
-				'SELECT * FROM users_blocked_by_users where user_id = ?',
-				[userId]
-			)) as RowDataPacket[]
-			if (rowsUsersBlocked.length > 0) {
-				usersBlocked = rowsUsersBlocked as UserBlocked[]
-			}
-
-			let usersBlockedBy: UserBlocked[] = []
-			const rowsUsersBlockedBy: RowDataPacket[] = (await this.dbManager.query(
-				'SELECT * FROM users_blocked_by_users where blocked = ?',
-				[user.msisdn]
-			)) as RowDataPacket[]
-			if (rowsUsersBlockedBy.length > 0) {
-				usersBlockedBy = rowsUsersBlockedBy as UserBlocked[]
-			}
-
-			let superAdminRoleId: number | undefined = undefined
-			const rowsRole: RowDataPacket[] = (await this.dbManager.query('SELECT * FROM role where name = ?', [
-				JSON.stringify({ r: 'super-admin', g: null }),
-			])) as RowDataPacket[]
-			if (rowsRole && rowsRole.length > 0) {
-				superAdminRoleId = (rowsRole[0] as Role).id
-			}
-
-			let hasSuperAdminRole: boolean = false
-			if (superAdminRoleId) {
-				const rowsRole: RowDataPacket[] = (await this.dbManager.query(
-					'SELECT * FROM model_has_role where role_id = ? AND model_id = ?',
-					[String(superAdminRoleId), userId]
-				)) as RowDataPacket[]
-				if (rowsRole && rowsRole.length > 0) {
-					// Simply finding a row with role_id === superAdminRoleId and our userId means it has super_admin rights
-					hasSuperAdminRole = true
-				}
-			}
-
-			const userOrganizations: number[] = []
-			const userOrganizationsRows: RowDataPacket[] = (await this.dbManager.query(
-				'SELECT * FROM group_user where user_id = ?',
-				[userId]
-			)) as RowDataPacket[]
-			if (userOrganizationsRows && userOrganizationsRows.length > 0) {
-				(userOrganizationsRows as GroupUser[]).forEach((row: GroupUser) => {
-					userOrganizations.push(row.group_id)
-				})
-			}
-
-			const organizationsRole: Record<string, string[]> = {}
-			const promises = userOrganizations.map(async (groupId: number) => {
-				// This is garbage DB structure and very hard to manage, should be changed in the future
-				console.log('Fetching roles for groupid: ', groupId)
-				const rowAdminRole: RowDataPacket[] = (await this.dbManager.query('SELECT * FROM role where name = ?', [
-					'{"r":"admin","g":' + groupId + '}',
-				])) as RowDataPacket[]
-				if (!organizationsRole[groupId]) {
-					organizationsRole[groupId] = []
-				}
-				if (rowAdminRole && rowAdminRole.length > 0) {
-					const roleAdminForGroup: Role = rowAdminRole[0] as Role
-					const rowsRole: RowDataPacket[] = (await this.dbManager.query(
-						'SELECT * FROM model_has_role where role_id = ? AND model_id = ?',
-						[String(roleAdminForGroup.id), userId]
-					)) as RowDataPacket[]
-					if (rowsRole && rowsRole.length > 0) {
-						organizationsRole[groupId].push('admin')
-					}
-				}
-				const rowManagerRole: RowDataPacket[] = (await this.dbManager.query('SELECT * FROM role where name = ?', [
-					'{"r":"manager","g":' + groupId + '}',
-				])) as RowDataPacket[]
-				if (rowManagerRole && rowManagerRole.length > 0) {
-					const roleManagerForGroup: Role = rowAdminRole[0] as Role
-					const rowsRole: RowDataPacket[] = (await this.dbManager.query(
-						'SELECT * FROM model_has_role where role_id = ? AND model_id = ?',
-						[String(roleManagerForGroup.id), userId]
-					)) as RowDataPacket[]
-					if (rowsRole && rowsRole.length > 0) {
-						organizationsRole[groupId].push('manager')
-					}
-				}
-				const rowModeratorRole: RowDataPacket[] = (await this.dbManager.query('SELECT * FROM role where name = ?', [
-					'{"r":"moderator","g":' + groupId + '}',
-				])) as RowDataPacket[]
-				if (rowModeratorRole && rowModeratorRole.length > 0) {
-					const roleModeratorForGroup: Role = rowAdminRole[0] as Role
-					const rowsRole: RowDataPacket[] = (await this.dbManager.query(
-						'SELECT * FROM model_has_role where role_id = ? AND model_id = ?',
-						[String(roleModeratorForGroup.id), userId]
-					)) as RowDataPacket[]
-					if (rowsRole && rowsRole.length > 0) {
-						organizationsRole[groupId].push('moderator')
-					}
-				}
-				console.log('RequestManager.getUserInfo: organizations=', organizationsRole)
-			})
-
-			await Promise.all(promises)
-
-			const body = JSON.stringify({
-				user_id: user.id,
-				group_id: user.personal_group_id,
-				name: user.name,
-				avatar: user.avatar_url,
-				msisdn: user.msisdn,
-				image_uid: user.image_uid,
-				pns_settings: {
-					//TODO: Fix those values, they are currently saved inside Redis, it should be moved to SQL
-					pns_event_created: true,
-					pns_event_updated: true,
-					pns_event_registered: true,
-					pns_event_mention: true,
-				},
-				usersReported: usersReported.map((user) => user.user_id),
-				usersBlocked: usersBlocked.map((user) => user.blocked),
-				usersBlockedBy: usersBlockedBy.map((user) => user.user_id),
-				roles: {
-					super_admin: hasSuperAdminRole,
-					organizations: organizationsRole,
-				},
-			})
-			res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-			res.setHeader('Pragma', 'no-cache')
-			res.setHeader('Expires', '0')
-			res.setHeader('Content-Type', 'application/json')
-			return res.status(200).send(body)
-		}
-		return res.status(401).send('No Authorization header')
 	}
 }

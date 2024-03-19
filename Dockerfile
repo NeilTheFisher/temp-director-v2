@@ -10,7 +10,7 @@ RUN npm install -g npm@latest && npm install -g eslint && npm ci
 RUN npm run lint
 RUN npm run build
 
-FROM node:21-alpine
+FROM node:21
 
 WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/package*.json ./
