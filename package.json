@@ -9,8 +9,8 @@
   "scripts": {
     "build": "rm -rf build && bun build src/app.ts --outdir build --target bun --external i18n-iso-countries",
     "dev": "bun --hot src/app.ts",
-    "format": "prettier --write --ignore-unknown .",
-    "format:check": "prettier --check .",
+    "format": "bunx prettier --write --ignore-unknown .",
+    "format:check": "bunx prettier --check .",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prepare": "husky || true",

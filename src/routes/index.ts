@@ -1,8 +1,8 @@
 import { Router } from "express"
+import event from "./event"
 import health from "./health"
 import odience from "./odience"
 import user from "./user"
-import event from "./event"
 
 const routes = Router()
 
