@@ -1,16 +1,16 @@
-import sqlite3 from 'sqlite3'
-import { Group } from '../../src/model/Group'
-import { GroupUser } from '../../src/model/GroupUser'
-import { ModelRole } from '../../src/model/ModelRole'
-import { Role } from '../../src/model/Role'
-import { User } from '../../src/model/User'
+import sqlite3 from "sqlite3"
+import { Group } from "../../src/model/Group"
+import { GroupUser } from "../../src/model/GroupUser"
+import { ModelRole } from "../../src/model/ModelRole"
+import { Role } from "../../src/model/Role"
+import { User } from "../../src/model/User"
 
 export class InMemoryDatabase {
 	private db: sqlite3.Database
 	private lastID: any
 
 	constructor() {
-		this.db = new sqlite3.Database(':memory:')
+		this.db = new sqlite3.Database(":memory:")
 	}
 
 	public getDb() {

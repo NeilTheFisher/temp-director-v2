@@ -1,6 +1,6 @@
-import * as dotenv from 'dotenv'
-import 'reflect-metadata'
-import { DirectorApi } from './server'
+import * as dotenv from "dotenv"
+import "reflect-metadata"
+import { DirectorApi } from "./server"
 
 // Load environment variables from .env file
 dotenv.config()

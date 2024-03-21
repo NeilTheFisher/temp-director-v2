@@ -1,22 +1,22 @@
-import { DataSource } from 'typeorm'
+import { DataSource } from "typeorm"
 
-let host = process.env.MYSQL_SOCKET_ADDRESS ?? 'localhost:3306'
-host = host.replace(/:\d+$/, '') // This regex removes the last : and numbers if present
+let host = process.env.MYSQL_SOCKET_ADDRESS ?? "localhost:3306"
+host = host.replace(/:\d+$/, "") // This regex removes the last : and numbers if present
 
 export const AppDataSource = new DataSource({
-	type: 'mysql',
+	type: "mysql",
 	host: host,
 	port: Number(process.env.MYSQL_SOCKET_PORT) || 3306,
-	username: process.env.MYSQL_USER ?? 'root',
-	password: process.env.MYSQL_PASSWORD ?? 'password',
-	database: process.env.MYSQL_DATABASE ?? 'db_director',
-	entities: ['build/entity/**/*.js'],
+	username: process.env.MYSQL_USER ?? "root",
+	password: process.env.MYSQL_PASSWORD ?? "password",
+	database: process.env.MYSQL_DATABASE ?? "db_director",
+	entities: ["build/entity/**/*.js"],
 })
 
 AppDataSource.initialize()
 	.then(() => {
-		console.log('Data Source has been initialized!')
+		console.log("Data Source has been initialized!")
 	})
 	.catch((err: Error) => {
-		console.error('Error during Data Source initialization', err)
+		console.error("Error during Data Source initialization", err)
 	})

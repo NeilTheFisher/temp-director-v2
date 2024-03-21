@@ -1,11 +1,13 @@
-import { Repository } from 'typeorm'
-import { AppDataSource } from '../data-source'
-import { User } from '../entity/User'
-import { UserGroupRoles } from '../entity/UserGroupRoles'
+import { Repository } from "typeorm"
+import { AppDataSource } from "../data-source"
+import { User } from "../entity/User"
+import { UserGroupRoles } from "../entity/UserGroupRoles"
+import { randomString } from "../utils/utils"
+import * as bcrypt from "bcryptjs"
+import { Role } from "../entity/Role"
 
-export class UserService {
-	readonly SUPER_ADMIN_ROLE = 'super-admin'
-
+export class UserService
+{
 	private userRepository: Repository<User>
 	private userGroupRolesRepository: Repository<UserGroupRoles>
 
@@ -22,7 +24,7 @@ export class UserService {
 		try {
 			const user = await this.userRepository.findOne({
 				where: { id: userId },
-				relations: ['usersReported', 'usersBlocked', 'usersBlockedBy', 'roles'], // Load the related usersReported
+				relations: ["usersReported", "usersBlocked", "usersBlockedBy", "roles"], // Load the related usersReported
 			})
 
 			if (!user) {
@@ -61,7 +63,7 @@ export class UserService {
 					if (boolSuperAdmin || !groupRole) {
 						return
 					}
-					if (groupRole.name == this.SUPER_ADMIN_ROLE) {
+					if (groupRole.name == Role.ROLE_SUPER_ADMIN) {
 						boolSuperAdmin = true
 						orgRoles = {}
 						return
@@ -105,5 +107,20 @@ export class UserService {
 			console.log(error)
 			return null
 		}
+	}
+
+	async createNewRegisteredUser(msisdn: string): Promise<User | null>
+	{
+		const salt = bcrypt.genSaltSync(10)
+		const password = randomString(60)
+		console.log("password generated:", password)
+		const hashedPassword = bcrypt.hashSync(password, salt)
+		const newUser = new User()
+		newUser.msisdn = msisdn
+		newUser.password = hashedPassword
+		newUser.type = "user"
+		newUser.created_at = new Date()
+		newUser.updated_at = new Date()
+		return await this.userRepository.save(newUser)
 	}
 }

@@ -1,37 +1,19 @@
-import cors from 'cors'
-import express from 'express'
-import session from 'express-session'
-import isoCountries from 'i18n-iso-countries'
-import passport from 'passport'
-import { RequestManager } from './controller/requestManager'
-import { routes as apiRoutes } from './routes/index'
-import { Settings } from './utils/Settings'
-import { DbManager } from './utils/dbmanager'
+import cors from "cors"
+import express from "express"
+import session from "express-session"
+import isoCountries from "i18n-iso-countries"
+import passport from "passport"
+import { routes as apiRoutes } from "./routes/index"
 // import https from 'https'
 // import fs from 'fs'
 
-const ROUTE_PATH_HEALTH = '/health'
-const ROUTE_PATH_PROVISIONING = '/odience'
-const ROUTE_PATH_GETEVENTSLIST = '/api/getEventsList'
 export class DirectorApi {
-	private dbManager: DbManager
-	private settings: Settings
-	private requestManager: RequestManager
 	private server: any
 
-	constructor(dbConnection: any | undefined = undefined) {
-		console.log('init directorapi rest api')
-		this.dbManager = new DbManager()
-		this.dbManager.connect(dbConnection)
-		this.settings = new Settings(this.dbManager)
-		this.requestManager = new RequestManager(this, this.dbManager)
-
+	constructor() {
+		console.log("init directorapi rest api")
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		isoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'))
-	}
-
-	public getDbManager() {
-		return this.dbManager
+		isoCountries.registerLocale(require("i18n-iso-countries/langs/en.json"))
 	}
 
 	public startServer(port: number = 3000) {
@@ -51,43 +33,12 @@ export class DirectorApi {
 		app.use(passport.initialize())
 		app.use(passport.session())
 		app.use(cors())
-		app.use('/api', apiRoutes)
-		app.get(ROUTE_PATH_HEALTH, (req, res) => {
-			res.status(200).send('OK')
-		})
-		app.get(ROUTE_PATH_PROVISIONING, (req, res) => {
-			this.requestManager
-				.odience(req, res)
-				.then(() => {
-					// Handle success if needed
-				})
-				.catch((error) => {
-					// Handle errors appropriately
-					console.error(error)
-					res.status(500).send('Internal Server Error')
-				})
-		})
-		app.get(ROUTE_PATH_GETEVENTSLIST, (req, res) => {
-			this.requestManager
-				.getEventsList(req, res)
-				.then(() => {
-					// Handle success if needed
-				})
-				.catch((error) => {
-					// Handle errors appropriately
-					console.error(error)
-					res.status(500).send('Internal Server Error')
-				})
-		})
-		this.server = app.listen(port, '0.0.0.0')
+		app.use("", apiRoutes)
+		this.server = app.listen(port, "0.0.0.0")
 		console.log(`HTTP Server is running on port ${port}`)
 	}
 
 	public async close() {
 		await this.server.close()
-	}
-
-	public getSettings() {
-		return this.settings
 	}
 }
