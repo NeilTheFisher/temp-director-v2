@@ -1,21 +1,20 @@
-FROM node:21 AS builder
+FROM oven/bun:1.0.33-alpine AS builder
 
 WORKDIR /usr/src/app
-# COPY package*.json tsconfig.json ./
-COPY .eslintignore .eslintrc.yml package*.json tsconfig.json ./
-RUN npm ci --omit=dev
-COPY src ./src
-COPY priv/public.key ./priv/public.key
-RUN npm install -g npm@latest && npm install -g eslint && npm ci
-# RUN npm run lint
-RUN npm run build
 
-FROM node:21
+COPY package.json bun.lockb ./
+RUN bun install --production
+
+COPY . .
+
+# RUN bun run lint
+RUN bun run build
+
+FROM oven/bun:1.0.33-alpine
 
 WORKDIR /usr/src/app
-COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/build ./dist
-COPY --from=builder /usr/src/app/priv/public.key ./priv/public.key
-RUN npm ci --omit=dev
+COPY --from=builder /usr/src/app/build ./
+# install external dependencies
+RUN bun add i18n-iso-countries
 
-CMD ["node", "dist/app.js"]
+CMD bun app.js

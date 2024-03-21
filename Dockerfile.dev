@@ -1,15 +1,12 @@
 ARG env
 
-FROM node:21 AS builder
+FROM oven/bun:1.0.33-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json tsconfig.json .
-
-RUN npm i
-RUN npm install -g nodemon
-RUN npm install -g typescript
+COPY package.json bun.lockb ./
+RUN bun install
 
 COPY . .
 
-CMD  [ "npm", "run", "dev"]
+CMD bun run dev
