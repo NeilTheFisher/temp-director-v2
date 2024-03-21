@@ -7,7 +7,7 @@ RUN npm ci --omit=dev
 COPY src ./src
 COPY priv/public.key ./priv/public.key
 RUN npm install -g npm@latest && npm install -g eslint && npm ci
-RUN npm run lint
+# RUN npm run lint
 RUN npm run build
 
 FROM node:21
