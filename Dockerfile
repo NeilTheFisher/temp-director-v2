@@ -13,7 +13,11 @@ RUN bun run build
 FROM oven/bun:1.0.33-alpine
 
 WORKDIR /usr/src/app
+
 COPY --from=builder /usr/src/app/build ./
+
+COPY --from=builder /usr/src/app/priv/public.key ./priv/public.key
+
 # install external dependencies
 RUN bun add i18n-iso-countries
 
