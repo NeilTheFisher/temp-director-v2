@@ -1,6 +1,8 @@
-FROM oven/bun:1.0.33-alpine AS builder
+FROM oven/bun:1.0.26-alpine AS builder
 
 WORKDIR /usr/src/app
+
+RUN apk add npm
 
 COPY package.json bun.lockb ./
 RUN bun install --production
@@ -10,7 +12,7 @@ COPY . .
 # RUN bun run lint
 RUN bun run build
 
-FROM oven/bun:1.0.33-alpine
+FROM oven/bun:1.0.26-alpine
 
 WORKDIR /usr/src/app
 
