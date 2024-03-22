@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { User } from "./User"
+// Hack to avoid circular dependency - `type` is needed for the import
+import { User as User2, type User } from "./User"
 
 @Entity("users_reported_by_users")
 export class UsersReported {
@@ -15,7 +16,7 @@ export class UsersReported {
   @Column({ type: "timestamp", nullable: true })
   date: Date | null
 
-  @ManyToOne(() => User, (user: User) => user.usersReported)
+  @ManyToOne(() => User2, (user: User) => user.usersReported)
   @JoinColumn({ name: "user_id", referencedColumnName: "id" }) // Define the foreign key
   user: User
 }

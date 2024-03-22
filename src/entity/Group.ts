@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm"
 import { Role } from "./Role"
-import { User } from "./User"
+import { User as User2, type User } from "./User"
 
 @Entity("group")
 export class Group {
@@ -37,11 +37,11 @@ export class Group {
   image_uid: string | null
 
   // Define Many-to-Many relationship with User
-  @ManyToMany(() => User, (user: User) => user.groups)
+  @ManyToMany(() => User2, (user: User) => user.groups)
   @JoinTable()
   users: User[]
 
-  @ManyToOne(() => User, (user: User) => user.ownedGroups)
+  @ManyToOne(() => User2, (user: User) => user.ownedGroups)
   @JoinColumn({ name: "owner_id", referencedColumnName: "id" }) // Define the foreign key
   owner: User
 
