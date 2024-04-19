@@ -7,3 +7,5 @@ tslint.json
 README.md
 jest.config.js
 .prettierrc.json
+tsconfig.tsbuildinfo
+odienceapis

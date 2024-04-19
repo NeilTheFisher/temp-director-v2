@@ -28,7 +28,7 @@ set -xe
 protoc_exec="npx"
 protoc_path="$(bun pm bin)/protoc-gen-ts"
 if is_windows; then
-    protoc_path+=.cmd
+    protoc_path+=.exe
 fi
 
 echo "protoc-gen-ts path: $protoc_path"

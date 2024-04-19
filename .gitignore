@@ -3,3 +3,4 @@ node_modules
 generated-protos
 .vscode/*
 !.vscode/extensions.json
+tsconfig.tsbuildinfo

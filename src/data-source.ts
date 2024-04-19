@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   username: process.env.MYSQL_USER ?? "root",
   password: process.env.MYSQL_PASSWORD ?? "password",
   database: process.env.MYSQL_DATABASE ?? "db_director",
-  entities: ["build/entity/**/*.js"],
+  entities: ["build/entity/**/*.js", "entity/**/*.js"],
 })
 
 AppDataSource.initialize()

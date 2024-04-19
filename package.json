@@ -7,10 +7,10 @@
   "author": "",
   "main": "build/app.js",
   "scripts": {
-    "build": "rm -rf build && bun build src/app.ts --outdir build --target bun --external i18n-iso-countries && ./generate_proto_web.sh",
-    "dev": "bun --hot src/app.ts",
-    "format": "bunx prettier --write --ignore-unknown .",
-    "format:check": "bunx prettier --check .",
+    "build": "tsc && sh generate_proto_web.sh",
+    "dev": "nodemon --watch src --ext ts --exec \"tsc --incremental && bun build/app.js\"",
+    "format": "prettier --write --ignore-unknown .",
+    "format:check": "prettier --check .",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prepare": "husky || true",
@@ -64,6 +64,8 @@
     "@types/xml2js": "^0.4.14",
     "husky": "^9.0.11",
     "jest": "^29.7.0",
+    "lint-staged": "^15.2.2",
+    "nodemon": "^3.1.0",
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.2"

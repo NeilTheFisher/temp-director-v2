@@ -1,6 +1,6 @@
 ARG env
 
-FROM oven/bun:1.0.33-alpine
+FROM oven/bun:1.1.4-alpine
 
 WORKDIR /usr/src/app
 
@@ -12,4 +12,5 @@ RUN bun install
 COPY . .
 
 RUN bun run build
+
 CMD bun run dev
