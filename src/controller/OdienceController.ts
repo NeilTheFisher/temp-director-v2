@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { OdienceService } from "../services/OdienceService"
+import { validateAndFormatPhoneNumber } from "../utils/utils"
 
 const odienceService = new OdienceService()
 class OdienceController {
@@ -20,6 +21,26 @@ class OdienceController {
         .send(
           `OdienceController.odience. msisdn: ${rawMsisdn || ""} failed with error: ${error.message || ""}`
         )
+    }
+  }
+  public static validatePhoneNumber = async (req: Request, res: Response) => {
+    const msisdn = req.params.msisdn
+    const country_code = req.params.country_code
+    console.log(`OdienceController.validatePhoneNumber: msisdn: ${msisdn || ""}`)
+    if(!msisdn)
+    {
+      return res
+        .status(500)
+        .send(
+          `OdienceController.validatePhoneNumber. msisdn: ${msisdn || ""} country_code: ${country_code || ""} failed with error: missing request params`
+        )
+    }
+    else
+    {
+      const objResponse =  await validateAndFormatPhoneNumber(msisdn, country_code)
+      return (objResponse.code || 0) !== 200
+        ? res.status(objResponse.code || 500).send(objResponse || "")
+        : res.send(objResponse)
     }
   }
 }
