@@ -91,6 +91,7 @@ export class UserService {
           avatar: user.avatar_url,
           msisdn: user.msisdn,
           image_uid: user.image_uid,
+          account_type: user.account_type,
           pns_settings: {
             //TODO: Fix those values, they are currently saved inside Redis, it should be moved to SQL
             pns_event_created: true,
