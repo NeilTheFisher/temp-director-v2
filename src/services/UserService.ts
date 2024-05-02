@@ -5,6 +5,7 @@ import { Role } from "../entity/Role"
 import { User } from "../entity/User"
 import { UserGroupRoles } from "../entity/UserGroupRoles"
 import { randomString } from "../utils/utils"
+import { $ } from "bun"
 
 export class UserService {
   private userRepository: Repository<User>
@@ -17,7 +18,6 @@ export class UserService {
 
   async getUserInfo(userId: number): Promise<any> {
     const reportedUsers = []
-    const blockedUsers = []
     let boolSuperAdmin = false
     let orgRoles: { [key: number]: string[] } = {}
     try {
@@ -35,7 +35,14 @@ export class UserService {
 
         //get blocked users
         const blockedUsersObjects = user.usersBlocked || []
-        blockedUsers.push(...blockedUsersObjects.map((blockedUser) => blockedUser.blocked))
+        const blockedUsers = await Promise.all(
+          blockedUsersObjects.map(async (user) => {
+            const userBlocked = await this.userRepository.findOne({
+              where: { msisdn: user.blocked },
+            })
+            return userBlocked ? {id: userBlocked.msisdn, name: userBlocked.name, avatar: userBlocked.avatar_url, sip: `+${userBlocked.msisdn}`, type: "user"} : null
+          })
+        )
 
         //get users blocked by
         const blockedByUsersObjects = user.usersBlockedBy || []
