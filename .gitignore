@@ -4,5 +4,3 @@ generated-protos
 .vscode/*
 !.vscode/extensions.json
 tsconfig.tsbuildinfo
-# Sentry Config File
-.sentryclirc
