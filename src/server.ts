@@ -1,5 +1,6 @@
 import cors from "cors"
 import express from "express"
+import * as Sentry from "@sentry/node"
 import session from "express-session"
 import isoCountries from "i18n-iso-countries"
 import passport from "passport"
@@ -18,6 +19,25 @@ export class DirectorApi {
 
   public startServer(port = 3000) {
     const app = express()
+
+    Sentry.init({
+      dsn: "https://0e04ee19d93852508924c8b576c80978@sentry.erl.rcs.st/2",
+      integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Sentry.Integrations.Express({ app }),
+      ],
+      // Performance Monitoring
+      tracesSampleRate: 1.0, //  Capture 100% of the transactions
+    })
+    // The request handler must be the first middleware on the app
+    app.use(Sentry.Handlers.requestHandler())
+    // TracingHandler creates a trace for every incoming request
+    app.use(Sentry.Handlers.tracingHandler())
+    // The error handler must be registered before any other error middleware and after all controllers
+    app.use(Sentry.Handlers.errorHandler())
+
     app.use(
       session({
         secret: String(process.env.SESSION_SECRET),
