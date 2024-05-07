@@ -18,6 +18,7 @@
     "test": "jest --detectOpenHandles"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.569.0",
     "@protobuf-ts/grpcweb-transport": "^2.9.4",
     "@protobuf-ts/plugin": "^2.9.4",
     "@protobuf-ts/runtime": "^2.9.4",
