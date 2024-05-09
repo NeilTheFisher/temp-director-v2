@@ -115,6 +115,12 @@ export class UserService {
       return null
     }
   }
+  async getUserInfoByMsisdn(msisdn: string): Promise<{id: string, sip: string, role: string, avatar: string, type: string, name: string} | null>
+  {
+    const user = await this.userRepository.findOne({
+      where: { msisdn: msisdn }})
+    return !user ? null :{id: String(msisdn), name: String(user.name), avatar: String(user.avatar_url), type: "standard", role: "user", sip: `+${msisdn}`}
+  }
 
   async createNewRegisteredUser(msisdn: string): Promise<User | null> {
     const salt = bcrypt.genSaltSync(10)
