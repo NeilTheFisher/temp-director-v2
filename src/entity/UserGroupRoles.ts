@@ -3,14 +3,14 @@ import { User } from "./User"
 
 @Entity("roles_user_group")
 export class UserGroupRoles {
-  @PrimaryColumn({ type: "int", width: 20, unsigned: true })
-  user_id: number
+  @PrimaryColumn({ name: "user_id", type: "int", width: 20, unsigned: true })
+  userId: number
 
-  @Column({ type: "int", width: 20, unsigned: true, nullable: true })
-  group_id: number | null
+  @Column({ name: "group_id", type: "int", width: 20, unsigned: true, nullable: true })
+  groupId: number | null
 
-  @PrimaryColumn({ type: "int", width: 20, unsigned: true })
-  role_id: number
+  @PrimaryColumn({ name: "role_id", type: "int", width: 20, unsigned: true })
+  roleId: number
 
   @ManyToMany(() => User, (user) => user.roles)
   users: User[]

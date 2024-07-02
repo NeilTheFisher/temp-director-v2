@@ -25,10 +25,10 @@ export class GroupService {
   async setupPersonalGroup(user: User): Promise<any> {
     try {
       let group = null
-      if (user.personal_group_id != null) {
-        group = await this.groupRepository.findOneBy({ id: user.personal_group_id })
+      if (user.personalGroupId != null) {
+        group = await this.groupRepository.findOneBy({ id: user.personalGroupId })
         if (group) {
-          group.owner_id = user.id
+          group.ownerId = user.id
           group = await this.groupRepository.save(group)
           await this.associateOwnerGroup(group, user)
         }
@@ -48,7 +48,7 @@ export class GroupService {
 
           const newGroup = new Group()
           newGroup.name = name
-          newGroup.owner_id = user.id
+          newGroup.ownerId = user.id
           group = await this.groupRepository.save(newGroup)
           await this.associateOwnerGroup(group, user)
         } else {
@@ -68,16 +68,16 @@ export class GroupService {
   }
 
   async associateOwnerGroup(group: Group, user: User): Promise<Group> {
-    user.personal_group_id = group.id
+    user.personalGroupId = group.id
     await this.userRepository.save(user)
     const groupUser = await this.groupUserRepository.findOneBy({
-      group_id: group.id,
-      user_id: user.id,
+      groupId: group.id,
+      userId: user.id,
     })
     if (!groupUser) {
       const newGroupUser = new GroupUser()
-      newGroupUser.user_id = user.id
-      newGroupUser.group_id = group.id
+      newGroupUser.userId = user.id
+      newGroupUser.groupId = group.id
       await this.groupUserRepository.save(newGroupUser)
       await this.assignGroupRole(group, user, Role.ROLE_ADMIN)
     }
@@ -88,16 +88,16 @@ export class GroupService {
     const role = await this.roleRepository.findOneBy({ name: roleName })
     if (role) {
       const userRoleGroup = await this.userGroupRolesRepository.findOneBy({
-        role_id: role.id,
-        user_id: user.id,
-        group_id: group.id,
+        roleId: role.id,
+        userId: user.id,
+        groupId: group.id,
       })
       if (!userRoleGroup) {
         console.log(`Role ${roleName} assigned to a user ${user.id}`)
         const userRoleGroup = new UserGroupRoles()
-        userRoleGroup.user_id = user.id
-        userRoleGroup.group_id = group.id
-        userRoleGroup.role_id = role.id
+        userRoleGroup.userId = user.id
+        userRoleGroup.groupId = group.id
+        userRoleGroup.roleId = role.id
         await this.userGroupRolesRepository.save(userRoleGroup)
       }
     }

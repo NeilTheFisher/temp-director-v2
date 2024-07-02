@@ -1,22 +1,21 @@
-import { Column, Entity, PrimaryColumn } from "typeorm"
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("setting")
 export class Setting {
-  @PrimaryColumn({ type: "int", width: 20, unsigned: true })
-  id: number
+  @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
+  id: number;
 
-  @Column({ type: "varchar", length: 191 })
-  key: string
+  @Column("varchar", { name: "key", length: 191 })
+  key: string;
 
-  @Column({ type: "longtext", nullable: true })
-  value: string | null
+  @Column("longtext", { name: "value", nullable: true })
+  value: string | null;
 
-  @Column({ type: "int", width: 20, unsigned: true, nullable: true })
-  configurable_id: number | null
+  @Column("varchar", { name: "configurable_type", nullable: true, length: 191 })
+  configurableType: string | null;
 
-  @Column({ type: "varchar", length: 191, nullable: true })
-  configurable_type: string | null
-
+  @Column("bigint", { name: "configurable_id", nullable: true, unsigned: true })
+  configurableId: string | null;
   private static loadedSettings: Map<string, string> = new Map()
 
   static getLoadedSettings(): Map<string, string> {

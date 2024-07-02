@@ -33,3 +33,7 @@ _Certificates_
 The repo currently contains self-signed certificates which should NOT be used in production.
 
 ANOTHER SUPER IMPORTANT TODO, the private key and public key for the jwt are currently comitted inside Director's repo. Here we only have the public key. Still those keys should be generated at deploy time inside Terraform.
+
+_ORM entities generation_
+- Install: npm i -g typeorm-model-generator
+- Generate: (replace user/pass/db/path if needed) typeorm-model-generator -h localhost -d db_spotlight -u admin -x admin -e mysql -p 3306 -o . && mv ./entities/* src/entity/ && rm -rf entities

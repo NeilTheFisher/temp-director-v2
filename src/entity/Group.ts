@@ -1,42 +1,68 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from "typeorm"
-import { Role } from "./Role"
-import { User as User2, type User } from "./User"
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { GroupStream } from "./GroupStream";
+import { EventGroup } from "./EventGroup";
+import { MediaContent } from "./MediaContent";
+import { AddressListGroup } from "./AddressListGroup";
+import { DeviceGroup } from "./DeviceGroup";
+import { Controller } from "./Controller";
+import { ProPublisher } from "./ProPublisher";
+import { GroupTemplate } from "./GroupTemplate";
+import { Role } from "./Role";
+import { User as User2, type User } from "./User";
 
 @Entity("group")
 export class Group {
-  @PrimaryGeneratedColumn({ type: "int", unsigned: true })
-  id: number
+  @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
+  id: number;
 
-  @Column({ type: "varchar", length: 191, unique: true })
-  name: string
+  @Column("varchar", { name: "name", length: 191 })
+  name: string;
 
-  @Column({ type: "int", width: 11, default: () => "UNIX_TIMESTAMP()" })
-  created_at: number
+  @Column("int", { name: "created_at", default: () => "UNIX_TIMESTAMP()" })
+  createdAt: number;
 
-  @Column({ type: "int", width: 11, default: () => "UNIX_TIMESTAMP()" })
-  updated_at: number
+  @Column("int", { name: "updated_at", default: () => "UNIX_TIMESTAMP()" })
+  updatedAt: number;
 
-  @Column({ type: "tinyint", width: 1, default: 0 })
-  is_public: number
+  @Column("tinyint", { name: "is_public", nullable: true, width: 1, default: 0 })
+  isPublic: boolean | null;
 
-  @Column({ type: "int", width: 20, unsigned: true, nullable: true })
-  owner_id: number | null
+  @Column("bigint", { name: "owner_id", nullable: true, unsigned: true })
+  ownerId: number | null;
 
-  @Column({ type: "varchar", length: 191, nullable: true })
-  image_url: string | null
+  @Column("char", { name: "image_uid", nullable: true, length: 36 })
+  imageUid: string | null;
 
-  @Column({ type: "char", length: 36, nullable: true })
-  image_uid: string | null
+  @Column("varchar", { name: "image_url", nullable: true, length: 191 })
+  imageUrl: string | null;
 
-  // Define Many-to-Many relationship with User
+  @OneToMany(() => GroupStream, (groupStream) => groupStream.group)
+  groupStreams: GroupStream[];
+
+  @OneToMany(() => EventGroup, (eventGroup) => eventGroup.group)
+  eventGroups: EventGroup[];
+
+  @OneToMany(() => MediaContent, (mediaContent) => mediaContent.group)
+  mediaContents: MediaContent[];
+
+  @OneToMany(
+    () => AddressListGroup,
+    (addressListGroup) => addressListGroup.group
+  )
+  addressListGroups: AddressListGroup[];
+
+  @OneToMany(() => DeviceGroup, (deviceGroup) => deviceGroup.group)
+  deviceGroups: DeviceGroup[];
+
+  @OneToMany(() => Controller, (controller) => controller.group)
+  controllers: Controller[];
+
+  @OneToMany(() => ProPublisher, (proPublisher) => proPublisher.group)
+  proPublishers: ProPublisher[];
+
+  @OneToMany(() => GroupTemplate, (groupTemplate) => groupTemplate.group)
+  groupTemplates: GroupTemplate[];
+
   @ManyToMany(() => User2, (user: User) => user.groups)
   @JoinTable()
   users: User[]

@@ -50,9 +50,9 @@ export class OdienceService {
       user = await this.userRepository.findOneBy({ msisdn: msisdn })
       console.log(
         "OdienceService.provisionUser: user.otp_created_at: ",
-        user?.otp_created_at,
+        user?.otpCreatedAt,
         ", ",
-        user?.otp_created_at ? new Date(user.otp_created_at).getTime() : "N/A"
+        user?.otpCreatedAt ? new Date(user.otpCreatedAt).getTime() : "N/A"
       )
       console.log(
         "OdienceService.provisionUser: Date.now           : ",
@@ -62,7 +62,7 @@ export class OdienceService {
       )
       if (
         user &&
-        (!user?.otp_created_at || new Date(user?.otp_created_at).getTime() < new Date().getTime())
+        (!user?.otpCreatedAt || new Date(user?.otpCreatedAt).getTime() < new Date().getTime())
       ) {
         console.log("OdienceService.provisionUser: otp_created_at was done earlier or is undefined")
         const otp = randomString(60)
@@ -71,9 +71,9 @@ export class OdienceService {
         const hashedOtp = bcrypt.hashSync(otp, salt)
 
         user.otp = hashedOtp
-        user.otp_created_at = new Date()
-        user.is_deleted = 0
-        user.deleted_timestamp = null
+        user.otpCreatedAt = new Date()
+        user.isDeleted = false
+        user.deletedTimestamp = null
 
         user = await this.userRepository.save(user)
         const acsService = new AcsService()

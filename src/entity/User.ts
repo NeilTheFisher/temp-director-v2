@@ -1,87 +1,101 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm"
-import { Group } from "./Group"
-import { Role } from "./Role"
-import { UsersBlocked } from "./UsersBlocked"
-import { UsersReported } from "./UsersReported"
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { EventUser } from "./EventUser";
+import { ModelLogs } from "./ModelLogs";
+import { SessionLogs } from "./SessionLogs";
+import { StreamUrlToken } from "./StreamUrlToken";
+import { EventRequests } from "./EventRequests";
+import { Group } from "./Group";
+import { Role } from "./Role";
+import { UsersBlocked } from "./UsersBlocked";
+import { UsersReported } from "./UsersReported";
 
 @Entity("user")
 export class User {
-  @PrimaryGeneratedColumn({ type: "int", unsigned: true })
-  id: number
+  @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
+  id: number;
 
-  @Column({ type: "varchar", length: 191, unique: true, nullable: true })
-  name: string | null
+  @Column("varchar", { name: "name", nullable: true, length: 191 })
+  name: string | null;
 
-  @Column({ type: "varchar", length: 191, unique: true, nullable: true })
-  email: string | null
+  @Column("varchar", { name: "email", nullable: true, length: 191 })
+  email: string | null;
 
-  @Column({ type: "timestamp", nullable: true })
-  email_verified_at: Date | null
+  @Column("timestamp", { name: "email_verified_at", nullable: true })
+  emailVerifiedAt: Date | null;
 
-  @Column({ type: "varchar", length: 191 })
-  password: string
+  @Column("varchar", { name: "password", length: 191 })
+  password: string;
 
-  @Column({ type: "varchar", length: 100 })
-  remember_token: string
+  @Column("varchar", { name: "remember_token", nullable: true, length: 100 })
+  rememberToken: string | null;
 
-  @Column({ type: "timestamp", nullable: true })
-  created_at: Date | null
+  @Column("timestamp", { name: "created_at", nullable: true })
+  createdAt: Date | null;
 
-  @Column({ type: "timestamp", nullable: true })
-  updated_at: Date | null
+  @Column("timestamp", { name: "updated_at", nullable: true })
+  updatedAt: Date | null;
 
-  @Column({ type: "int", width: 11, nullable: true })
-  created_by: number | null
+  @Column("int", { name: "created_by", nullable: true })
+  createdBy: number | null;
 
-  @Column({ type: "varchar", length: 191, unique: true })
-  msisdn: string
+  @Column("varchar", { name: "msisdn", nullable: true, length: 191, unique: true})
+  msisdn: string;
 
-  @Column({ type: "varchar", length: 191, nullable: true })
-  otp: string | null
+  @Column("varchar", { name: "otp", nullable: true, length: 191 })
+  otp: string | null;
 
-  @Column({ type: "timestamp", nullable: true })
-  otp_created_at: Date | null
+  @Column("timestamp", { name: "otp_created_at", nullable: true })
+  otpCreatedAt: Date | null;
 
-  @Column({ type: "int", width: 20, unsigned: true, nullable: true })
-  personal_group_id: number | null
+  @Column("bigint", {
+    name: "personal_group_id",
+    nullable: true,
+    unsigned: true,
+  })
+  personalGroupId: number | null;
 
-  @Column({ type: "char", length: 36, nullable: true })
-  image_uid: string | null
+  @Column("char", { name: "image_uid", nullable: true, length: 36 })
+  imageUid: string | null;
 
-  @Column({ type: "int", width: 11, nullable: true })
-  verif_code: number | null
+  @Column("int", { name: "verif_code", nullable: true })
+  verifCode: number | null;
 
-  @Column({ type: "timestamp", nullable: true })
-  verif_expir: Date | null
+  @Column("timestamp", { name: "verif_expir", nullable: true })
+  verifExpir: Date | null;
 
-  @Column({ type: "varchar", length: 191, default: "user" })
-  type: string
+  @Column("varchar", { name: "type", length: 191, default: () => "user" })
+  type: string;
 
-  @Column({ type: "varchar", length: 191, nullable: true })
-  timezone: string | null
+  @Column("varchar", { name: "timezone", nullable: true, length: 191 })
+  timezone: string | null;
 
-  @Column({ type: "varchar", length: 191, nullable: true })
-  avatar_url: string | null
+  @Column("varchar", { name: "avatar_url", nullable: true, length: 191 })
+  avatarUrl: string | null;
 
-  @Column({ type: "int", width: 11, default: 1 })
-  account_type: number
+  @Column("int", { name: "account_type", default: () => "'1'" })
+  accountType: number;
 
-  @Column({ type: "tinyint", width: 1, default: 0 })
-  is_deleted: number
+  @Column("tinyint", { name: "is_deleted", width: 1, default: () => 0 })
+  isDeleted: boolean;
 
-  @Column({ type: "int", width: 11, nullable: true })
-  deleted_timestamp: number | null
+  @Column("int", { name: "deleted_timestamp", nullable: true })
+  deletedTimestamp: number | null;
 
-  // Define Many-to-Many relationship with Group
+  @OneToMany(() => EventUser, (eventUser) => eventUser.user)
+  eventUsers: EventUser[];
+
+  @OneToMany(() => ModelLogs, (modelLogs) => modelLogs.user)
+  modelLogs: ModelLogs[];
+
+  @OneToMany(() => SessionLogs, (sessionLogs) => sessionLogs.user)
+  sessionLogs: SessionLogs[];
+
+  @OneToMany(() => StreamUrlToken, (streamUrlToken) => streamUrlToken.user)
+  streamUrlTokens: StreamUrlToken[];
+
+  @OneToMany(() => EventRequests, (eventRequests) => eventRequests.user)
+  eventRequests: EventRequests[];
+
   @ManyToMany(() => Group, (group: Group) => group.users)
   @JoinTable()
   groups: Group[]

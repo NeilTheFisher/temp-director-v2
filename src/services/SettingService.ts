@@ -18,7 +18,7 @@ export class SettingService {
     }
     console.log(`fetching value for ${settingName} from DB`)
     const settingObject = await this.settingRepository.findOne({
-      where: { key: settingName, configurable_type: IsNull(), configurable_id: IsNull() },
+      where: { key: settingName, configurableType: IsNull(), configurableId: IsNull() },
     })
     const value = settingObject ? settingObject.value : null
 

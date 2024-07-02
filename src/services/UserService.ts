@@ -40,7 +40,7 @@ export class UserService {
             const userBlocked = await this.userRepository.findOne({
               where: { msisdn: user.blocked },
             })
-            return userBlocked ? {id: userBlocked.msisdn, name: userBlocked.name, avatar: userBlocked.avatar_url, sip: `+${userBlocked.msisdn}`, type: "user"} : null
+            return userBlocked ? {id: userBlocked.msisdn, name: userBlocked.name, avatar: userBlocked.avatarUrl, sip: `+${userBlocked.msisdn}`, type: "user"} : null
           })
         )
 
@@ -60,9 +60,9 @@ export class UserService {
         const userRoles = await Promise.all(
           userRolesObject.map(async (role) => {
             const roleGroupObject = await this.userGroupRolesRepository.findOne({
-              where: { role_id: role.id, user_id: userId },
+              where: { roleId: role.id, userId: userId },
             })
-            return roleGroupObject ? { groupId: roleGroupObject.group_id, name: role.name } : null
+            return roleGroupObject ? { groupId: roleGroupObject.groupId, name: role.name } : null
           })
         )
         userRoles.forEach((groupRole) => {
@@ -86,12 +86,12 @@ export class UserService {
 
         const result = {
           user_id: user.id,
-          group_id: user.personal_group_id,
+          group_id: user.personalGroupId,
           name: user.name,
-          avatar: user.avatar_url,
+          avatar: user.avatarUrl,
           msisdn: user.msisdn,
-          image_uid: user.image_uid,
-          account_type: user.account_type,
+          image_uid: user.imageUid,
+          account_type: user.accountType,
           pns_settings: {
             //TODO: Fix those values, they are currently saved inside Redis, it should be moved to SQL
             pns_event_created: true,
@@ -119,7 +119,7 @@ export class UserService {
   {
     const user = await this.userRepository.findOne({
       where: { msisdn: msisdn }})
-    return !user ? null :{id: String(msisdn), name: String(user.name), avatar: String(user.avatar_url), type: "standard", role: "user", sip: `+${msisdn}`}
+    return !user ? null :{id: String(msisdn), name: String(user.name), avatar: String(user.avatarUrl), type: "standard", role: "user", sip: `+${msisdn}`}
   }
 
   async createNewRegisteredUser(msisdn: string): Promise<User | null> {
@@ -131,8 +131,8 @@ export class UserService {
     newUser.msisdn = msisdn
     newUser.password = hashedPassword
     newUser.type = "user"
-    newUser.created_at = new Date()
-    newUser.updated_at = new Date()
+    newUser.createdAt = new Date()
+    newUser.updatedAt = new Date()
     return await this.userRepository.save(newUser)
   }
 }

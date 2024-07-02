@@ -7,8 +7,8 @@ export class UsersReported {
   @PrimaryGeneratedColumn({ type: "int", unsigned: true })
   id: number
 
-  @Column({ type: "int", width: 20, unsigned: true })
-  user_id: number
+  @Column({ name: "user_id", type: "int", width: 20, unsigned: true })
+  userId: number
 
   @Column({ type: "varchar", length: 191, unique: true })
   reported: string

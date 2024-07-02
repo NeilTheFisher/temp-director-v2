@@ -1,10 +1,10 @@
-import { Entity, PrimaryColumn } from "typeorm"
+import { PrimaryColumn, Entity } from "typeorm";
 
 @Entity("group_user")
 export class GroupUser {
-  @PrimaryColumn()
-  user_id: number
+  @PrimaryColumn("bigint", { name: "group_id", unsigned: true })
+  groupId: number;
 
-  @PrimaryColumn()
-  group_id: number
+  @PrimaryColumn("bigint", { name: "user_id", unsigned: true })
+  userId: number;
 }
