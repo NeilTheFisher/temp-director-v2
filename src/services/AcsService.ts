@@ -153,7 +153,7 @@ export class AcsService {
       })
 
       if (errorCode == 0) {
-        return { message: `User ${strMsisdn} provisioned`, code: 200 }
+        return { message: `User ${strMsisdn} provisioned`, code: 201 }
       } else {
         console.error(
           `AcsService.createUser: Provisioning failed for MSISDN:${strMsisdn} with code: ${errorCode}, message: ${errorMessage} (Retry later)`

@@ -11,9 +11,7 @@ class OdienceController {
     const rawMsisdn: string = (req.query["msisdn"] ?? "") as string
     try {
       const objResponse = await odienceService.provisionUser(req, res, rawMsisdn)
-      return (objResponse.code || 0) !== 200
-        ? res.status(objResponse.code || 500).send(objResponse.message || "")
-        : res.send(objResponse.message || "")
+      return res.status(objResponse.code).send(objResponse.message || "");
     } catch (error: any) {
       console.error(
         `OdienceController.odience: for msisdn: ${rawMsisdn || ""}, error => ${error.message || ""}`
