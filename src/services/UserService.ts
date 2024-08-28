@@ -88,6 +88,7 @@ export class UserService {
           user_id: user.id,
           group_id: user.personalGroupId,
           name: user.name,
+          email: String(user.email),
           avatar: user.avatarUrl,
           msisdn: user.msisdn,
           image_uid: user.imageUid,
