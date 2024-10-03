@@ -8,6 +8,7 @@ import { Group } from "./Group";
 import { Role } from "./Role";
 import { UsersBlocked } from "./UsersBlocked";
 import { UsersReported } from "./UsersReported";
+import { EmailUser } from "./EmailUser";
 
 @Entity("user")
 export class User {
@@ -115,6 +116,9 @@ export class User {
 
   @OneToMany(() => UsersBlocked, (usersBlocked) => usersBlocked.blockedByUser)
   usersBlockedBy: UsersBlocked[]
+
+  @OneToMany(() => EmailUser, (email) => email.user)
+  emails: EmailUser[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable({

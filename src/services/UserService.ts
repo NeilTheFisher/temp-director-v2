@@ -23,7 +23,7 @@ export class UserService {
     try {
       const user = await this.userRepository.findOne({
         where: { id: userId },
-        relations: ["usersReported", "usersBlocked", "usersBlockedBy", "roles"], // Load the related usersReported
+        relations: ["usersReported", "usersBlocked", "usersBlockedBy", "roles", 'emails'], // Load the related usersReported
       })
 
       if (!user) {
@@ -54,6 +54,12 @@ export class UserService {
             return blockedUser ? blockedUser.msisdn : null
           })
         )
+
+        const emailsObjects = user.emails || []
+        const userEmails: string[]  = [];
+        emailsObjects.forEach((email) => {
+          userEmails.push(email.email);
+        })
 
         //get user roles with org id if super admin org roles is empty
         const userRolesObject = user.roles || []
@@ -89,6 +95,7 @@ export class UserService {
           group_id: user.personalGroupId,
           name: user.name,
           email: String(user.email),
+          emails: userEmails,
           avatar: user.avatarUrl,
           msisdn: user.msisdn,
           image_uid: user.imageUid,
