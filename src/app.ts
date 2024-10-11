@@ -1,10 +1,18 @@
+import * as Sentry from "@sentry/bun"
 import * as dotenv from "dotenv"
 import "reflect-metadata"
 import { DirectorApi } from "./server"
-import * as Sentry from "@sentry/bun"
 
 // Load environment variables from .env file
 dotenv.config()
+
+if (process.argv[2] && process.argv[2] === "test") {
+  console.log('"test" passed as argument, will close the server in 1 second')
+  setTimeout(() => {
+    directorApiServer.close()
+    process.exit(0)
+  }, 1000)
+}
 
 // const LISTEN_PORT = Number(process.env.HTTP_PORT) ?? 3000;
 const LISTEN_PORT = process.env.HTTP_PORT ? Number(process.env.HTTP_PORT) : 3000
