@@ -14,9 +14,10 @@ import { ProPublisher } from "./ProPublisher";
 import { Device } from "./Device";
 
 @Index("stream_code_unique", ["code"], { unique: true })
-@Index("stream_propublisher_id_foreign", ["propublisherId"], {})
 @Entity("stream")
 export class Stream {
+  public static CLASS_NAME = "App\Models\Class"
+
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
   id: number;
 
@@ -101,9 +102,6 @@ export class Stream {
   })
   accessType: string;
 
-  @Column("bigint", { name: "propublisher_id", nullable: true, unsigned: true })
-  propublisherId: number | null;
-
   @Column("varchar", { name: "propublisher_uid", nullable: true, length: 191 })
   propublisherUid: string | null;
 
@@ -120,7 +118,7 @@ export class Stream {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })
-  @JoinColumn([{ name: "propublisher_id", referencedColumnName: "id" }])
+  @JoinColumn([{ name: "propublisher_uid", referencedColumnName: "uid" }])
   propublisher: ProPublisher;
 
   @OneToMany(() => Device, (device) => device.stream)

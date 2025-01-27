@@ -11,6 +11,9 @@ import { User } from "./User";
 @Index("stream_url_token_user_id_index", ["userId"], {})
 @Entity("stream_url_token")
 export class StreamUrlToken {
+
+  public static EXPIRATION_INTERVAL = 3600
+
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
   id: number;
 
@@ -21,7 +24,7 @@ export class StreamUrlToken {
   userId: number;
 
   @Column("bigint", { name: "date" })
-  date: string;
+  date: number;
 
   @Column("int", { name: "duration", nullable: true })
   duration: number | null;

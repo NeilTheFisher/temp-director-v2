@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.669.0",
+    "@aws-sdk/client-ec2": "^3.734.0",
     "@sentry/bun": "^8.0.0",
     "axios": "1.6.8",
     "bcryptjs": "2.4.3",

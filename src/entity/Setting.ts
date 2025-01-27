@@ -267,5 +267,9 @@ export class Setting {
   /* api settings */
   public static API_ACCESS_TOKEN = "api_access_token"
 
+  /* stream setting */
+
+  public static EDGE_DISCOVERY = "edge_discovery"
+  
   //#endregion
 }

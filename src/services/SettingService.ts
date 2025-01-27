@@ -28,4 +28,13 @@ export class SettingService {
     }
     return null
   }
+
+  async getModelSetting(settingName: string, modelId: string, modelClass: string, defaultValue: any = null)
+  {
+    console.log(`fetching value for ${settingName} from DB for class ${modelClass} and id ${modelId} with defaultValue ${defaultValue}`)
+    const settingObject = await this.settingRepository.findOne({
+      where: { key: settingName, configurableType: modelClass, configurableId: modelId },
+    })
+    return settingObject ? settingObject.value : defaultValue
+  }
 }

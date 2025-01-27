@@ -50,6 +50,34 @@ export async function verifyAccess(authHeader: string): Promise<string> {
   return "false"
 }
 
+export function getPhoneDetails(msisdn: string) {
+  let countryCode = 1;
+  let regionCode = 'CA';
+  try {
+    const phoneUtil = PhoneNumberUtil.getInstance();
+
+    // Parse the phone number in international format
+    const phoneNumber = phoneUtil.parseAndKeepRawInput(`+${msisdn}`);
+
+    // Get the region code (ISO 3166-1 alpha-2 format)
+    regionCode = phoneUtil.getRegionCodeForNumber(phoneNumber) || regionCode;
+
+    // Get the country calling code (E.164 format)
+    if(regionCode)
+    {
+      countryCode = phoneUtil.getCountryCodeForRegion(regionCode);
+    }
+
+  } catch (error) {
+    console.error("Error parsing phone number:", error);
+  }
+  return {
+    regionCode, // e.g., 'US'
+    countryCode, // e.g., '1'
+  };
+}
+
+
 export async function validateAndFormatPhoneNumber(
   strMsisdn: string,
   strCountryCode = ""
@@ -222,4 +250,39 @@ export function randomString(length: number): string {
 
 export function capitalize(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export function concatenateAndConvertToHex(length: number, string: string): string {
+  const randomHex = generateRandomHex(length);
+  const combinedString = randomHex + string; // Concatenate the random hex and userId
+  const buffer = Buffer.from(combinedString, 'utf8'); // Convert to a Buffer
+  return buffer.toString('hex'); // Convert the entire Buffer to hex
+}
+
+function generateRandomHex(length: number): string {
+  return randomBytes(length).toString('hex');
+}
+
+
+export function parseDomainDetails(urlString: string) {
+  const url = new URL(urlString);
+
+  // Get the host without 'www.'
+  const currentHost = url.hostname.replace(/^www\./i, '');
+
+  // Get the port (if any)
+  const currentPort = url.port;
+
+  // Format the port (prepend with ':' if it exists)
+  const currentPortFormatted = currentPort ? `:${currentPort}` : '';
+
+  // Combine host and formatted port
+  const currentDomain = currentHost + currentPortFormatted;
+
+  return {
+    currentHost,
+    currentPort,
+    currentPortFormatted,
+    currentDomain,
+  };
 }
