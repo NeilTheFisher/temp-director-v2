@@ -11,6 +11,8 @@ import { MccMnc } from "../entity/MccMnc";
 import { StreamUrlToken } from "../entity/StreamUrlToken";
 import { DiscoveryLogs } from "../entity/DiscoveryLogs";
 import { AwsAuthotizationService } from "./AwsAuthorizationService";
+import RedisService from "./RedisService";
+
 
 export class StreamUrlService {
   private streamUrlRepository: Repository<StreamUrl>
@@ -18,8 +20,8 @@ export class StreamUrlService {
   private discoveryLogsRepository: Repository<DiscoveryLogs>
   private userRepository: Repository<User>
   private mccMncRepository: Repository<MccMnc>
-  private mccMncCache: Map<string, { mcc: number; mnc: number; city: string; country: string; timestamp: number }>;
-  private ipCache: Map<string, { data: any; timestamp: number }>;
+  private redisService = RedisService.getInstance()
+  private redisClient = this.redisService.getClient()
 
   constructor() {
     this.streamUrlRepository = AppDataSource.getRepository(StreamUrl)
@@ -27,8 +29,6 @@ export class StreamUrlService {
     this.userRepository = AppDataSource.getRepository(User)
     this.mccMncRepository = AppDataSource.getRepository(MccMnc)
     this.discoveryLogsRepository = AppDataSource.getRepository(DiscoveryLogs)
-    this.mccMncCache = new Map();
-    this.ipCache = new Map();
   }
 
   async getStreamUrls(streamUrlId: number, userId: number, ip: string, maxResults: number = 10): Promise<any>
@@ -91,7 +91,7 @@ export class StreamUrlService {
                   if(proteusId != "" && proteusKey != "")
                   {
                     const proteusResult = await (new AwsAuthotizationService(ip)).getAggregatorUrls(maxResults)
-                    Object.values(proteusResult.urls).forEach(function(result){
+                    Object.values(proteusResult.urls).forEach(function(result: any){
                       urls.push({url: streamUrl.url.replace(currentDomain, result.url), description: result.description})
                     })
                   }
@@ -200,17 +200,19 @@ export class StreamUrlService {
     let city = "";
     let country = "";
     let error = "";
+    const cacheKey =  `mobileUserInfo:${ip}`;
+    const cacheTTL = 15 * 60 * 1000;
     try
     {
-      const cachedData = this.mccMncCache.get(ip);
-      const cacheValidity = 15 * 60 * 1000; // 15 minutes in milliseconds
-      if (cachedData && Date.now() - cachedData.timestamp < cacheValidity) {
+      const cachedData = await this.redisClient.get(cacheKey);
+      if (cachedData) {
         console.log(`Cache hit for IP: ${ip}`);
+        const parsedData = JSON.parse(cachedData);
         return {
-          mcc: cachedData.mcc,
-          mnc: cachedData.mnc,
-          city: cachedData.city,
-          country: cachedData.country,
+          mcc: parsedData.mcc,
+          mnc: parsedData.mnc,
+          city: parsedData.city,
+          country: parsedData.country,
           error: "",
         };
       }
@@ -223,13 +225,7 @@ export class StreamUrlService {
       error = mccMncUserInfo.error
 
       // Update the cache
-      this.mccMncCache.set(ip, {
-        mcc,
-        mnc,
-        city,
-        country,
-        timestamp: Date.now(),
-      });
+      await this.redisClient.set(cacheKey,  JSON.stringify({ mcc: mcc, mnc: mnc, city: city, country: country}),  { EX: cacheTTL });
     }
     catch(error: any)
     {
@@ -241,20 +237,8 @@ export class StreamUrlService {
 
   async checkIpMccMnc(ip: string)
   {
-    const cacheValidity = 15 * 60 * 1000; // 15 minutes in milliseconds
-    const currentTime = Date.now();
-    if (this.ipCache.has(ip)) {
-      const cachedEntry = this.ipCache.get(ip)!;
-      if (currentTime - cachedEntry.timestamp < cacheValidity) {
-        console.log("Cache hit for IP:", ip);
-        return cachedEntry.data;
-      } else {
-        console.log("Cache expired for IP:", ip);
-        this.ipCache.delete(ip); // Remove expired cache entry
-      }
-    }
-    console.log("Cache miss for IP:", ip);
-
+    const cacheKey =  `mccMncIpInfo:${ip}`;
+    const cacheTTL = 15 * 60 * 1000;
     let mcc = 0;
     let mnc = 0;
     let city = "N/A";
@@ -262,6 +246,18 @@ export class StreamUrlService {
     let error = "";
     try
     {
+      const cachedData = await this.redisClient.get(cacheKey);
+      if (cachedData) {
+        console.log(`Cache hit for IP: ${ip}`);
+        const parsedData = JSON.parse(cachedData);
+        return {
+          mcc: parsedData.mcc,
+          mnc: parsedData.mnc,
+          city: parsedData.city,
+          country: parsedData.country,
+          error: "",
+        };
+      }
       const usernamePassword = process.env.WLZ_BELL_PASSWORD ?? ""
       const authHeader = 'Basic ' + Buffer.from(usernamePassword).toString('base64');
       const response = await axios.get(`https://geoip.maxmind.com/geoip/v2.1/city/${ip}`, {
@@ -283,6 +279,7 @@ export class StreamUrlService {
       if (data.country && data.country.names && data.country.names.en) {
         country = data.country.names.en.toLowerCase();
       }
+      await this.redisClient.set(cacheKey,  JSON.stringify({ mcc: mcc, mnc: mnc, city: city, country: country}),  { EX: cacheTTL });
     }
     catch(error: any)
     {

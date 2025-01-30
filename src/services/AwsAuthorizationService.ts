@@ -1,3 +1,5 @@
+import RedisService from "./RedisService";
+
 const crypto = require("crypto");
 const axios = require("axios");
 const dns = require("dns").promises;
@@ -11,8 +13,8 @@ export class AwsAuthotizationService {
   private service: string = ""
   private host: string = ""
   private ip: string = ""
-  private zoneNameCache: Map<string, { zoneName: string; timestamp: number }>;
-  private aggregatorUrlsCache: { data: { urls: any[]; error: string }; timestamp: number } | null;
+  private redisService = RedisService.getInstance();
+  private redisClient = this.redisService.getClient()
 
   constructor(ip: string) {
     this.ip = "66.249.79.102"
@@ -22,8 +24,6 @@ export class AwsAuthotizationService {
     this.service = process.env.PROTEUS_SERVICE ?? "proteus-preprod"
     this.host = process.env.PROTEUS_HOST ?? "discovery.us-east-1.gamma.proteus.ec2.aws.dev"
     this.uri = process.env.PROTEUS_URI ?? "/discover-zones"
-    this.zoneNameCache = new Map();
-    this.aggregatorUrlsCache = null;
   }
 
   getAuthorizationHeader() {
@@ -77,15 +77,13 @@ export class AwsAuthotizationService {
 
   async getAggregatorUrls(maxResults: number) {
     let error = "";
+    const cacheKey = "aggregatorUrls"
+    const cacheTTL = 15 * 60 * 1000; // 15 minutes in milliseconds
     try {
-      const cacheValidity = 15 * 60 * 1000; // 15 minutes in milliseconds
-      const currentTime = Date.now();
-      if (
-        this.aggregatorUrlsCache &&
-        currentTime - this.aggregatorUrlsCache.timestamp < cacheValidity
-      ) {
+      const cachedData = await this.redisClient.get(cacheKey);
+      if (cachedData) {
         console.log("Cache hit for aggregator URLs");
-        return this.aggregatorUrlsCache.data;
+        return JSON.parse(cachedData); // Return cached data
       }
       console.log("Cache miss for aggregator URLs");
 
@@ -107,10 +105,7 @@ export class AwsAuthotizationService {
       });
       // Process the response
       const data =  await this.getAvailableZoneUrls(response.data || "", maxResults);
-      this.aggregatorUrlsCache = {
-        data,
-        timestamp: currentTime,
-      };
+      await this.redisClient.set(cacheKey, JSON.stringify(data),  { EX: cacheTTL });
       return data;
 
     } catch (err: any) {
@@ -173,16 +168,17 @@ export class AwsAuthotizationService {
 
   async getAvailabilityZonesNameById(region: string, zoneId: string, zoneType: string) {
     try {
+      const cacheTTL = 60 * 60 * 1000; // 15 minutes in milliseconds
       const cacheKey = `${region}:${zoneId}:${zoneType}`;
 
       // Check the cache first
-      const cachedData = this.zoneNameCache.get(cacheKey);
+      const cachedData =  await this.redisClient.get(cacheKey);
 
       // Cache validity period (e.g., 1 hour)
-      const cacheValidity = 60 * 60 * 1000; // 1 hour in milliseconds
-      if (cachedData && Date.now() - cachedData.timestamp < cacheValidity) {
+      if (cachedData) {
         console.log(`Cache hit for zone: ${cacheKey}`);
-        return cachedData.zoneName;
+        const parsedData = JSON.parse(cachedData);
+        return parsedData.zoneName;
       }
 
       let zoneName = ""
@@ -210,7 +206,7 @@ export class AwsAuthotizationService {
         }
 
         if (zoneName) {
-          this.zoneNameCache.set(cacheKey, { zoneName, timestamp: Date.now() });
+          await this.redisClient.set(cacheKey, JSON.stringify({zoneName: zoneName}),  { EX: cacheTTL });
         }
 
       return zoneName || "";
