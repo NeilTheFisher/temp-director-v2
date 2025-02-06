@@ -99,8 +99,9 @@ export async function validateAndFormatPhoneNumber(
 
   try {
     const settingService = new SettingService()
-    const accountSid = await settingService.getSystemSetting(Setting.TWILIO_ACCOUNT_SID)
-    const authToken = await settingService.getSystemSetting(Setting.TWILIO_AUTH_TOKEN)
+    const systemSettings =  await settingService.getSystemSettings();
+    const accountSid = systemSettings[Setting.TWILIO_ACCOUNT_SID] ?? ''
+    const authToken = systemSettings[Setting.TWILIO_AUTH_TOKEN] ?? ''
     console.log("SID:", accountSid)
     const response = await axios.get(`https://lookups.twilio.com/v1/PhoneNumbers/+${strMsisdn}`, {
       auth: {

@@ -27,6 +27,8 @@ export class Setting {
   }
 
   //#region constants
+  public static SYSTEM_SETTINGS = "system_settings"
+  public static EVENT_SETTINGS = "event_settings"
   public static STORE_LOG_DURATION = "store_log_duration"
   public static STORE_DISCOVERY_LOG_DURATION = "store_discovery_log_duration"
   public static MESSAGE_INTERVAL = "message_interval"
@@ -270,6 +272,6 @@ export class Setting {
   /* stream setting */
 
   public static EDGE_DISCOVERY = "edge_discovery"
-  
+
   //#endregion
 }
