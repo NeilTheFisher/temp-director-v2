@@ -12,11 +12,3 @@ export const AppDataSource = new DataSource({
   database: process.env.MYSQL_DATABASE ?? "db_director",
   entities: ["build/entity/**/*.js", "entity/**/*.js"],
 })
-
-AppDataSource.initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!")
-  })
-  .catch((err: Error) => {
-    console.error("Error during Data Source initialization", err)
-  })

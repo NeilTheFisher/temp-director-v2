@@ -3,56 +3,74 @@ import * as dotenv from "dotenv"
 import "reflect-metadata"
 import { DirectorApi } from "./server"
 import RedisService from "./services/RedisService"
+import { AppDataSource } from "./data-source"
 
-// Load environment variables from .env file
+// Load env vars
 dotenv.config()
 
-// Initialize Redis Service as a singleton
-const redisService = RedisService.getInstance();
-
-if (process.argv[2] && process.argv[2] === "test") {
-  console.log('"test" passed as argument, will close the server in 1 second')
-  setTimeout(() => {
-    directorApiServer.close()
-    redisService.disconnect();
-    process.exit(0)
-  }, 1000)
-}
-
-// const LISTEN_PORT = Number(process.env.HTTP_PORT) ?? 3000;
+const redisService = RedisService.getInstance()
+const redisClient = redisService.getClient()
 const LISTEN_PORT = process.env.HTTP_PORT ? Number(process.env.HTTP_PORT) : 3000
-
 const directorApiServer = new DirectorApi()
+
+// Sentry
 Sentry.init({
   dsn: "https://4c1088a02529302c3c6b4d3a010dfb0b@sentry.erl.rcs.st/12",
-  // Performance Monitoring
-  tracesSampleRate: 1.0, // Capture 100% of the transactions
+  tracesSampleRate: 1.0,
 })
-// Ensure Redis is ready before starting the server
-redisService
-  .getClient()
-  .connect()
-  .then(() => {
-    console.log("Redis client connected. Starting the server...");
-    directorApiServer.startServer(LISTEN_PORT);
-  })
-  .catch((err:any) => {
-    console.error("Failed to connect to Redis. Exiting...");
-    console.error(err);
-    process.exit(1); // Exit if Redis connection fails
-  });
 
-// Graceful shutdown
+// Redis connection events
+redisClient.on("error", (err: any) => {
+  console.error("Redis error:", err)
+})
+
+redisClient.on("end", () => {
+  console.error("Redis connection closed. Exiting...")
+  directorApiServer.close()
+  process.exit(1)
+})
+
+// ✅ TEST MODE: skips full startup
+if (process.argv.includes("test")) {
+  console.log('"test" passed as argument. Skipping service init...')
+  setTimeout(() => {
+    directorApiServer.close()
+    redisService.disconnect()
+    process.exit(0)
+  }, 1000)
+} else {
+  // ✅ Full startup
+  AppDataSource.initialize()
+    .then(async () => {
+      console.log("MySQL Data Source initialized!")
+
+      // Optional: Run a quick test query
+      await AppDataSource.query("SELECT 1")
+      console.log("MySQL connection test succeeded!")
+
+      await redisClient.connect()
+      console.log("Redis client connected. Starting the server...")
+
+      directorApiServer.startServer(LISTEN_PORT)
+    })
+    .catch((err: any) => {
+      console.error("Failed to start services. Exiting...")
+      console.error(err)
+      process.exit(1)
+    })
+}
+
+// ✅ Graceful shutdown
 process.on("SIGINT", async () => {
-  console.log("SIGINT received. Shutting down...");
-  await redisService.disconnect(); // Disconnect Redis client
-  directorApiServer.close(); // Close the API server
-  process.exit(0);
-});
+  console.log("SIGINT received. Shutting down...")
+  await redisService.disconnect()
+  directorApiServer.close()
+  process.exit(0)
+})
 
 process.on("SIGTERM", async () => {
-  console.log("SIGTERM received. Shutting down...");
-  await redisService.disconnect(); // Disconnect Redis client
-  directorApiServer.close(); // Close the API server
-  process.exit(0);
-});
+  console.log("SIGTERM received. Shutting down...")
+  await redisService.disconnect()
+  directorApiServer.close()
+  process.exit(0)
+})
