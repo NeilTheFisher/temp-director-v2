@@ -97,8 +97,8 @@ export class Event {
   @Column("char", { name: "image_uid", nullable: true, length: 36 })
   imageUid: string | null;
 
-  @Column("varchar", { name: "stream_order", nullable: true, length: 191 })
-  streamOrder: string | null;
+  @Column("tinyint", { name: "restream", width: 1, default: () => 0 })
+  restream: boolean;
 
   @Column("varchar", { name: "promo_video_url", nullable: true, length: 191 })
   promoVideoUrl: string | null;
