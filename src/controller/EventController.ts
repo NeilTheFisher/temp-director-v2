@@ -1,24 +1,21 @@
 import { Request, Response } from "express"
-import { AppDataSource } from "../data-source"
-import { User } from "../entity/User"
 import { EventService } from "../services/EventService"
+import { UserService } from "../services/UserService"
 import { verifyAccess } from "../utils/utils"
 
 const eventService = new EventService()
+const userService = new UserService()
 class EventController {
   public static list = async (req: Request, res: Response) => {
     console.log("EventController.list:")
     if (req.headers.authorization) {
       const userId = await verifyAccess(req.headers.authorization)
       console.log("Jwt verify returned userId:", userId)
-      const userService = AppDataSource.getRepository(User)
-      const user = await userService.findOne(
-        {where: { id: parseInt(userId) }}
-      );
-      if (!user) {
+      const userInfo = await userService.getUserInfoForEvent(parseInt(userId))
+      if (!userInfo) {
         return res.status(401).json("User not found or not authenticated")
       } else {
-        const body = await eventService.getEvents(user.msisdn!)
+        const body = await eventService.getEvents(userInfo)
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
         res.setHeader("Pragma", "no-cache")
         res.setHeader("Expires", "0")

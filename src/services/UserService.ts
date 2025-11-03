@@ -23,7 +23,7 @@ export class UserService {
     try {
       const user = await this.userRepository.findOne({
         where: { id: userId },
-        relations: ["usersReported", "usersBlocked", "usersBlockedBy", "roles", 'emails'], // Load the related usersReported
+        relations: ["usersReported", "usersBlocked", "usersBlockedBy", "roles", "emails"], // Load the related usersReported
       })
 
       if (!user) {
@@ -56,9 +56,9 @@ export class UserService {
         )
 
         const emailsObjects = user.emails || []
-        const userEmails: string[]  = [];
+        const userEmails: string[]  = []
         emailsObjects.forEach((email) => {
-          userEmails.push(email.email);
+          userEmails.push(email.email)
         })
 
         //get user roles with org id if super admin org roles is empty
@@ -123,6 +123,59 @@ export class UserService {
       return null
     }
   }
+
+  async getUserInfoForEvent(userId:number):Promise<any>
+  {
+    const user = await this.userRepository.findOne({
+      where: { id: userId},
+      relations: ["roles", "emails"], // Load the related usersReported
+    })
+    if(user)
+    {
+      let boolSuperAdmin = false
+      const emailsObjects = user.emails || []
+      const userEmails: string[]  = []
+      const orgIds: number[] = []
+      if(user.email)
+      {
+        userEmails.push(user.email)
+      }
+      emailsObjects.forEach((email) => {
+        userEmails.push(email.email)
+      })
+      const userRolesObject = user.roles || []
+      const userRoles = await Promise.all(
+        userRolesObject.map(async (role) => {
+          const roleGroupObject = await this.userGroupRolesRepository.findOne({
+            where: { roleId: role.id, userId: userId },
+          })
+          return roleGroupObject ? { groupId: roleGroupObject.groupId, name: role.name } : null
+        })
+      )
+      userRoles.forEach((groupRole) => {
+        if (boolSuperAdmin || !groupRole) {
+          return
+        }
+        if (groupRole.name == Role.ROLE_SUPER_ADMIN) {
+          boolSuperAdmin = true
+          return
+        }
+        if (groupRole.groupId == null) {
+          return
+        }
+        if(groupRole.groupId)
+        {
+          orgIds.push(groupRole.groupId)
+        }
+      })
+      return {userId: user.id, msisdn: user.msisdn, emails: [...new Set(userEmails)], orgIds: [...new Set(orgIds)]}
+    }
+    else
+    {
+      return null
+    }
+  }
+
   async getUserInfoByMsisdn(msisdn: string): Promise<{id: string, sip: string, role: string, avatar: string, type: string, name: string} | null>
   {
     const user = await this.userRepository.findOne({
