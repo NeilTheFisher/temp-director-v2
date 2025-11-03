@@ -2,10 +2,12 @@ import { Repository } from "typeorm"
 import { AppDataSource } from "../data-source"
 import { In } from "typeorm"
 import { Event } from "../entity/Event"
+import { Group } from "../entity/Group"
 import { Invite } from "../entity/Invite"
 import { EventStream } from "../entity/EventStream"
 import { Stream } from "../entity/Stream"
 import RedisService from "./RedisService"
+import { SettingService } from "./SettingService"
 import { OdienceEventCollection } from "../resources/OdienceEventResource"
 
 const EVENT_STATUS_LIVE = "live"
@@ -19,11 +21,14 @@ const EVENT_STATUS_DEACTIVATED = "deactivated"
 export class EventService {
   private eventRepository: Repository<Event>
   private streamRepository: Repository<Stream>
+  private groupRepository: Repository<Group>
   private redisService = RedisService.getInstance()
   private redisClient = this.redisService.getClient()
+  private settingService = new SettingService()
   constructor() {
     this.eventRepository = AppDataSource.getRepository(Event)
     this.streamRepository = AppDataSource.getRepository(Stream)
+    this.groupRepository = AppDataSource.getRepository(Group)
   }
 
   type(ev:EventStream, stream: Stream[]) : number {
@@ -34,6 +39,7 @@ export class EventService {
   }
 
   label(event : Event, stream: Stream[]) : string {
+    //logic is wrong TODO
     const now = new Date().valueOf() / 1000
     if (!event.active) return EVENT_STATUS_DEACTIVATED
     if (event.isDraft)  return EVENT_STATUS_DRAFT
@@ -70,13 +76,26 @@ export class EventService {
       const events = await this.eventRepository.find({
         //select: {id: true,name: true,latitude: true,longitude: true,invites: true,},
         where : {isDraft : false},
-        relations: ["invites", "eventStreams"]
+        relations: ["invites", "eventStreams", "eventGroups"]
       })
       const now = new Date().valueOf() / 1000
 
+      for (const event of events)
+      {
+        const firstGroup = event.eventGroups?.[0]
+        let eventGroup = null
+        if (firstGroup) {
+          eventGroup = await this.groupRepository.findOneBy({
+            id: firstGroup.groupId
+          })
+        }
+        event.organization = eventGroup?.name || null
+        event.organizationImageUrl = eventGroup?.imageUrl || null
+        event.organizationId = eventGroup?.id || null
+      }
       const result = events.filter( (event:Event) => {
         if (!event.isPublic && event.invitationsOnly) {
-          if(userInfo.orgIds.includes(event.ownerId)){
+          if(userInfo.orgIds.includes(event?.organizationId || 0) || event.ownerId === userInfo.userId){
             return true
           }
           const invites = event.invites || []
@@ -92,9 +111,14 @@ export class EventService {
 
       //* so far eventStreams didn't load stream from foreign table
       const ids : number[] = []
-      result.forEach( (event:Event) => {
-        event.eventStreams.forEach((x) => ids.push(x.streamId) )
-      })
+      for (const event of result) {
+        const settings = this.settingService.getEventSettings(String(event.id))
+        event.settings = settings ?? {}
+        // collect streamIds
+        for (const stream of event.eventStreams) {
+          ids.push(stream.streamId)
+        }
+      }
       const streams = await this.streamRepository.findBy({
         //select: {id: true, recordedType: true},
         id: In(ids)

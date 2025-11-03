@@ -1,6 +1,7 @@
 import { IsNull, Repository } from "typeorm"
 import { AppDataSource } from "../data-source"
 import { Setting } from "../entity/Setting"
+import { SettingInterface } from "../interfaces/Setting"
 
 export class SettingService {
   private settingRepository: Repository<Setting>
@@ -10,7 +11,7 @@ export class SettingService {
   }
 
   async getSystemSettings(): Promise<any> {
-    const settingName = Setting.SYSTEM_SETTINGS;
+    const settingName = Setting.SYSTEM_SETTINGS
     const loadedSettings = await Setting.getLoadedSettings()
     if (loadedSettings.has(settingName)) {
       console.log(`Returning saved value: ${settingName}:${loadedSettings.get(settingName)}`)
@@ -24,7 +25,22 @@ export class SettingService {
     let result = null
     if(value != null)
     {
-      result = JSON.parse(value);
+      result = JSON.parse(value)
+    }
+    return result
+  }
+
+  async getEventSettings(eventId: string): Promise<SettingInterface> {
+    const settingName = Setting.EVENT_SETTINGS
+    console.log(`fetching value for ${settingName} from DB`)
+    const settingObject = await this.settingRepository.findOne({
+      where: { key: settingName, configurableType: "App\\Models\\Event", configurableId: eventId },
+    })
+    const value = settingObject ? settingObject.value : ""
+    let result = []
+    if(value != null)
+    {
+      result = JSON.parse(value)
     }
     return result
   }

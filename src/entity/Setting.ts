@@ -1,21 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity("setting")
 export class Setting {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
-  id: number;
+  id: number
 
   @Column("varchar", { name: "key", length: 191 })
-  key: string;
+  key: string
 
   @Column("longtext", { name: "value", nullable: true })
-  value: string | null;
+  value: string | null
 
   @Column("varchar", { name: "configurable_type", nullable: true, length: 191 })
-  configurableType: string | null;
+  configurableType: string | null
 
   @Column("bigint", { name: "configurable_id", nullable: true, unsigned: true })
-  configurableId: string | null;
+  configurableId: string | null
   private static loadedSettings: Map<string, string> = new Map()
 
   static getLoadedSettings(): Map<string, string> {
@@ -132,6 +132,8 @@ export class Setting {
   public static BRAND_SUBTITLE = "brand_subtitle"
   public static BRAND_TEXT_COLOR = "brand_text_color"
   public static BRAND_BACKGROUND_OPACITY = "brand_background_opacity"
+  public static SHOW_BRAND_PANEL = "show_brand_panel"
+  public static BRAND_LOGO_PADDING = "brand_logo_padding"
   public static CUSTOM_TRIGGER_ACTION = "custom_trigger_action"
   public static CHAT_PROFANITY = "chat_profanity"
   public static CHAT_PROFANITY_NOTIFICATION_MESSAGE = "chat_profanity_notification_message"
@@ -143,6 +145,7 @@ export class Setting {
   public static ESPORT_SERVER_TOKEN = "esport_server_token"
   public static KPI_MESSAGES = "kpi_messages"
   public static NFT_BOT = "nft_bot"
+  public static HQ_ZOOM = "hq_zoom"
   public static AUTOMATIC_SMS_ITEMS = "automatic_sms_items"
   public static PAYED_EVENT = "payed_event"
   public static KPI_USERS = "kpi_users"
@@ -273,5 +276,9 @@ export class Setting {
 
   public static EDGE_DISCOVERY = "edge_discovery"
 
+  /* featured catalog settings */
+
+  public static FEATURED_CATALOG_IMAGE_ALIGNMENT = "eatured_catalog_image_alignment"
+  public static FEATURED_CATALOG_BLURRED_BACKGROUND = "featured_catalog_blurred_background"
   //#endregion
 }
