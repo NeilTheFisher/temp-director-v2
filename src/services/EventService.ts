@@ -39,7 +39,6 @@ export class EventService {
   }
 
   label(event : Event, stream: Stream[]) : string {
-    //logic is wrong TODO
     const now = new Date().valueOf() / 1000
     if (!event.active) return EVENT_STATUS_DEACTIVATED
     if (event.isDraft)  return EVENT_STATUS_DRAFT
@@ -69,7 +68,7 @@ export class EventService {
         Math.pow(Math.sin((lon1-lon2)*Math.PI/360),2)
   }
 
-  async getEvents(userInfo: {userId: number, msisdn: string, emails: string[], orgIds: number[]}): Promise<any> {
+  async getEvents(userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
     try {
       const cacheKey =  `{user:${userInfo.msisdn}}:coordinates` // todo
       const cachedData = await this.redisClient.get(cacheKey)
@@ -88,8 +87,8 @@ export class EventService {
         .getMany()
       const now = new Date().valueOf() / 1000
       const result = events.filter( (event:Event) => {
-        if (!event.isPublic && event.invitationsOnly) {
-          if(userInfo.orgIds.includes(event.groupId || 0) || event.ownerId === userInfo.userId){
+        if (!event.isPublic) {
+          if(userInfo.orgIds.includes(event.groupId || 0) || event.ownerId === userInfo.userId || userInfo.isSuperAdmin){
             return true
           }
           const invites = event.invites || []

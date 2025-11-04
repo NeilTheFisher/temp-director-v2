@@ -168,7 +168,7 @@ export class UserService {
           orgIds.push(groupRole.groupId)
         }
       })
-      return {userId: user.id, msisdn: user.msisdn, emails: [...new Set(userEmails)], orgIds: [...new Set(orgIds)]}
+      return {userId: user.id, msisdn: user.msisdn, isSuperAdmin: boolSuperAdmin, emails: [...new Set(userEmails)], orgIds: [...new Set(orgIds)]}
     }
     else
     {

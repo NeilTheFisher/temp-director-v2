@@ -6,7 +6,7 @@ import { LocationInfoInterface } from "../interfaces/LocationInfo"
 const s3Service = new S3Service()
 
 export function OdienceEventResource(event: any, forWeb = false) {
-  const eventSettings = getEventSettings(event.settings)
+  const eventSettings = getEventSettings(event.settings[0] ?? [])
   return {
     id: String(event.id),
     namespace: `/${event.id}`,
@@ -15,20 +15,20 @@ export function OdienceEventResource(event: any, forWeb = false) {
     duration: event.duration ?? -1,
     date: event.date,
     featured: Boolean(event.featured),
-    location: String(event.location),
+    location: String(event.location || ""),
     brand: getBrand(event, eventSettings),
     featured_catalogue: getFeaturedCatalog(eventSettings),
     organization: getOrgName(event.group.name),
     organization_image_url: event.group.imageUrl ?? "",
     organization_id: event.groupId,
     owner_id: String(event.ownerId),
-    description: String(event.description),
+    description: String(event.description || ""),
     category: String(event.category),
     categoryImage: getCategoryImageUrl(String(event.category)),
     capacity: event.capacity,
     is_public: Boolean(event.isPublic),
     is_5g: Boolean(event.is5g),
-    imageUrl: getImageUrl(String(event.imageUrl), String(event.webImageUrl), forWeb),
+    imageUrl: getImageUrl(String(event.imageUrl || ""), String(event.webImageUrl || ""), forWeb),
     min_price: getMinPrice(eventSettings),
     ticket_url: getTicketUrl(event, eventSettings),
     ticket_platform: getTicketPlatform(event.payed, eventSettings),
