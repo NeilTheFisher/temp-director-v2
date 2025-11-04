@@ -5,7 +5,7 @@ import { LocationInfoInterface } from "../interfaces/LocationInfo"
 
 const s3Service = new S3Service()
 
-export function OdienceEventResource(event: any, forWeb = false) {
+export function OdienceEventResource(event: any, forWeb = false, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
   const eventSettings = getEventSettings(event.settings[0] ?? [])
   return {
     id: String(event.id),
@@ -49,7 +49,7 @@ export function OdienceEventResource(event: any, forWeb = false) {
     banned: false, //todo
     blocked: false, //todo
     opened: false, //todo
-    pre_access: false, //todo
+    pre_access: getPreAccess(event.ownerId, event.groupId, userInfo),
     web_allowed: Boolean(event.webAllowed),
     app_allowed: Boolean(event.appAllowed),
     appUrl: "", //todo
@@ -63,8 +63,8 @@ export function OdienceEventResource(event: any, forWeb = false) {
   }
 }
 
-export function OdienceEventCollection(events: any[], forWeb = false) {
-  return events.map(event => OdienceEventResource(event, forWeb))
+export function OdienceEventCollection(events: any[], forWeb = false, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
+  return events.map(event => OdienceEventResource(event, forWeb, userInfo))
 }
 
 function getOrgName(strGroupName: string, strOwnerName?: string): string {
@@ -213,4 +213,9 @@ function getEventSettings(settings: any)
     result = JSON.parse(value)
   }
   return result
+}
+
+function getPreAccess(ownerId: number, groupId: number, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+{
+  return userInfo.isSuperAdmin || (ownerId === userInfo.userId || userInfo.orgIds.includes(groupId))
 }

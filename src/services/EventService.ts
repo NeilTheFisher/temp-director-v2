@@ -141,7 +141,7 @@ export class EventService {
         x.is_past = !x.is_draft && x.date && x.duration && x.date + x.duration <= now
         //x.ads_count todo need change Event.ts
       })
-      const filteredEvents = OdienceEventCollection(result)
+      const filteredEvents = OdienceEventCollection(result, false, userInfo)
       return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
     } catch (error) {
       console.log(error)
