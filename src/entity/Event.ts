@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from "typeorm"
 import { EventRegistered } from "./EventRegistered"
 import { EventLogs } from "./EventLogs"
 import { EventUser } from "./EventUser"
@@ -7,7 +7,8 @@ import { Action } from "./Action"
 import { EventInterested } from "./EventInterested"
 import { EventRemoved } from "./EventRemoved"
 import { Feed } from "./Feed"
-import { EventGroup } from "./EventGroup"
+import { Group } from "./Group"
+import { Setting } from "./Setting"
 import { EventStream } from "./EventStream"
 import { MediaContent } from "./MediaContent"
 import { EventTemplate } from "./EventTemplate"
@@ -173,6 +174,13 @@ export class Event {
   })
   promoVideoStatus: string | null
 
+  @ManyToOne(() => Group, (group) => group.events)
+  @JoinColumn({ name: "group_id" })
+  group: Group
+
+  @Column({name: "group_id", type: "bigint", unsigned: true })
+  groupId: number
+
   @OneToMany(() => EventRegistered, (eventRegistered) => eventRegistered.event)
   eventRegistereds: EventRegistered[]
 
@@ -196,9 +204,6 @@ export class Event {
 
   @OneToMany(() => Feed, (feed) => feed.event)
   feeds: Feed[]
-
-  @OneToMany(() => EventGroup, (eventGroup) => eventGroup.event)
-  eventGroups: EventGroup[]
 
   @OneToMany(() => EventStream, (eventStream) => eventStream.event)
   eventStreams: EventStream[]
@@ -245,9 +250,6 @@ export class Event {
   @OneToMany(() => EventRequests, (eventRequests) => eventRequests.event)
   eventRequests: EventRequests[]
 
-  // Add optional fields for organization
-  organization?: string | null
-  organizationImageUrl?: string | null
-  organizationId?: number | null
-  settings?: SettingInterface
+  @OneToMany(() => Setting, (setting) => setting.event)
+  settings: SettingInterface
 }

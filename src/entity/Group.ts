@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { GroupStream } from "./GroupStream"
-import { EventGroup } from "./EventGroup"
 import { MediaContent } from "./MediaContent"
 import { AddressListGroup } from "./AddressListGroup"
 import { DeviceGroup } from "./DeviceGroup"
@@ -8,6 +7,7 @@ import { Controller } from "./Controller"
 import { ProPublisher } from "./ProPublisher"
 import { GroupTemplate } from "./GroupTemplate"
 import { Role } from "./Role"
+import { Event } from "./Event"
 import { User as User2, type User } from "./User"
 
 @Entity("group")
@@ -39,8 +39,8 @@ export class Group {
   @OneToMany(() => GroupStream, (groupStream) => groupStream.group)
   groupStreams: GroupStream[]
 
-  @OneToMany(() => EventGroup, (eventGroup) => eventGroup.group)
-  groupEvents: EventGroup[]
+  @OneToMany(() => Event, (groupEvent) => groupEvent.group)
+  events: Event[]
 
   @OneToMany(() => MediaContent, (mediaContent) => mediaContent.group)
   mediaContents: MediaContent[]

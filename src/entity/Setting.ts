@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm"
+import { Event } from "./Event"
 
 @Entity("setting")
 export class Setting {
@@ -17,6 +18,10 @@ export class Setting {
   @Column("bigint", { name: "configurable_id", nullable: true, unsigned: true })
   configurableId: string | null
   private static loadedSettings: Map<string, string> = new Map()
+
+  @ManyToOne(() => Event, (event) => event.settings)
+  @JoinColumn({ name: "configurable_id", referencedColumnName: "id" })
+  event: Event
 
   static getLoadedSettings(): Map<string, string> {
     return this.loadedSettings

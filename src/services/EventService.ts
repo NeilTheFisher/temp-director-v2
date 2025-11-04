@@ -4,6 +4,7 @@ import { In } from "typeorm"
 import { Event } from "../entity/Event"
 import { Group } from "../entity/Group"
 import { Invite } from "../entity/Invite"
+import { Setting } from "../entity/Setting"
 import { EventStream } from "../entity/EventStream"
 import { Stream } from "../entity/Stream"
 import RedisService from "./RedisService"
@@ -24,7 +25,6 @@ export class EventService {
   private groupRepository: Repository<Group>
   private redisService = RedisService.getInstance()
   private redisClient = this.redisService.getClient()
-  private settingService = new SettingService()
   constructor() {
     this.eventRepository = AppDataSource.getRepository(Event)
     this.streamRepository = AppDataSource.getRepository(Stream)
@@ -73,29 +73,23 @@ export class EventService {
     try {
       const cacheKey =  `{user:${userInfo.msisdn}}:coordinates` // todo
       const cachedData = await this.redisClient.get(cacheKey)
-      const events = await this.eventRepository.find({
-        //select: {id: true,name: true,latitude: true,longitude: true,invites: true,},
-        where : {isDraft : false},
-        relations: ["invites", "eventStreams", "eventGroups"]
-      })
+      const events = await this.eventRepository
+        .createQueryBuilder("event")
+        .leftJoinAndSelect("event.invites", "invite")
+        .leftJoinAndSelect("event.eventStreams", "stream")
+        .leftJoinAndSelect("event.group", "group")
+        .leftJoinAndSelect(
+          "event.settings",
+          "settings",
+          "settings.key = :key AND settings.configurable_type = :type AND settings.configurable_id = event.id",
+          { key: Setting.EVENT_SETTINGS, type: "App\\Models\\Event" }
+        )
+        .where("event.isDraft = :isDraft", { isDraft: false })
+        .getMany()
       const now = new Date().valueOf() / 1000
-
-      for (const event of events)
-      {
-        const firstGroup = event.eventGroups?.[0]
-        let eventGroup = null
-        if (firstGroup) {
-          eventGroup = await this.groupRepository.findOneBy({
-            id: firstGroup.groupId
-          })
-        }
-        event.organization = eventGroup?.name || null
-        event.organizationImageUrl = eventGroup?.imageUrl || null
-        event.organizationId = eventGroup?.id || null
-      }
       const result = events.filter( (event:Event) => {
         if (!event.isPublic && event.invitationsOnly) {
-          if(userInfo.orgIds.includes(event?.organizationId || 0) || event.ownerId === userInfo.userId){
+          if(userInfo.orgIds.includes(event.groupId || 0) || event.ownerId === userInfo.userId){
             return true
           }
           const invites = event.invites || []
@@ -112,9 +106,6 @@ export class EventService {
       //* so far eventStreams didn't load stream from foreign table
       const ids : number[] = []
       for (const event of result) {
-        const settings = this.settingService.getEventSettings(String(event.id))
-        event.settings = settings ?? {}
-        // collect streamIds
         for (const stream of event.eventStreams) {
           ids.push(stream.streamId)
         }

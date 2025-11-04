@@ -6,6 +6,7 @@ import { LocationInfoInterface } from "../interfaces/LocationInfo"
 const s3Service = new S3Service()
 
 export function OdienceEventResource(event: any, forWeb = false) {
+  const eventSettings = getEventSettings(event.settings)
   return {
     id: String(event.id),
     namespace: `/${event.id}`,
@@ -15,11 +16,11 @@ export function OdienceEventResource(event: any, forWeb = false) {
     date: event.date,
     featured: Boolean(event.featured),
     location: String(event.location),
-    brand: getBrand(event),
-    featured_catalogue: getFeaturedCatalog(event.settings),
-    organization: getOrgName(event.organization),
-    organization_image_url: event.organizationImageUrl ?? "",
-    organization_id: event.organizationId,
+    brand: getBrand(event, eventSettings),
+    featured_catalogue: getFeaturedCatalog(eventSettings),
+    organization: getOrgName(event.group.name),
+    organization_image_url: event.group.imageUrl ?? "",
+    organization_id: event.groupId,
     owner_id: String(event.ownerId),
     description: String(event.description),
     category: String(event.category),
@@ -28,9 +29,9 @@ export function OdienceEventResource(event: any, forWeb = false) {
     is_public: Boolean(event.isPublic),
     is_5g: Boolean(event.is5g),
     imageUrl: getImageUrl(String(event.imageUrl), String(event.webImageUrl), forWeb),
-    min_price: getMinPrice(event.settings),
-    ticket_url: getTicketUrl(event),
-    ticket_platform: getTicketPlatform(event.payed, event.settings),
+    min_price: getMinPrice(eventSettings),
+    ticket_url: getTicketUrl(event, eventSettings),
+    ticket_platform: getTicketPlatform(event.payed, eventSettings),
     map_image_url: getMapImageUrl(event.id),
     promo_video_url: String(event.promoVideoUrl),
     promo_video_aspect_ratio: event.promoVideoUrl ? (event.promoVideoAspectRatio || "fit_inside") : "",
@@ -52,7 +53,7 @@ export function OdienceEventResource(event: any, forWeb = false) {
     web_allowed: Boolean(event.webAllowed),
     app_allowed: Boolean(event.appAllowed),
     appUrl: "", //todo
-    settings: getSettings(event.settings),
+    settings: getSettings(eventSettings),
     active: Boolean(event.active),
     downloads: [], //todo
     sponsors: {}, //todo
@@ -114,9 +115,8 @@ function getOnLocationLock(location_info: LocationInfoInterface)
   return Boolean(location_info?.location_lock ?? 0)
 }
 
-function getBrand(event: any)
+function getBrand(event: any, settings: SettingInterface)
 {
-  const settings: SettingInterface = event.settings
   const date = new Date(event.date * 1000)
   const formattedDate = new Intl.DateTimeFormat("en-US", {month: "long",day: "numeric",year: "numeric"}).format(date)
   return {
@@ -154,13 +154,12 @@ function getTickets(settings: SettingInterface): any | null {
   return ticketLevels ?? null
 }
 
-function getTicketPlatform(payed: boolean, settings: Record<string, any>): string {
+function getTicketPlatform(payed: boolean, settings: SettingInterface): string {
   return payed ? String(settings[Setting.EVENT_TICKET_PLATFORM] ?? "") : ""
 }
 
-function getTicketUrl(event: any): string {
+function getTicketUrl(event: any, settings: SettingInterface): string {
   let ticketUrl = ""
-  const settings: SettingInterface = event.settings
   try {
     if (event.payed) {
       const eventPlatform = settings[Setting.EVENT_TICKET_PLATFORM]
@@ -203,4 +202,15 @@ function getMinPrice(settings: SettingInterface): number {
 function getMapImageUrl(eventId: number)
 {
   return `https://${process.env.DIRECTOR_PUBLIC_SOCKET_ADDRESS}/mobile/mapImage/${eventId}?date=${Date.now()}`
+}
+
+function getEventSettings(settings: any)
+{
+  const value = settings ? settings.value : ""
+  let result = []
+  if(value != null)
+  {
+    result = JSON.parse(value)
+  }
+  return result
 }
