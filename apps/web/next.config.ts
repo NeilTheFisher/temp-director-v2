@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  typedRoutes: true,
-  cacheComponents: true,
-  experimental: {
-    turbopackFileSystemCacheForDev: true,
-  },
-  // reactCompiler: true,
+	typedRoutes: true,
+	cacheComponents: true,
+	experimental: {
+		// turbopackFileSystemCacheForDev: true,
+	},
+	reactCompiler: true,
 };
 
 export default nextConfig;
