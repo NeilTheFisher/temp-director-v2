@@ -1,17 +1,7 @@
-import { implement, ORPCError } from "@orpc/server";
-import type { Context } from "./context";
-import { appContract } from "./contract";
+import { authMiddleware } from "./middlewares/auth";
 
-export const pub = implement(appContract).$context<Context>();
+import { pub } from "./middlewares/pub";
 
-export const authed = pub.use(({ context, next }) => {
-  if (!context.session?.user) {
-    throw new ORPCError("UNAUTHORIZED");
-  }
+export { pub };
 
-  return next({
-    context: {
-      session: context.session,
-    },
-  });
-});
+export const authed = pub.use(authMiddleware);
