@@ -6,11 +6,11 @@ import { streamRouter } from "./stream";
 import { userRouter } from "./user";
 
 export const appRouter = {
-	health: healthRouter,
-	events: eventRouter,
-	odience: odienceRouter,
-	stream: streamRouter,
-	user: userRouter,
+  health: healthRouter,
+  events: eventRouter,
+  odience: odienceRouter,
+  stream: streamRouter,
+  user: userRouter,
 };
 
 export type AppRouterClient = RouterClient<typeof appRouter>;

@@ -76,6 +76,6 @@ export const userRouter = {
           message: `UserController.getUserInfoByMsisdn: failed with error: ${errorMessage}`,
         });
       }
-    }
+    },
   ),
 };

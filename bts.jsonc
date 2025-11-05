@@ -9,15 +9,8 @@
   "orm": "prisma",
   "backend": "self",
   "runtime": "none",
-  "frontend": [
-    "next"
-  ],
-  "addons": [
-    "turborepo",
-    "husky",
-    "oxlint",
-    "biome"
-  ],
+  "frontend": ["next"],
+  "addons": ["turborepo", "husky", "oxlint", "biome"],
   "examples": [],
   "auth": "better-auth",
   "packageManager": "bun",

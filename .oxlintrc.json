@@ -1,11 +1,8 @@
 {
-  "plugins": [
-    "unicorn",
-    "typescript",
-    "oxc"
-  ],
+  "plugins": ["unicorn", "typescript", "oxc", "import"],
   "categories": {},
   "rules": {
+    "import/no-cycle": "error",
     "for-direction": "warn",
     "no-async-promise-executor": "warn",
     "no-caller": "warn",

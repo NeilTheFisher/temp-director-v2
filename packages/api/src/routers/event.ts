@@ -15,7 +15,7 @@ export const eventRouter = {
       userInfo.orgIds,
       userInfo.msisdn,
       userInfo.emails,
-      userInfo.isSuperAdmin
+      userInfo.isSuperAdmin,
     );
 
     return events;
@@ -33,10 +33,10 @@ export const eventRouter = {
         userInfo.orgIds,
         userInfo.msisdn,
         userInfo.emails,
-        userInfo.isSuperAdmin
+        userInfo.isSuperAdmin,
       );
 
       return events;
-    }
+    },
   ),
 };

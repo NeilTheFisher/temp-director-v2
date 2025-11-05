@@ -30,7 +30,7 @@ export const odienceRouter = {
       console.error(
         `OdienceController.odience: for msisdn: ${
           rawMsisdn || ""
-        }, error => ${errorMessage}`
+        }, error => ${errorMessage}`,
       );
       throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: `OdienceController.odience. msisdn: ${
@@ -47,7 +47,7 @@ export const odienceRouter = {
         string | undefined
       >;
       console.log(
-        `OdienceController.validatePhoneNumber: msisdn: ${msisdn || ""}`
+        `OdienceController.validatePhoneNumber: msisdn: ${msisdn || ""}`,
       );
 
       if (!msisdn) {
@@ -76,7 +76,7 @@ export const odienceRouter = {
         country_code: country_code || "US",
         code: 200,
       };
-    }
+    },
   ),
 
   getCategoryList: pub.odience.getCategoryList.handler(async () => {
@@ -118,7 +118,7 @@ export const odienceRouter = {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       console.error(
-        `OdienceController.getCategoryList: error => ${errorMessage}`
+        `OdienceController.getCategoryList: error => ${errorMessage}`,
       );
       throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: `OdienceController.getCategoryList: failed with error: ${errorMessage}`,

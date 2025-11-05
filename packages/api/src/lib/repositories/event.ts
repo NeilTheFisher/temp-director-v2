@@ -43,7 +43,7 @@ export async function getVisibleEvents(
   orgIds: number[],
   msisdn: string,
   emails: string[],
-  isSuperAdmin: boolean
+  isSuperAdmin: boolean,
 ) {
   // Super admins can see everything
   if (isSuperAdmin) {

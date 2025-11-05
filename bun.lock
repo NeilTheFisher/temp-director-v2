@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 1,
   "workspaces": {
     "": {
       "name": "director_v2",
@@ -8,7 +9,7 @@
         "zod": "^4.1.11",
       },
       "devDependencies": {
-        "@biomejs/biome": "^2.2.0",
+        "@biomejs/biome": "^2.3.3",
         "@types/node": "^22.13.11",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.2",

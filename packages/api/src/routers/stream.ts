@@ -42,7 +42,7 @@ export const streamRouter = {
       // Temporary placeholder
       console.log(
         "Stream URL ID:",
-        (input as Record<string, number>).streamUrlId
+        (input as Record<string, number>).streamUrlId,
       );
       return {
         urls: [
@@ -50,6 +50,6 @@ export const streamRouter = {
           "https://example.com/stream2.m3u8",
         ],
       };
-    }
+    },
   ),
 };
