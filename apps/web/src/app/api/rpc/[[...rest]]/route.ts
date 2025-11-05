@@ -2,9 +2,9 @@ import { createContext } from "@director_v2/api/context";
 import { appRouter } from "@director_v2/api/routers/index";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { RPCHandler } from "@orpc/server/fetch";
 import { onError } from "@orpc/server";
+import { RPCHandler } from "@orpc/server/fetch";
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { NextRequest } from "next/server";
 
 const rpcHandler = new RPCHandler(appRouter, {
@@ -30,13 +30,13 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 async function handleRequest(req: NextRequest) {
 	const rpcResult = await rpcHandler.handle(req, {
 		prefix: "/api/rpc",
-		context: await createContext(req),
+		context: await createContext(req as any),
 	});
 	if (rpcResult.response) return rpcResult.response;
 
 	const apiResult = await apiHandler.handle(req, {
 		prefix: "/api/rpc/api-reference",
-		context: await createContext(req),
+		context: await createContext(req as any),
 	});
 	if (apiResult.response) return apiResult.response;
 

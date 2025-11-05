@@ -10,6 +10,7 @@
     "catalog": {
       "next": "16.0.0",
       "zod": "^4.1.12",
+      "@orpc/contract": "^1.10.0",
       "@orpc/server": "^1.10.0",
       "@orpc/client": "^1.10.0",
       "@orpc/openapi": "^1.10.0",
@@ -29,7 +30,7 @@
     "check-types": "turbo check-types",
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
-    "db:push": "turbo -F @director_v2/db db:push",
+    "db:pull": "turbo -F @director_v2/db db:pull",
     "db:studio": "turbo -F @director_v2/db db:studio",
     "db:generate": "turbo -F @director_v2/db db:generate",
     "db:migrate": "turbo -F @director_v2/db db:migrate"

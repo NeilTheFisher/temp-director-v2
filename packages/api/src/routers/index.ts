@@ -1,16 +1,15 @@
-import { protectedProcedure, publicProcedure } from "../index";
-import type { RouterClient } from "@orpc/server";
+import { eventRouter } from "./event";
+import { healthRouter } from "./health";
+import { odienceRouter } from "./odience";
+import { streamRouter } from "./stream";
+import { userRouter } from "./user";
 
 export const appRouter = {
-	healthCheck: publicProcedure.handler(() => {
-		return "OK";
-	}),
-	privateData: protectedProcedure.handler(({ context }) => {
-		return {
-			message: "This is private",
-			user: context.session?.user,
-		};
-	}),
+  health: healthRouter,
+  events: eventRouter,
+  odience: odienceRouter,
+  stream: streamRouter,
+  user: userRouter,
 };
+
 export type AppRouter = typeof appRouter;
-export type AppRouterClient = RouterClient<typeof appRouter>;

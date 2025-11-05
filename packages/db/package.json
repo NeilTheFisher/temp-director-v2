@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsdown",
+    "db:pull": "prisma db pull",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
@@ -28,6 +29,7 @@
   "dependencies": {
     "@prisma/client": "catalog:",
     "dotenv": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "zod-prisma-types": "^3.3.5"
   }
 }
