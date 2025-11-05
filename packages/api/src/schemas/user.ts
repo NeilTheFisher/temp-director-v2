@@ -1,7 +1,7 @@
-import { UserSchema } from "@director_v2/db";
+import { userSchema } from "@director_v2/db";
 import { z } from "zod";
 
-export const UserInfoSchema = UserSchema.pick({
+export const UserInfoSchema = userSchema.pick({
   id: true,
   msisdn: true,
   email: true,

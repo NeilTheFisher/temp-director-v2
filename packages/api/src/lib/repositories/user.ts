@@ -19,7 +19,7 @@ export async function getUserById(id: bigint) {
  * Returns: { userId, msisdn, isSuperAdmin, emails, orgIds }
  * This is used to determine which events a user can see
  */
-export async function getUserInfoForEvents(userId: bigint) {
+export async function getUserInfoForEvents(userId: number) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -49,7 +49,7 @@ export async function getUserInfoForEvents(userId: bigint) {
   const orgIds: bigint[] = [];
 
   return {
-    userId: user.id,
+    userId: Number(user.id),
     msisdn: user.msisdn || "",
     isSuperAdmin,
     emails: [...new Set(userEmails)],
@@ -60,7 +60,7 @@ export async function getUserInfoForEvents(userId: bigint) {
 /**
  * Get full user info including relationships
  */
-export async function getFullUserInfo(userId: bigint) {
+export async function getFullUserInfo(userId: number) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -84,7 +84,7 @@ export async function getFullUserInfo(userId: bigint) {
   }
 
   return {
-    user_id: user.id,
+    user_id: Number(user.id),
     msisdn: user.msisdn,
     email: user.email,
     emails: [...new Set(userEmails)],

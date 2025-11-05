@@ -15,7 +15,7 @@
     "build": "tsdown",
     "db:pull": "prisma db pull",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio",
+    "db:studio": "prisma studio --browser none",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev"
   },

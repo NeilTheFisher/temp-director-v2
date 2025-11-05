@@ -6,22 +6,12 @@
 import { ORPCError } from "@orpc/server";
 import * as userRepository from "./repositories/user";
 
-export interface UserInfoForEvents {
-  userId: bigint;
-  msisdn: string;
-  isSuperAdmin: boolean;
-  emails: string[];
-  orgIds: bigint[];
-}
-
 /**
  * Get user info for event filtering
  * Throws UNAUTHORIZED if user not found
  * Returns user ID, phone, super admin status, emails, and org memberships
  */
-export async function getUserInfoForEvents(
-  userId: bigint
-): Promise<UserInfoForEvents> {
+export async function getUserInfoForEvents(userId: number) {
   try {
     const userInfo = await userRepository.getUserInfoForEvents(userId);
 
@@ -43,21 +33,11 @@ export async function getUserInfoForEvents(
   }
 }
 
-export interface FullUserInfo {
-  user_id: bigint;
-  msisdn: string | null;
-  email: string | null;
-  emails: string[];
-  name: string | null;
-  avatar: string | null;
-  account_type: number;
-}
-
 /**
  * Get complete user profile information
  * Throws UNAUTHORIZED if user not found
  */
-export async function getFullUserInfo(userId: bigint): Promise<FullUserInfo> {
+export async function getFullUserInfo(userId: number) {
   try {
     const userInfo = await userRepository.getFullUserInfo(userId);
 

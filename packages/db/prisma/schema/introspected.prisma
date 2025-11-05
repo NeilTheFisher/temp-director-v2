@@ -253,7 +253,7 @@ model email_user {
   msisdn            String?
   email_verified_at DateTime? @db.Timestamp(0)
   user_id           BigInt?   @db.UnsignedBigInt
-  user              User?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "email_user_user_id_foreign")
+  user              user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "email_user_user_id_foreign")
 
   @@index([user_id], map: "email_user_user_id_foreign")
 }
@@ -431,7 +431,7 @@ model event_requests {
   date     Int?
   status   String? @default("pending")
   event    event   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_requests_event_id_foreign")
-  user     User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_requests_user_id_foreign")
+  user     user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_requests_user_id_foreign")
 
   @@index([event_id], map: "event_requests_event_id_index")
   @@index([user_id], map: "event_requests_user_id_index")
@@ -480,7 +480,7 @@ model event_user {
   user_id  BigInt @db.UnsignedBigInt
   event_id BigInt @db.UnsignedBigInt
   event    event  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_user_event_id_foreign")
-  user     User   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_user_user_id_foreign")
+  user     user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_user_user_id_foreign")
 
   @@index([event_id], map: "event_user_event_id_foreign")
   @@index([user_id], map: "event_user_user_id_foreign")
@@ -538,7 +538,7 @@ model group {
   device_group                       device_group[]       @ignore
   domain_group                       domain_group[]       @ignore
   event                              event[]
-  user_group_owner_idTouser          User?                @relation("group_owner_idTouser", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_owner_id_foreign")
+  user_group_owner_idTouser          user?                @relation("group_owner_idTouser", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_owner_id_foreign")
   group_stream                       group_stream[]       @ignore
   group_template                     group_template[]     @ignore
   group_user                         group_user[]         @ignore
@@ -546,7 +546,7 @@ model group {
   pro_publisher                      pro_publisher[]
   roles_user_group                   roles_user_group[]   @ignore
   sponsor_group                      sponsor_group[]      @ignore
-  user_user_personal_group_idTogroup User[]               @relation("user_personal_group_idTogroup")
+  user_user_personal_group_idTogroup user[]               @relation("user_personal_group_idTogroup")
 
   @@index([owner_id], map: "group_owner_id_foreign")
 }
@@ -580,7 +580,7 @@ model group_user {
   group_id BigInt @db.UnsignedBigInt
   user_id  BigInt @db.UnsignedBigInt
   group    group  @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_user_group_id_foreign")
-  user     User   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_user_user_id_foreign")
+  user     user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_user_user_id_foreign")
 
   @@index([group_id], map: "group_user_group_id_foreign")
   @@index([user_id], map: "group_user_user_id_foreign")
@@ -690,7 +690,7 @@ model kpi_emotes_sent {
   emote      String
   created_at Int    @default(0)
   updated_at Int    @default(0)
-  user       User   @relation(fields: [msisdn], references: [msisdn], onDelete: NoAction, onUpdate: NoAction, map: "kpi_emotes_sent_msisdn_foreign")
+  user       user   @relation(fields: [msisdn], references: [msisdn], onDelete: NoAction, onUpdate: NoAction, map: "kpi_emotes_sent_msisdn_foreign")
 
   @@index([msisdn], map: "kpi_emotes_sent_msisdn_foreign")
 }
@@ -820,7 +820,7 @@ model kpi_questions_sent {
   question_id String
   created_at  Int    @default(0)
   updated_at  Int    @default(0)
-  user        User   @relation(fields: [msisdn], references: [msisdn], onDelete: NoAction, onUpdate: NoAction, map: "kpi_questions_sent_msisdn_foreign")
+  user        user   @relation(fields: [msisdn], references: [msisdn], onDelete: NoAction, onUpdate: NoAction, map: "kpi_questions_sent_msisdn_foreign")
 
   @@index([msisdn], map: "kpi_questions_sent_msisdn_foreign")
 }
@@ -985,7 +985,7 @@ model model_logs {
   model    String?
   date     Int?
   info     String
-  user     User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "model_logs_user_id_foreign")
+  user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "model_logs_user_id_foreign")
 
   @@index([model_id], map: "model_logs_model_id_index")
   @@index([user_id], map: "model_logs_user_id_index")
@@ -1142,7 +1142,7 @@ model roles_user_group {
   user_id  BigInt  @db.UnsignedBigInt
   group    group?  @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_group_id_foreign")
   roles    roles   @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_role_id_foreign")
-  user     User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_user_id_foreign")
+  user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_user_id_foreign")
 
   @@index([group_id], map: "roles_user_group_group_id_foreign")
   @@index([role_id], map: "roles_user_group_role_id_foreign")
@@ -1157,7 +1157,7 @@ model session_logs {
   platform String?
   date     Int?
   location String?
-  user     User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "session_logs_user_id_foreign")
+  user     user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "session_logs_user_id_foreign")
 
   @@index([user_id], map: "session_logs_user_id_index")
 }
@@ -1316,7 +1316,7 @@ model stream_url_token {
   date     BigInt
   duration Int?
   token    String
-  user     User   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stream_url_token_user_id_foreign")
+  user     user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stream_url_token_user_id_foreign")
 
   @@index([user_id], map: "stream_url_token_user_id_index")
 }
@@ -1353,7 +1353,7 @@ model users_blocked_by_users {
   user_id BigInt    @db.UnsignedBigInt
   blocked String
   date    DateTime? @db.Timestamp(0)
-  user    User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_blocked_by_users_user_id_foreign")
+  user    user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_blocked_by_users_user_id_foreign")
 
   @@index([user_id], map: "users_blocked_by_users_user_id_index")
 }
@@ -1365,7 +1365,7 @@ model users_reported_by_users {
   date     DateTime? @db.Timestamp(0)
   event_id Int?
   reason   String?   @db.Text
-  user     User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_reported_by_users_user_id_foreign")
+  user     user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_reported_by_users_user_id_foreign")
 
   @@index([user_id], map: "users_reported_by_users_user_id_index")
 }

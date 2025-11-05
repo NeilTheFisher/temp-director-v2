@@ -39,8 +39,8 @@ export async function getEventsByGroup(groupId: bigint) {
  * - Private events where the user is invited
  */
 export async function getVisibleEvents(
-  userId: bigint,
-  orgIds: bigint[],
+  userId: number,
+  orgIds: number[],
   msisdn: string,
   emails: string[],
   isSuperAdmin: boolean
@@ -69,7 +69,7 @@ export async function getVisibleEvents(
         // Public events
         { is_public: true },
         // Events owned by the user
-        { owner_id: userId as unknown as number },
+        { owner_id: userId },
         // Events in user's organizations
         { group_id: { in: orgIds } },
         // Private events where user is invited
