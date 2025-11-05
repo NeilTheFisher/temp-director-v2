@@ -259,4 +259,6 @@ export class Event {
   settings: SettingInterface
 
   hasRicoh?: boolean
+
+  downloadUrls?: string[]
 }

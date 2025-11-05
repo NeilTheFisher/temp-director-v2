@@ -1,6 +1,7 @@
 import { S3Service } from "../services/S3Service"
 import { Setting } from "../entity/Setting"
 import { User } from "../entity/User"
+import { Event } from "../entity/Event"
 import { SettingInterface } from "../interfaces/Setting"
 import { LocationInfoInterface } from "../interfaces/LocationInfo"
 
@@ -8,6 +9,7 @@ const s3Service = new S3Service()
 
 export function OdienceEventResource(event: any, forWeb = false, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
   const eventSettings = getEventSettings(event.settings[0] ?? [])
+  const appUrl = getAppUrl(event.id)
   return {
     id: String(event.id),
     namespace: `/${event.id}`,
@@ -19,7 +21,7 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     location: String(event.location || ""),
     brand: getBrand(event, eventSettings),
     featured_catalogue: getFeaturedCatalog(eventSettings),
-    organization: getOrgName(event.group.name),
+    organization: getOrgName(event.group.name, event.owner.name),
     organization_image_url: event.group.imageUrl ?? "",
     organization_id: event.groupId,
     owner_id: String(event.ownerId),
@@ -38,8 +40,8 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     promo_video_aspect_ratio: event.promoVideoUrl ? (event.promoVideoAspectRatio || "fit_inside") : "",
     has_ricoh_stream: event.hasRicoh,
     payed: Boolean(event.payed),
-    invitation_message: "", //todo
-    event_url: "", //todo
+    invitation_message: getInvitationMessage(event, eventSettings, appUrl),
+    event_url: appUrl,
     invitations_only: Boolean(event.invitationsOnly),
     usersConnected: 0, //todo
     complete: false, //todo,
@@ -53,10 +55,10 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     pre_access: getPreAccess(event.ownerId, event.groupId, userInfo),
     web_allowed: Boolean(event.webAllowed),
     app_allowed: Boolean(event.appAllowed),
-    appUrl: "", //todo
+    appUrl: appUrl,
     settings: getSettings(eventSettings),
     active: Boolean(event.active),
-    downloads: [], //todo
+    downloads: event.downloadUrls,
     sponsors: {}, //todo
     host: getHost(eventSettings, event.owner),
     onLocation: getOnLocation(event.location_info),
@@ -224,4 +226,43 @@ function getPreAccess(ownerId: number, groupId: number, userInfo: {userId: numbe
 function getHost(settings: SettingInterface, owner: User)
 {
   return  settings[Setting.EVENT_ASSISTANT_PHONE_NUMBER] || (owner.msisdn || "")
+}
+
+function getAppUrl(eventId: number)
+{
+  return `https://${process.env.DIRECTOR_PUBLIC_SOCKET_ADDRESS}/o/${eventId}`
+}
+
+function  getInvitationMessage(event: Event, arrEventSettings: SettingInterface, eventAppUrl: string): string {
+  const strMessage = arrEventSettings[Setting.EVENT_INVITATION_MESSAGE] || ""
+
+  return strMessage.replace(
+    /\[eventName\]|\[orgName\]|\[eventDate\]|\[eventDescription\]|\[invitationUrl\]|\[eventId\]|\[orgId\]|\\r|\\n/g,
+    (match: string) => {
+      switch(match) {
+      case "[eventName]": return event.name
+      case "[orgName]": return getOrgName(event.group.name ?? "", event.owner.name ?? "")
+      case "[eventDate]":
+        if (event.date) {
+          const dateObj = new Date(event.date * 1000) // convert seconds -> milliseconds
+          return dateObj.toLocaleString("en-US", {
+            month: "long",
+            day: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false, // 24-hour format like PHP H:i
+          })
+        }
+        return ""
+      case "[eventDescription]": return event.description
+      case "[invitationUrl]": return eventAppUrl
+      case "[eventId]": return String(event.id)
+      case "[orgId]": return String(event.groupId)
+      case "\\r": return "\r"
+      case "\\n": return "\n"
+      default: return match
+      }
+    }
+  )
 }

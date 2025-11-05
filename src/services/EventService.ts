@@ -52,7 +52,7 @@ export class EventService {
     if (event.date && event.date <= now && (event.duration == null || event.date + event.duration > now))
     {
       if(event_stream.length === 0 && event_simulations.length > 0)
-        return EVENT_STATUS_RE_STREAM
+        return EVENT_STATUS_LIVE
       if (undefined != event_stream.find((e:EventStream) => this.type(e, stream) == 0))
         return EVENT_STATUS_LIVE
       if (event.restream || undefined != event_stream.find((e:EventStream) => this.type(e, stream) == 1) ) //nvr live
@@ -160,9 +160,11 @@ export class EventService {
           ids.push(stream.streamId)
         }
       }
-      const streams = await this.streamRepository.findBy({
-        //select: {id: true, recordedType: true},
-        id: In(ids)
+      const streams = await this.streamRepository.find({
+        where: {
+          id: In(ids)
+        },
+        relations: ["streamUrls"], // <-- load the related URLs
       })
       //*/
 
@@ -190,6 +192,15 @@ export class EventService {
         x.is_upcoming = EVENT_STATUS_UPCOMING == x.label
         x.is_past = !x.is_draft && x.date && x.duration && x.date + x.duration <= now
         x.hasRicoh = this.hasRicoh(streams)
+        x.downloadUrls = Array.from(
+          new Set(
+            streams.flatMap(stream =>
+              stream.streamUrls
+                .map(url => url.downloadUrl)
+                .filter(u => u) // remove null/undefined/empty strings
+            )
+          )
+        )
         //x.ads_count todo need change Event.ts
       })
       const filteredEvents = OdienceEventCollection(result, isWeb, userInfo)
