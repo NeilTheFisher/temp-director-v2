@@ -43,15 +43,15 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     invitation_message: getInvitationMessage(event, eventSettings, appUrl),
     event_url: appUrl,
     invitations_only: Boolean(event.invitationsOnly),
-    usersConnected: 0, //todo
-    complete: false, //todo,
-    invitation_accepted: false, //todo
-    invitation_requested: false, //todo
-    registered: false, //todo
-    usersInterestedCount: 0, //todo
-    banned: false, //todo
-    blocked: false, //todo
-    opened: false, //todo
+    usersConnected: event.usersConnected,
+    complete: Boolean >= event.capacity,
+    invitation_accepted: event.invitationAccepted,
+    invitation_requested: hasRequested(event, userInfo),
+    registered: hasRegistered(event, userInfo),
+    usersInterestedCount: event.usersInterested.length,
+    banned: isBanned(event, userInfo),
+    blocked: isBlocked(event, userInfo),
+    opened: hasOpened(event, userInfo),
     pre_access: getPreAccess(event.ownerId, event.groupId, userInfo),
     web_allowed: Boolean(event.webAllowed),
     app_allowed: Boolean(event.appAllowed),
@@ -265,4 +265,29 @@ function  getInvitationMessage(event: Event, arrEventSettings: SettingInterface,
       }
     }
   )
+}
+
+function isBanned(event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+{
+  return event.usersRemoved.some(user => user.msisdn === userInfo.msisdn)
+}
+
+function isBlocked(event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+{
+  return event.usersBlocked.some(user => user.msisdn === userInfo.msisdn)
+}
+
+function hasOpened(event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+{
+  return event.usersOpened.some(user => user.msisdn === userInfo.msisdn)
+}
+
+function hasRequested(event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+{
+  return event.eventRequests.some(user => user.msisdn === userInfo.msisdn)
+}
+
+function hasRegistered(event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+{
+  return event.usersRegistered.some(user => user.msisdn === userInfo.msisdn)
 }

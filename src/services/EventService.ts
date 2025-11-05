@@ -2,7 +2,6 @@ import { Repository } from "typeorm"
 import { AppDataSource } from "../data-source"
 import { In, Brackets, SelectQueryBuilder } from "typeorm"
 import { Event } from "../entity/Event"
-import { Group } from "../entity/Group"
 import { Invite } from "../entity/Invite"
 import { Setting } from "../entity/Setting"
 import { EventStream } from "../entity/EventStream"
@@ -23,19 +22,28 @@ const EVENT_STATUS_DEACTIVATED = "deactivated"
 export class EventService {
   private eventRepository: Repository<Event>
   private streamRepository: Repository<Stream>
-  private groupRepository: Repository<Group>
   private redisService = RedisService.getInstance()
   private redisClient = this.redisService.getClient()
   constructor() {
     this.eventRepository = AppDataSource.getRepository(Event)
     this.streamRepository = AppDataSource.getRepository(Stream)
-    this.groupRepository = AppDataSource.getRepository(Group)
+  }
+
+  async getUsersConnected(eventId: number): Promise<number> {
+    try {
+      const key = "{event:" + eventId + "}:users:"
+      const usersConnected = await this.redisClient.hGet(key, "users_connected_list")
+      console.log("usersConnected", usersConnected)
+      return Number(usersConnected)
+    } catch (err) {
+      console.error("Redis error:", (err as Error).message)
+    }
+    return 0
   }
 
   type(ev:EventStream, stream: Stream[]) : number {
     if (ev.stream) return ev.stream.recordedType
     const s = stream.find((e:Stream) => ev.streamId == e.id)
-    console.log("s", s)
     return s ? s.recordedType : -1
   }
 
@@ -77,6 +85,18 @@ export class EventService {
         Math.pow(Math.sin((lon1-lon2)*Math.PI/360),2)
   }
 
+  hasUserInvite(invites: { recipient: string }[], userInfo: {
+  userId: number
+  msisdn: string
+  isSuperAdmin: boolean
+  emails: string[]
+}): boolean {
+    return invites.some(invite =>
+      invite.recipient === userInfo.msisdn ||
+    userInfo.emails.includes(invite.recipient)
+    )
+  }
+
   async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
     try {
 
@@ -90,13 +110,19 @@ export class EventService {
       const dateStr = searchInitTimestamp
         ? new Date(searchInitTimestamp * 1000).toISOString().slice(0, 10) // YYYY-MM-DD
         : null
-      const events = await this.eventRepository
+      const query = this.eventRepository
         .createQueryBuilder("event")
-        .leftJoinAndSelect("event.invites", "invite")
+        .leftJoinAndSelect("event.invites", "invites")
         .leftJoinAndSelect("event.eventStreams", "streams")
         .leftJoinAndSelect("event.eventSimulations", "simulations")
         .leftJoinAndSelect("event.group", "group")
         .leftJoinAndSelect("event.owner", "owner")
+        .leftJoinAndSelect("event.usersRemoved", "usersRemoved")
+        .leftJoinAndSelect("event.usersOpened", "usersOpened")
+        .leftJoinAndSelect("event.eventRequests", "eventRequests")
+        .leftJoinAndSelect("event.usersRegistered", "usersRegistered")
+        .leftJoinAndSelect("event.usersInterested", "usersInterested")
+        .leftJoinAndSelect("event.usersBlocked", "usersBlocked")
         .leftJoinAndSelect(
           "event.settings",
           "settings",
@@ -104,19 +130,26 @@ export class EventService {
           { key: Setting.EVENT_SETTINGS, type: "App\\Models\\Event" }
         )
         .where("event.isDraft = :isDraft", { isDraft: false })
-        .where("event.active = :active", { active: true })
-        .where("event.category = :category", { category: searchCategory })
-        .where("event.location LIKE :location", { location: `%${searchLocation}%` })
-        .andWhere(new Brackets(qb => {
-          qb.where(new Brackets(subQ => {
-            subQ.where("(event.date + event.duration) >= :dateNow", { dateNow })
-              .orWhere("event.duration IS NULL")
+        .andWhere("event.active = :active", { active: true })
+        // Conditionally add category filter
+      if (searchCategory) {
+        query.andWhere("event.category = :category", { category: searchCategory })
+      }
+      // Conditionally add location filter
+      if (searchLocation) {
+        query.andWhere("event.location LIKE :location", { location: `%${searchLocation}%` })
+      }
 
-            if (dateStr) {
-              subQ.andWhere("DATE(FROM_UNIXTIME(event.dateStr)) = :dateStr", { dateStr })
-            }
-          }))
+      query.andWhere(new Brackets(qb => {
+        qb.where(new Brackets(subQ => {
+          subQ.where("(event.date + event.duration) >= :dateNow", { dateNow })
+            .orWhere("event.duration IS NULL")
+
+          if (dateStr) {
+            subQ.andWhere("DATE(FROM_UNIXTIME(event.dateStr)) = :dateStr", { dateStr })
+          }
         }))
+      }))
         .andWhere(new Brackets(qb => {
           qb.where((qb2: SelectQueryBuilder<Event>) => {
             const sub1 = qb2.subQuery()
@@ -135,7 +168,7 @@ export class EventService {
               return `EXISTS ${sub2}`
             })
         }))
-        .getMany()
+      const events =  await query.getMany()
       const now = new Date().valueOf() / 1000
       const result = events.filter( (event:Event) => {
         if (!event.isPublic) {
@@ -167,10 +200,10 @@ export class EventService {
         relations: ["streamUrls"], // <-- load the related URLs
       })
       //*/
-
-      result.forEach( (x:any) => {
-        if (x.invitationsOnly) {
-          x.invitation_accepted = true
+      for (const x of result as any[]) {
+        x.invitationAccepted = this.hasUserInvite(x.invites, userInfo)
+        if (x.invitationsOnly && !x.invitationAccepted) {
+          x.invitationAccepted = true
           if (x.location) {  //&& event.locationLock
             console.log("latitude:", x.latitude)
             console.log("longitude:", x.longitude)
@@ -180,7 +213,7 @@ export class EventService {
               if (loc.length >= 2) {
                 const dis = this.calcDis(parseFloat(x.latitude!), parseFloat(x.longitude!), parseFloat(loc[0]), parseFloat(loc[1]))
                 console.log("dis:", dis)
-                x.invitation_accepted = false
+                x.invitationAccepted = false
               }
             }
           }
@@ -192,6 +225,7 @@ export class EventService {
         x.is_upcoming = EVENT_STATUS_UPCOMING == x.label
         x.is_past = !x.is_draft && x.date && x.duration && x.date + x.duration <= now
         x.hasRicoh = this.hasRicoh(streams)
+        x.usersConnected = await this.getUsersConnected(x.id)
         x.downloadUrls = Array.from(
           new Set(
             streams.flatMap(stream =>
@@ -202,7 +236,7 @@ export class EventService {
           )
         )
         //x.ads_count todo need change Event.ts
-      })
+      }
       const filteredEvents = OdienceEventCollection(result, isWeb, userInfo)
       return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
     } catch (error) {

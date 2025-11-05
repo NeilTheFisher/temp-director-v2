@@ -187,7 +187,7 @@ export class Event {
   groupId: number
 
   @OneToMany(() => EventRegistered, (eventRegistered) => eventRegistered.event)
-  eventRegistereds: EventRegistered[]
+  usersRegistered: EventRegistered[]
 
   @OneToMany(() => EventLogs, (eventLogs) => eventLogs.event)
   eventLogs: EventLogs[]
@@ -196,16 +196,16 @@ export class Event {
   eventUsers: EventUser[]
 
   @OneToMany(() => EventBlocked, (eventBlocked) => eventBlocked.event)
-  eventBlockeds: EventBlocked[]
+  usersBlocked: EventBlocked[]
 
   @OneToMany(() => Action, (action) => action.event)
   actions: Action[]
 
   @OneToMany(() => EventInterested, (eventInterested) => eventInterested.event)
-  eventInteresteds: EventInterested[]
+  usersInterested: EventInterested[]
 
   @OneToMany(() => EventRemoved, (eventRemoved) => eventRemoved.event)
-  eventRemoveds: EventRemoved[]
+  usersRemoved: EventRemoved[]
 
   @OneToMany(() => Feed, (feed) => feed.event)
   feeds: Feed[]
@@ -232,7 +232,7 @@ export class Event {
   shoppingFeeds: ShoppingFeed[]
 
   @OneToMany(() => EventOpened, (eventOpened) => eventOpened.event)
-  eventOpeneds: EventOpened[]
+  usersOpened: EventOpened[]
 
   @OneToMany(() => ChatbotEvent, (chatbotEvent) => chatbotEvent.event)
   chatbotEvents: ChatbotEvent[]
@@ -259,6 +259,7 @@ export class Event {
   settings: SettingInterface
 
   hasRicoh?: boolean
-
+  invitationAccepted?: boolean
+  usersConnected?: number
   downloadUrls?: string[]
 }

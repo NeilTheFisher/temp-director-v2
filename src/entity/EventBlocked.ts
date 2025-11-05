@@ -23,7 +23,7 @@ export class EventBlocked {
   @Column("timestamp", { name: "date", nullable: true })
   date: Date | null;
 
-  @ManyToOne(() => Event, (event) => event.eventBlockeds, {
+  @ManyToOne(() => Event, (event) => event.usersBlocked, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })

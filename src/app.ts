@@ -32,7 +32,7 @@ redisClient.on("end", () => {
 
 // ✅ TEST MODE: skips full startup
 if (process.argv.includes("test")) {
-  console.log('"test" passed as argument. Skipping service init...')
+  console.log("\"test\" passed as argument. Skipping service init...")
   setTimeout(() => {
     directorApiServer.close()
     redisService.disconnect()
