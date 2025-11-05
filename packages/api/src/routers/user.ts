@@ -32,17 +32,16 @@ export const userRouter = {
 
     // Temporary placeholder
     return {
-      id: Number.parseInt(userId),
-      msisdn: context.session.user.email || "",
-      email: context.session.user.email,
-      firstName: context.session.user.name?.split(" ")[0],
-      lastName: context.session.user.name?.split(" ")[1],
+      id: BigInt(userId),
+      msisdn: context.session.user.email || null,
+      email: context.session.user.email || null,
+      name: context.session.user.name || null,
     };
   }),
 
   getUserInfoByMsisdn: authed.user.getUserInfoByMsisdn.handler(
     async ({ input, context }) => {
-      const { msisdn } = input as Record<string, string>;
+      const { msisdn } = input;
       console.log(`UserController.getUserInfoByMsisdn: ${msisdn}`);
 
       if (!context.session?.user) {
@@ -65,11 +64,10 @@ export const userRouter = {
 
         // Temporary placeholder
         return {
-          id: 1,
-          msisdn: msisdn as string,
+          id: BigInt(1),
+          msisdn: msisdn || null,
           email: `${msisdn}@example.com`,
-          firstName: "John",
-          lastName: "Doe",
+          name: "John Doe",
         };
       } catch (error: unknown) {
         const errorMessage =

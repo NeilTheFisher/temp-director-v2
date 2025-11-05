@@ -1,11 +1,11 @@
+import { UserSchema } from "@director_v2/db";
 import { z } from "zod";
 
-export const UserInfoSchema = z.object({
-  id: z.number(),
-  msisdn: z.string(),
-  email: z.string().optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+export const UserInfoSchema = UserSchema.pick({
+  id: true,
+  msisdn: true,
+  email: true,
+  name: true,
 });
 
 export const GetUserInfoInputSchema = z.object({});

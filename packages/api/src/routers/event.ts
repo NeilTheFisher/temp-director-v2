@@ -1,4 +1,6 @@
 import { ORPCError } from "@orpc/server";
+import * as eventRepository from "../lib/repositories/event";
+import * as userRepository from "../lib/user-handlers";
 import { authed } from "../orpc";
 
 export const eventRouter = {
@@ -11,28 +13,18 @@ export const eventRouter = {
       });
     }
 
-    // TODO: Replace with actual service calls
-    // const userId = context.session.user.id;
-    // const userInfo = await userService.getUserInfoForEvent(parseInt(userId));
-    //
-    // if (!userInfo) {
-    //   throw new ORPCError("UNAUTHORIZED", {
-    //     message: "User not found or not authenticated"
-    //   });
-    // }
-    //
-    // const events = await eventService.getEvents(userInfo);
-    // return events;
+    const userId = BigInt(context.session.user.id);
+    const userInfo = await userRepository.getUserInfoForEvents(userId);
 
-    // Temporary placeholder
-    return [
-      {
-        id: 1,
-        name: "Sample Event",
-        description: "This is a sample event",
-        status: "upcoming",
-      },
-    ];
+    const events = await eventRepository.getVisibleEvents(
+      userInfo.userId,
+      userInfo.orgIds,
+      userInfo.msisdn,
+      userInfo.emails,
+      userInfo.isSuperAdmin
+    );
+
+    return events;
   }),
 
   listPartialEvents: authed.events.listPartialEvents.handler(
@@ -45,29 +37,18 @@ export const eventRouter = {
         });
       }
 
-      // TODO: Replace with actual service calls
-      // Same implementation as listEvents for now
-      // const userId = context.session.user.id;
-      // const userInfo = await userService.getUserInfoForEvent(parseInt(userId));
-      //
-      // if (!userInfo) {
-      //   throw new ORPCError("UNAUTHORIZED", {
-      //     message: "User not found or not authenticated"
-      //   });
-      // }
-      //
-      // const events = await eventService.getEvents(userInfo);
-      // return events;
+      const userId = BigInt(context.session.user.id);
+      const userInfo = await userRepository.getUserInfoForEvents(userId);
 
-      // Temporary placeholder
-      return [
-        {
-          id: 1,
-          name: "Sample Partial Event",
-          description: "This is a sample partial event",
-          status: "upcoming",
-        },
-      ];
+      const events = await eventRepository.getVisibleEvents(
+        userInfo.userId,
+        userInfo.orgIds,
+        userInfo.msisdn,
+        userInfo.emails,
+        userInfo.isSuperAdmin
+      );
+
+      return events;
     }
   ),
 };

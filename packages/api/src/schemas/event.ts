@@ -1,13 +1,8 @@
+import { eventSchema } from "@director_v2/db";
 import { z } from "zod";
 
-export const EventSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  description: z.string().optional(),
-  status: z.string(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-});
+// Reuse generated eventSchema from database models
+export const EventSchema = eventSchema;
 
 export const EventListInputSchema = z.object({});
 
