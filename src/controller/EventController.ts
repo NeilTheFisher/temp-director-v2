@@ -15,7 +15,7 @@ class EventController {
       if (!userInfo) {
         return res.status(401).json("User not found or not authenticated")
       } else {
-        const body = await eventService.getEvents(userInfo)
+        const body = await eventService.getEvents(req, userInfo)
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
         res.setHeader("Pragma", "no-cache")
         res.setHeader("Expires", "0")

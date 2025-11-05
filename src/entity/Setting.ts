@@ -285,5 +285,7 @@ export class Setting {
 
   public static FEATURED_CATALOG_IMAGE_ALIGNMENT = "eatured_catalog_image_alignment"
   public static FEATURED_CATALOG_BLURRED_BACKGROUND = "featured_catalog_blurred_background"
+
+  public static EVENT_ASSISTANT_PHONE_NUMBER = "event_assistant_phone_number"
   //#endregion
 }

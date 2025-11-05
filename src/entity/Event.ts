@@ -8,6 +8,7 @@ import { EventInterested } from "./EventInterested"
 import { EventRemoved } from "./EventRemoved"
 import { Feed } from "./Feed"
 import { Group } from "./Group"
+import { User } from "./User"
 import { Setting } from "./Setting"
 import { EventStream } from "./EventStream"
 import { MediaContent } from "./MediaContent"
@@ -43,6 +44,10 @@ export class Event {
 
   @Column("int", { name: "owner_id" })
   ownerId: number
+
+  @ManyToOne(() => User, (user) => user.ownedEvents)
+  @JoinColumn({ name: "owner_id" })
+  owner: User
 
   @Column("int", { name: "duration", nullable: true })
   duration: number | null
@@ -252,4 +257,6 @@ export class Event {
 
   @OneToMany(() => Setting, (setting) => setting.event)
   settings: SettingInterface
+
+  hasRicoh?: boolean
 }

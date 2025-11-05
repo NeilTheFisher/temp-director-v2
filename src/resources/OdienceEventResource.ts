@@ -1,5 +1,6 @@
 import { S3Service } from "../services/S3Service"
 import { Setting } from "../entity/Setting"
+import { User } from "../entity/User"
 import { SettingInterface } from "../interfaces/Setting"
 import { LocationInfoInterface } from "../interfaces/LocationInfo"
 
@@ -35,7 +36,7 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     map_image_url: getMapImageUrl(event.id),
     promo_video_url: String(event.promoVideoUrl),
     promo_video_aspect_ratio: event.promoVideoUrl ? (event.promoVideoAspectRatio || "fit_inside") : "",
-    has_ricoh_stream: false, //todo
+    has_ricoh_stream: event.hasRicoh,
     payed: Boolean(event.payed),
     invitation_message: "", //todo
     event_url: "", //todo
@@ -57,7 +58,7 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     active: Boolean(event.active),
     downloads: [], //todo
     sponsors: {}, //todo
-    host: "", //todo
+    host: getHost(eventSettings, event.owner),
     onLocation: getOnLocation(event.location_info),
     onLocationLock: getOnLocationLock(event.location_info)
   }
@@ -218,4 +219,9 @@ function getEventSettings(settings: any)
 function getPreAccess(ownerId: number, groupId: number, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
 {
   return userInfo.isSuperAdmin || (ownerId === userInfo.userId || userInfo.orgIds.includes(groupId))
+}
+
+function getHost(settings: SettingInterface, owner: User)
+{
+  return  settings[Setting.EVENT_ASSISTANT_PHONE_NUMBER] || (owner.msisdn || "")
 }

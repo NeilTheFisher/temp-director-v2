@@ -1,14 +1,15 @@
 import { Repository } from "typeorm"
 import { AppDataSource } from "../data-source"
-import { In } from "typeorm"
+import { In, Brackets, SelectQueryBuilder } from "typeorm"
 import { Event } from "../entity/Event"
 import { Group } from "../entity/Group"
 import { Invite } from "../entity/Invite"
 import { Setting } from "../entity/Setting"
 import { EventStream } from "../entity/EventStream"
+import { EventSimulation } from "../entity/EventSimulation"
 import { Stream } from "../entity/Stream"
+import { Request } from "express"
 import RedisService from "./RedisService"
-import { SettingService } from "./SettingService"
 import { OdienceEventCollection } from "../resources/OdienceEventResource"
 
 const EVENT_STATUS_LIVE = "live"
@@ -46,9 +47,12 @@ export class EventService {
       return EVENT_STATUS_ENDED
     if (event.eventStreams.length == 0) return EVENT_STATUS_DRAFT
     const event_stream : EventStream[] = event.eventStreams || []
+    const event_simulations : EventSimulation[] = event.eventSimulations || []
 
     if (event.date && event.date <= now && (event.duration == null || event.date + event.duration > now))
     {
+      if(event_stream.length === 0 && event_simulations.length > 0)
+        return EVENT_STATUS_RE_STREAM
       if (undefined != event_stream.find((e:EventStream) => this.type(e, stream) == 0))
         return EVENT_STATUS_LIVE
       if (event.restream || undefined != event_stream.find((e:EventStream) => this.type(e, stream) == 1) ) //nvr live
@@ -62,21 +66,37 @@ export class EventService {
     return EVENT_STATUS_DEACTIVATED
   }
 
+  hasRicoh(streams: Stream[])
+  {
+    return streams.some(stream => stream.code && stream.code.trim() !== "")
+  }
+
   calcDis(lat1: number, lon1: number, lat2: number, lon2: number) : number {
     return 6371*2000*Math.asin(Math.pow(Math.sin((lat1-lat2)*Math.PI/360),2) +
         Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)) *
         Math.pow(Math.sin((lon1-lon2)*Math.PI/360),2)
   }
 
-  async getEvents(userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
+  async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
     try {
+
       const cacheKey =  `{user:${userInfo.msisdn}}:coordinates` // todo
       const cachedData = await this.redisClient.get(cacheKey)
+      const dateNow = Math.floor(Date.now() / 1000)
+      const searchInitTimestamp = Number(req.query["date"] ?? 0)
+      const isWeb = Boolean(parseInt((req.query["web"] as string) ?? "0", 10))
+      const searchLocation = req.query["location"] ?? ""
+      const searchCategory = req.query["category"] ?? ""
+      const dateStr = searchInitTimestamp
+        ? new Date(searchInitTimestamp * 1000).toISOString().slice(0, 10) // YYYY-MM-DD
+        : null
       const events = await this.eventRepository
         .createQueryBuilder("event")
         .leftJoinAndSelect("event.invites", "invite")
-        .leftJoinAndSelect("event.eventStreams", "stream")
+        .leftJoinAndSelect("event.eventStreams", "streams")
+        .leftJoinAndSelect("event.eventSimulations", "simulations")
         .leftJoinAndSelect("event.group", "group")
+        .leftJoinAndSelect("event.owner", "owner")
         .leftJoinAndSelect(
           "event.settings",
           "settings",
@@ -84,6 +104,37 @@ export class EventService {
           { key: Setting.EVENT_SETTINGS, type: "App\\Models\\Event" }
         )
         .where("event.isDraft = :isDraft", { isDraft: false })
+        .where("event.active = :active", { active: true })
+        .where("event.category = :category", { category: searchCategory })
+        .where("event.location LIKE :location", { location: `%${searchLocation}%` })
+        .andWhere(new Brackets(qb => {
+          qb.where(new Brackets(subQ => {
+            subQ.where("(event.date + event.duration) >= :dateNow", { dateNow })
+              .orWhere("event.duration IS NULL")
+
+            if (dateStr) {
+              subQ.andWhere("DATE(FROM_UNIXTIME(event.dateStr)) = :dateStr", { dateStr })
+            }
+          }))
+        }))
+        .andWhere(new Brackets(qb => {
+          qb.where((qb2: SelectQueryBuilder<Event>) => {
+            const sub1 = qb2.subQuery()
+              .select("1")
+              .from("event_stream", "es")
+              .where("es.event_id = event.id")
+              .getQuery()
+            return `EXISTS ${sub1}`
+          })
+            .orWhere((qb2: SelectQueryBuilder<Event>) => {
+              const sub2 = qb2.subQuery()
+                .select("1")
+                .from("event_simulation", "sim")
+                .where("sim.event_id = event.id")
+                .getQuery()
+              return `EXISTS ${sub2}`
+            })
+        }))
         .getMany()
       const now = new Date().valueOf() / 1000
       const result = events.filter( (event:Event) => {
@@ -113,7 +164,6 @@ export class EventService {
         //select: {id: true, recordedType: true},
         id: In(ids)
       })
-      console.log("streams", streams)
       //*/
 
       result.forEach( (x:any) => {
@@ -139,9 +189,10 @@ export class EventService {
         x.is_live = EVENT_STATUS_LIVE == x.label
         x.is_upcoming = EVENT_STATUS_UPCOMING == x.label
         x.is_past = !x.is_draft && x.date && x.duration && x.date + x.duration <= now
+        x.hasRicoh = this.hasRicoh(streams)
         //x.ads_count todo need change Event.ts
       })
-      const filteredEvents = OdienceEventCollection(result, false, userInfo)
+      const filteredEvents = OdienceEventCollection(result, isWeb, userInfo)
       return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
     } catch (error) {
       console.log(error)
