@@ -62,8 +62,8 @@ export class Event {
   @Column("int", { name: "duration", nullable: true })
   duration: number | null
 
-  @Column("int", { name: "date", nullable: true })
-  date: number | null
+  @Column("int", { name: "date"})
+  date: number
 
   @Column("tinyint", { name: "active", width: 1, default: () => 1 })
   active: boolean
@@ -289,4 +289,5 @@ export class Event {
 
   invitationAccepted?: boolean
   usersConnected?: number
+  downloadUrls?: string[]
 }

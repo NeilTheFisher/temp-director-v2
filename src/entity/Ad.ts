@@ -47,8 +47,8 @@ export class Ad {
   @ManyToMany(() => Event, (event) => event.ads)
   @JoinTable({
     name: "ad_event", // your pivot table name
-    joinColumn: { name: "event_id", referencedColumnName: "id" },
-    inverseJoinColumn: { name: "ad_id", referencedColumnName: "id" },
+    joinColumn: { name: "ad_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "event_id", referencedColumnName: "id" },
   })
     events: Event[]
 

@@ -2,17 +2,18 @@ import { Repository } from "typeorm"
 import { AppDataSource } from "../data-source"
 import { Brackets, SelectQueryBuilder } from "typeorm"
 import { Event } from "../entity/Event"
-import { Invite } from "../entity/Invite"
 import { Setting } from "../entity/Setting"
 import { Request } from "express"
 import RedisService from "./RedisService"
 import { OdienceEventCollection } from "../resources/OdienceEventResource"
+import { OdienceSimpleEventCollection } from "../resources/OdienceSimpleEventResource"
 import { isIpAllowed } from "../utils/utils"
 
 export class EventService {
   private eventRepository: Repository<Event>
   private redisService = RedisService.getInstance()
   private redisClient = this.redisService.getClient()
+  private dataSource = AppDataSource
   constructor() {
     this.eventRepository = AppDataSource.getRepository(Event)
   }
@@ -36,10 +37,9 @@ export class EventService {
   }
 
   hasUserInvite(invites: { recipient: string }[], userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[]}): boolean {
-    return invites.some(invite =>
-      invite.recipient === userInfo.msisdn ||
-    userInfo.emails.includes(invite.recipient)
-    )
+    const recipients = new Set(invites.map(i => i.recipient))
+    if (recipients.has(userInfo.msisdn)) return true
+    return userInfo.emails.some(email => recipients.has(email))
   }
 
   async getInvitationAccepted(clientIp: string, event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
@@ -92,8 +92,9 @@ export class EventService {
     return invitationAccepted
   }
 
-  async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
+  async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}, boolPartial = false): Promise<any> {
     try {
+      console.log(userInfo)
       const startTime = Date.now()
       const dateNow = Math.floor(Date.now() / 1000)
       const searchInitTimestamp = Number(req.query["date"] ?? 0)
@@ -106,20 +107,20 @@ export class EventService {
       const dateStr = searchInitTimestamp
         ? new Date(searchInitTimestamp * 1000).toISOString().slice(0, 10) // YYYY-MM-DD
         : null
-      const query = this.eventRepository
+      const mainQuery = this.eventRepository
         .createQueryBuilder("event")
         .where("event.isDraft = :isDraft", { isDraft: false })
         .andWhere("event.active = :active", { active: true })
-        // Conditionally add category filter
+
       if (searchCategory) {
-        query.andWhere("event.category = :category", { category: searchCategory })
-      }
-      // Conditionally add location filter
-      if (searchLocation) {
-        query.andWhere("event.location LIKE :location", { location: `%${searchLocation}%` })
+        mainQuery.andWhere("event.category = :category", { category: searchCategory })
       }
 
-      query.andWhere(new Brackets(qb => {
+      if (searchLocation) {
+        mainQuery.andWhere("event.location LIKE :location", { location: `%${searchLocation}%` })
+      }
+
+      mainQuery.andWhere(new Brackets(qb => {
         qb.where(new Brackets(subQ => {
           subQ.where("(event.date + event.duration) >= :dateNow", { dateNow })
             .orWhere("event.duration IS NULL")
@@ -129,111 +130,340 @@ export class EventService {
           }
         }))
       }))
-        .andWhere(new Brackets(qb => {
-          qb.where((qb2: SelectQueryBuilder<Event>) => {
-            const sub1 = qb2.subQuery()
-              .select("1")
-              .from("event_stream", "es")
-              .where("es.event_id = event.id")
-              .getQuery()
-            return `EXISTS ${sub1}`
-          })
-            .orWhere((qb2: SelectQueryBuilder<Event>) => {
-              const sub2 = qb2.subQuery()
-                .select("1")
-                .from("event_simulation", "sim")
-                .where("sim.event_id = event.id")
-                .getQuery()
-              return `EXISTS ${sub2}`
-            })
-        }))
-      query.andWhere(
-        new Brackets((qb) => {
-          // Public events always allowed
-          qb.where("event.isPublic = true")
 
-          // Non-public events allowed if user has access
+      mainQuery.andWhere(new Brackets(qb => {
+        qb.where((qb2: SelectQueryBuilder<Event>) => {
+          const sub1 = qb2.subQuery()
+            .select("1")
+            .from("event_stream", "es")
+            .where("es.event_id = event.id")
+            .getQuery()
+          return `EXISTS ${sub1}`
+        })
+          .orWhere((qb2: SelectQueryBuilder<Event>) => {
+            const sub2 = qb2.subQuery()
+              .select("1")
+              .from("event_simulation", "sim")
+              .where("sim.event_id = event.id")
+              .getQuery()
+            return `EXISTS ${sub2}`
+          })
+      }))
+
+      mainQuery.andWhere(
+        new Brackets((qb) => {
+          // If SuperAdmin, can see all events (no restrictions)
+          if (userInfo.isSuperAdmin) {
+            console.log("SUPER ADMIN")
+            qb.where("1=1") // always true
+            return
+          }
+
+          // Non-superadmin logic
+          qb.where("event.isPublic = true") // Public events
+
           qb.orWhere(
             new Brackets((qb2) => {
-              // User is SuperAdmin
-              if (userInfo.isSuperAdmin) {
-                qb2.where("1=1") // allow all
-              } else {
-                qb2.where("event.isPublic = false")
-                  .andWhere(
-                    new Brackets((qb3) => {
-                      // user is group member
-                      qb3.where("event.groupId IN (:...orgIds)", { orgIds: userInfo.orgIds || [0] })
-                      // or user is owner
-                        .orWhere("event.ownerId = :userId", { userId: userInfo.userId })
-                      // or user is invited
-                        .orWhere((qb4: SelectQueryBuilder<Event>) => {
-                          const subQuery = qb4.subQuery()
-                            .select("1")
-                            .from("invite", "i")
-                            .where("i.eventId = event.id")
-                            .andWhere("i.recipient = :msisdn", { msisdn: userInfo.msisdn })
-                            .orWhere("i.recipient IN (:...emails)", { emails: userInfo.emails || [] })
-                            .getQuery()
-                          return `EXISTS ${subQuery}`
-                        })
-                    })
+              qb2.where("event.isPublic = false").andWhere(
+                new Brackets((qb3) => {
+                  // User is owner
+                  qb3.where("event.ownerId = :userId", { userId: userInfo.userId })
+
+                  // User is in orgs
+                  if (userInfo.orgIds && userInfo.orgIds.length > 0) {
+                    qb3.orWhere("event.groupId IN (:...orgIds)", { orgIds: userInfo.orgIds })
+                  }
+
+                  // User is invited
+                  const recipients = [userInfo.msisdn]
+                  if (userInfo.emails && userInfo.emails.length > 0) {
+                    recipients.push(...userInfo.emails)
+                  }
+
+                  qb3.orWhere(
+                    `EXISTS (
+                SELECT 1 FROM invite i
+                WHERE i.event_id = event.id
+                AND i.recipient IN (:...recipients)
+              )`,
+                    { recipients }
                   )
-              }
+                })
+              )
             })
           )
         })
       )
-        .leftJoinAndSelect("event.invites", "invites")
-        .leftJoinAndSelect("event.streams", "streams")
-        .leftJoinAndSelect("streams.streamUrls", "streamUrls")
-        .leftJoinAndSelect("event.eventSimulations", "simulations")
+      // ONLY join group and owner in main query (smallest relations)
+      mainQuery
         .leftJoinAndSelect("event.group", "group")
         .leftJoinAndSelect("event.owner", "owner")
-        .leftJoinAndSelect("event.usersRemoved", "usersRemoved")
-        .leftJoinAndSelect("event.usersOpened", "usersOpened")
-        .leftJoinAndSelect("event.eventRequests", "eventRequests")
-        .leftJoinAndSelect("event.usersRegistered", "usersRegistered")
-        .leftJoinAndSelect("event.usersInterested", "usersInterested")
-        .leftJoinAndSelect("event.usersBlocked", "usersBlocked")
-        .leftJoinAndSelect("event.ads", "ads")
-        .leftJoinAndSelect("ads.sponsor", "adsSponsor")
-        .leftJoinAndSelect(
-          "event.settings",
-          "settings",
-          "settings.key = :key AND settings.configurable_type = :type AND settings.configurable_id = event.id",
-          { key: Setting.EVENT_SETTINGS, type: "App\\Models\\Event" }
-        )
-      const result =  await query.getMany()
-      //   const result = events.filter( (event:Event) => {
-      //     if (!event.isPublic) {
-      //       if(userInfo.orgIds.includes(event.groupId || 0) || event.ownerId === userInfo.userId || userInfo.isSuperAdmin){
-      //         return true
-      //       }
-      //       const invites = event.invites || []
-      //       console.log("invites:", invites)
-      //       const found = invites.find((i: Invite) =>
-      //         i.recipient === userInfo.msisdn || userInfo.emails.includes(i.recipient)
-      //       )
-      //       if (!found) return false
-      //     }
-      //     console.log("allow", event.name)
-      //     return true
-      //   })
-      //*/
-      for (const event of result as any[]) {
-        event.usersConnected = await this.getUsersConnected(event.id)
-        event.invitationAccepted = this.getInvitationAccepted(clientIp, event, userInfo)
+      const startMain = Date.now()
+      const events =  await mainQuery.getMany()
+      console.log(`Main query: ${Date.now() - startMain}ms, Events: ${events.length}`)
+      if (events.length === 0) {
+        return { total_events : 0, per_page: 0, current_page: 0, events: []}
+      }
+      const eventIds = events.map(e => e.id)
+      // STEP 2: Load all other data in parallel
+      const startParallel = Date.now()
+
+      const [
+        invites,
+        streams,
+        streamUrls,
+        simulations,
+        ads,
+        settings,
+        userRemovedData,
+        userOpenedData,
+        userRequestsData,
+        userRegisteredData,
+        userInterestedData,
+        userBlockedData
+      ] = await Promise.all([
+        // Invites
+        this.dataSource
+          .createQueryBuilder()
+          .select(["invite.event_id as eventId", "invite.recipient as recipient"])
+          .from("invite", "invite")
+          .where("invite.event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        // Streams (with recordedType for getLabel)
+        this.dataSource
+          .createQueryBuilder()
+          .select(["s.id", "es.event_id as eventId", "s.recorded_type as recordedType", "s.code"])
+          .from("event_stream", "es")
+          .innerJoin("stream", "s", "s.id = es.stream_id")
+          .where("es.event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        // Stream URLs
+        this.dataSource
+          .createQueryBuilder()
+          .select(["su.download_url as downloadUrl", "es.event_id as eventId"])
+          .from("stream_url", "su")
+          .innerJoin("stream", "s", "s.id = su.stream_id")
+          .innerJoin("event_stream", "es", "es.stream_id = s.id")
+          .where("es.event_id IN (:...eventIds)", { eventIds })
+          .andWhere("su.download_url IS NOT NULL")
+          .getRawMany(),
+
+        // Simulations
+        this.dataSource
+          .createQueryBuilder()
+          .select(["simulation_id as simulationId", "event_id as eventId"])
+          .from("event_simulation", "event_simulation")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        // Ads with sponsors
+        this.dataSource
+          .createQueryBuilder()
+          .select([
+            "a.id", "a.location", "a.name", "a.url", "a.media_url as mediaUrl",
+            "s.id as sponsorId", "s.name as sponsorName",
+            "ae.event_id as eventId"
+          ])
+          .from("ad_event", "ae")
+          .innerJoin("ad", "a", "a.id = ae.ad_id")
+          .leftJoin("sponsor", "s", "s.id = a.sponsor_id")
+          .where("ae.event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        // Settings
+        this.dataSource
+          .createQueryBuilder()
+          .select([
+            "setting.id AS id",
+            "`setting`.`key` AS `key`",
+            "setting.value AS value",
+            "setting.configurable_id AS configurableId",
+          ])
+          .from("setting", "setting")
+          .where("`setting`.`key` = :key", { key: Setting.EVENT_SETTINGS })
+          .andWhere("`setting`.`configurable_type` = :type", { type: "App\\Models\\Event" })
+          .andWhere("`setting`.`configurable_id` IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        // User relations - one query each
+        this.dataSource
+          .createQueryBuilder()
+          .select(["event_id as eventId", "msisdn"])
+          .from("event_removed", "event_removed")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        this.dataSource
+          .createQueryBuilder()
+          .select(["event_id as eventId", "msisdn"])
+          .from("event_opened", "event_opened")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        this.dataSource
+          .createQueryBuilder()
+          .select(["event_id as eventId", "msisdn"])
+          .from("event_requests", "event_requests")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        this.dataSource
+          .createQueryBuilder()
+          .select(["event_id as eventId", "msisdn"])
+          .from("event_registered", "event_registered")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .getRawMany(),
+
+        this.dataSource
+          .createQueryBuilder()
+          .select(["event_id as eventId", "COUNT(*) as count"])
+          .from("event_interested", "event_interested")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .groupBy("event_id")
+          .getRawMany(),
+
+        this.dataSource
+          .createQueryBuilder()
+          .select(["event_id as eventId", "msisdn"])
+          .from("event_blocked", "event_blocked")
+          .where("event_id IN (:...eventIds)", { eventIds })
+          .getRawMany()
+      ])
+      console.log(`Parallel queries: ${Date.now() - startParallel}ms`)
+
+      // STEP 3: Map data back to events
+      const startMapping = Date.now()
+
+      // Create lookup maps
+      const invitesMap = new Map<number, any[]>()
+      invites.forEach((i) => {
+        if (!i.eventId) return
+        if (!invitesMap.has(i.eventId)) {
+          invitesMap.set(i.eventId, [])
+        }
+        invitesMap.get(i.eventId)!.push({ recipient: i.recipient })
+      })
+
+      const streamsMap = new Map<number, any[]>()
+      streams.forEach(s => {
+        if (!streamsMap.has(s.eventId)) streamsMap.set(s.eventId, [])
+            streamsMap.get(s.eventId)!.push({
+              id: s.id,
+              recordedType: s.recordedType,
+              code: s.code
+            })
+      })
+
+      const streamUrlsMap = new Map<number, Set<string>>()
+      streamUrls.forEach(su => {
+        if (!streamUrlsMap.has(su.eventId)) streamUrlsMap.set(su.eventId, new Set())
+        if (su.downloadUrl) streamUrlsMap.get(su.eventId)!.add(su.downloadUrl)
+      })
+
+      const simulationsMap = new Map<number, any[]>()
+      simulations.forEach(sim => {
+        if (!simulationsMap.has(sim.eventId)) simulationsMap.set(sim.eventId, [])
+            simulationsMap.get(sim.eventId)!.push({ simulation_id: sim.simulationId })
+      })
+
+      const adsMap = new Map<number, any[]>()
+      ads.forEach(ad => {
+        if (!adsMap.has(ad.eventId)) adsMap.set(ad.eventId, [])
+                adsMap.get(ad.eventId)!.push({
+                  id: ad.id,
+                  location: ad.location,
+                  name: ad.name,
+                  url: ad.url,
+                  media_url: ad.mediaUrl,
+                  sponsor: ad.sponsorId ? { id: ad.sponsorId, name: ad.sponsorName } : null
+                })
+      })
+
+      const settingsMap = new Map(settings.map(s => [s.configurableId, [{
+        id: s.id,
+        key: s.key,
+        value: s.value
+      }]]))
+
+      // User data maps
+      const createUserMap = (data: any[]) => {
+        const map = new Map<number, any[]>()
+        data.forEach(item => {
+          if (!map.has(item.eventId)) map.set(item.eventId, [])
+            map.get(item.eventId)!.push({ msisdn: item.msisdn })
+        })
+        return map
+      }
+
+      const removedMap = createUserMap(userRemovedData)
+      const openedMap = createUserMap(userOpenedData)
+      const requestsMap = createUserMap(userRequestsData)
+      const registeredMap = createUserMap(userRegisteredData)
+      const blockedMap = createUserMap(userBlockedData)
+
+      const interestedMap = new Map(
+        userInterestedData.map(d => [d.eventId, Array(parseInt(d.count)).fill({ id: 0 })])
+      )
+
+      // Apply to events
+      events.forEach(event => {
+        event.invites = invitesMap.get(event.id) || []
+        event.streams = streamsMap.get(event.id) || []
+        event.eventSimulations = simulationsMap.get(event.id) || []
+        event.settings = settingsMap.get(event.id) || []
+        event.usersOpened = openedMap.get(event.id) || []
+        event.eventRequests = requestsMap.get(event.id) || []
+        event.usersRegistered = registeredMap.get(event.id) || []
+
+        if(!boolPartial)
+        {
+        // only for full list
+          event.usersBlocked = blockedMap.get(event.id) || []
+          event.usersInterested = interestedMap.get(event.id) || []
+          event.ads = adsMap.get(event.id) || []
+          event.downloadUrls = streamUrlsMap.get(event.id) ? Array.from(streamUrlsMap.get(event.id)!) : []
+          event.usersRemoved = removedMap.get(event.id) || []
+        }
+
+      })
+
+      console.log(`Mapping: ${Date.now() - startMapping}ms`)
+
+      const result = events
+
+      const usersConnectedPromises = result.map(event =>
+        this.getUsersConnected(event.id)
+      )
+
+      const invitationAcceptedPromises = result.map(event =>
+        this.getInvitationAccepted(clientIp, event, userInfo)
+      )
+      // Wait for all Redis operations to complete in parallel
+      const [usersConnectedResults, invitationAcceptedResults] = await Promise.all([
+        Promise.all(usersConnectedPromises),
+        Promise.all(invitationAcceptedPromises)
+      ])
+      for (let i = 0; i < result.length; i++) {
+        const event = result[i] as any
+        event.usersConnected = usersConnectedResults[i]
+        event.invitationAccepted = invitationAcceptedResults[i]
+
         delete event.invites
-        for (const e in event) if (null == event[e]) delete event[e]
+
+        // Clean up null values (more efficient)
+        Object.keys(event).forEach(key => {
+          if (event[key] === null) delete event[key]
+        })
       }
       console.log(`${Date.now() - startTime} time took to get events list for user ${userInfo.msisdn}`)
-      const filteredEvents = OdienceEventCollection(result, isWeb, userInfo)
+      const filteredEvents = boolPartial ? OdienceSimpleEventCollection(result, isWeb, userInfo) :  OdienceEventCollection(result, isWeb, userInfo)
       console.log(`${Date.now() - startTime} time took to get events list and build schema for user ${userInfo.msisdn}`)
       return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
     } catch (error) {
       console.log(error)
-      return null
+      return { total_events : 0, per_page: 0, current_page: 1, events: [], error: error}
     }
   }
 }

@@ -125,8 +125,8 @@ export class Stream {
   @ManyToMany(() => Event, (event) => event.streams)
   @JoinTable({
     name: "event_stream", // your pivot table name
-    joinColumn: { name: "event_id", referencedColumnName: "id" },
-    inverseJoinColumn: { name: "stream_id", referencedColumnName: "id" },
+    joinColumn: { name: "stream_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "event_id", referencedColumnName: "id" },
   })
   events: Event[]
 

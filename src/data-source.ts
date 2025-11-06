@@ -11,4 +11,7 @@ export const AppDataSource = new DataSource({
   password: process.env.MYSQL_PASSWORD ?? "password",
   database: process.env.MYSQL_DATABASE ?? "db_director",
   entities: ["build/entity/**/*.js", "entity/**/*.js"],
+  // logging: ["query", "error"],
+  // logger: "advanced-console",
+  // maxQueryExecutionTime: 100,
 })
