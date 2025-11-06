@@ -1,9 +1,6 @@
 import { userSchema } from "@director_v2/db/prisma/generated/zod/schemas/models/user.schema";
 import { oc } from "@orpc/contract";
-import {
-  GetUserInfoByMsisdnInputSchema,
-  GetUserInfoInputSchema,
-} from "../schemas/user";
+import z from "zod";
 
 const minUserSchema = userSchema.pick({
   id: true,
@@ -13,8 +10,12 @@ const minUserSchema = userSchema.pick({
 });
 
 export const userContract = {
-  getUserInfo: oc.input(GetUserInfoInputSchema).output(minUserSchema),
+  getUserInfo: oc.input(z.object({})).output(minUserSchema),
   getUserInfoByMsisdn: oc
-    .input(GetUserInfoByMsisdnInputSchema)
+    .input(
+      z.object({
+        msisdn: z.string(),
+      }),
+    )
     .output(minUserSchema),
 };

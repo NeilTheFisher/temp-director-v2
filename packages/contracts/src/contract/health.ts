@@ -1,4 +1,4 @@
 import { oc } from "@orpc/contract";
-import { HealthCheckOutputSchema } from "../schemas/health";
+import z from "zod";
 
-export const healthContract = oc.output(HealthCheckOutputSchema);
+export const healthContract = oc.output(z.literal("OK"));

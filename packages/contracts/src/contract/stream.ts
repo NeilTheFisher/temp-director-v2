@@ -1,6 +1,16 @@
 import { oc } from "@orpc/contract";
-import { StreamUrlInputSchema, StreamUrlOutputSchema } from "../schemas/stream";
+import z from "zod";
 
 export const streamContract = {
-  getStreamUrls: oc.input(StreamUrlInputSchema).output(StreamUrlOutputSchema),
+  getStreamUrls: oc
+    .input(
+      z.object({
+        streamUrlId: z.number().int().positive(),
+      }),
+    )
+    .output(
+      z.object({
+        urls: z.array(z.string()),
+      }),
+    ),
 };
