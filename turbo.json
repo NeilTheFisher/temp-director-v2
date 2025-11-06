@@ -8,10 +8,12 @@
       "outputs": ["dist/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "cache": false,
+      "outputs": []
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "lint:types": {
+      "cache": false,
+      "outputs": []
     },
     "dev": {
       "cache": false,

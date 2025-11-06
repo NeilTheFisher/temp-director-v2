@@ -24,6 +24,11 @@ export async function getUserInfoForEvents(userId: number) {
     where: { id: userId },
     include: {
       email_user: true,
+      roles_user_group: {
+        include: {
+          roles: true,
+        },
+      },
     },
   });
 
@@ -42,11 +47,37 @@ export async function getUserInfoForEvents(userId: number) {
     });
   }
 
-  // TODO: Check for super admin role and collect org IDs
-  // This requires loading role information which needs more DB queries
-  // For now, we return basic structure
-  const isSuperAdmin = false;
-  const orgIds: bigint[] = [];
+  // Determine super admin status and collect org IDs from user's roles
+  let isSuperAdmin = false;
+  const orgIds: number[] = [];
+
+  if (user.roles_user_group && user.roles_user_group.length > 0) {
+    user.roles_user_group.forEach((userRole) => {
+      const roleName = userRole.roles?.name || "";
+
+      // Check if SUPER_ADMIN role (common patterns: "super-admin", "Super Admin", "SUPER_ADMIN")
+      if (
+        roleName.toLowerCase().includes("super") &&
+        roleName.toLowerCase().includes("admin")
+      ) {
+        isSuperAdmin = true;
+      }
+
+      // Collect group IDs (organizations) where user has a role
+      // Skip if user is super admin (they see everything)
+      if (userRole.group_id !== null && !isSuperAdmin) {
+        const groupId = Number(userRole.group_id);
+        if (!orgIds.includes(groupId)) {
+          orgIds.push(groupId);
+        }
+      }
+    });
+
+    // If user is super admin, clear org IDs (super admins see everything)
+    if (isSuperAdmin) {
+      orgIds.length = 0;
+    }
+  }
 
   return {
     userId: Number(user.id),

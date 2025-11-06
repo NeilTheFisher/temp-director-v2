@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port=3001",
+    "dev": "next dev --port=3001 --experimental-https",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "biome check . && oxlint",
+    "lint:types": "tsc --noEmit"
   },
   "dependencies": {
     "radix-ui": "^1.4.2",

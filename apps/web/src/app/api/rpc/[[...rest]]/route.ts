@@ -3,7 +3,11 @@ import { appRouter } from "@director_v2/api/routers/index";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
+import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
+import {
+  SimpleCsrfProtectionHandlerPlugin,
+  StrictGetMethodPlugin,
+} from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
 
@@ -13,12 +17,20 @@ const rpcHandler = new RPCHandler(appRouter, {
       console.error(error);
     }),
   ],
+  plugins: [
+    new CompressionPlugin(),
+    new SimpleCsrfProtectionHandlerPlugin(),
+    new StrictGetMethodPlugin(),
+  ],
 });
 const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
     new OpenAPIReferencePlugin({
       schemaConverters: [new ZodToJsonSchemaConverter()],
     }),
+    new CompressionPlugin(),
+    new SimpleCsrfProtectionHandlerPlugin(),
+    new StrictGetMethodPlugin(),
   ],
   interceptors: [
     onError((error) => {

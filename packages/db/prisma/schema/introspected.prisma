@@ -1132,10 +1132,10 @@ model role_has_permission {
 model roles {
   id               BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
   name             String             @unique(map: "roles_name_unique")
-  roles_user_group roles_user_group[] @ignore
+  roles_user_group roles_user_group[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// Explicit many-to-many relation between users, roles, and groups/organizations
 model roles_user_group {
   role_id  BigInt  @db.UnsignedBigInt
   group_id BigInt? @db.UnsignedBigInt
@@ -1144,10 +1144,10 @@ model roles_user_group {
   roles    roles   @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_role_id_foreign")
   user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_user_id_foreign")
 
+  @@id([role_id, user_id])
   @@index([group_id], map: "roles_user_group_group_id_foreign")
   @@index([role_id], map: "roles_user_group_role_id_foreign")
   @@index([user_id], map: "roles_user_group_user_id_foreign")
-  @@ignore
 }
 
 model session_logs {

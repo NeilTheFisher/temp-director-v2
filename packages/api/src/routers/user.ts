@@ -33,9 +33,9 @@ export const userRouter = {
     // Temporary placeholder
     return {
       id: BigInt(userId),
-      msisdn: context.session.user.email || null,
-      email: context.session.user.email || null,
-      name: context.session.user.name || null,
+      msisdn: null,
+      email: null,
+      name: null,
     };
   }),
 

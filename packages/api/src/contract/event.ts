@@ -1,9 +1,8 @@
+import { eventSchema } from "@director_v2/db/prisma/generated/zod/schemas/models/event.schema";
 import { oc } from "@orpc/contract";
-import { EventListInputSchema, EventListOutputSchema } from "../schemas/event";
+import z from "zod";
 
 export const eventContract = {
-  listEvents: oc.input(EventListInputSchema).output(EventListOutputSchema),
-  listPartialEvents: oc
-    .input(EventListInputSchema)
-    .output(EventListOutputSchema),
+  listEvents: oc.input(z.void()).output(eventSchema),
+  listPartialEvents: oc.input(z.void()).output(eventSchema),
 };

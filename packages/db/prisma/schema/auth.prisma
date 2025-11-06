@@ -30,7 +30,7 @@ model user {
   kpi_emotes_sent                     kpi_emotes_sent[]
   kpi_questions_sent                  kpi_questions_sent[]
   model_logs                          model_logs[]
-  roles_user_group                    roles_user_group[]        @ignore
+  roles_user_group                    roles_user_group[]
   session_logs                        session_logs[]
   stream_url_token                    stream_url_token[]
   group_user_personal_group_idTogroup group?                    @relation("user_personal_group_idTogroup", fields: [personal_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_personal_group_id_foreign")

@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   cacheComponents: true,
   experimental: {
-    // turbopackFileSystemCacheForDev: true,
+    turbopackFileSystemCacheForDev: true,
+    preloadEntriesOnStart: true,
   },
   reactCompiler: true,
 };

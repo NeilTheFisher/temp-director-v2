@@ -3,10 +3,10 @@ import type { authClient } from "@/lib/auth-client";
 
 export default function Dashboard({
   // customerState,
-  session,
+  _session,
 }: {
   // customerState: ReturnType<typeof authClient.customer.state>;
-  session: typeof authClient.$Infer.Session;
+  _session: typeof authClient.$Infer.Session;
 }) {
   // const privateData = useQuery(orpc.privateData.queryOptions());
 

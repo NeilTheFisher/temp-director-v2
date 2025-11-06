@@ -1,6 +1,7 @@
 import type { AppRouterClient } from "@director_v2/api/routers/index";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
+import { DedupeRequestsPlugin } from "@orpc/client/plugins";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -36,6 +37,17 @@ export const link = new RPCLink({
     const { headers } = await import("next/headers");
     return Object.fromEntries(await headers());
   },
+  plugins: [
+    new DedupeRequestsPlugin({
+      filter: ({ request }) => request.method === "GET",
+      groups: [
+        {
+          condition: () => true,
+          context: {},
+        },
+      ],
+    }),
+  ],
 });
 
 export const client: AppRouterClient = createORPCClient(link);
