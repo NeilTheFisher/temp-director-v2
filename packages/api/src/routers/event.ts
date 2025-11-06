@@ -25,7 +25,7 @@ export const eventRouter = {
       userInfo.isSuperAdmin,
     );
 
-    return events;
+    return events as any;
   }),
 
   listPartialEvents: authed.events.listPartialEvents.handler(
@@ -51,7 +51,7 @@ export const eventRouter = {
         userInfo.isSuperAdmin,
       );
 
-      return events;
+      return events as any;
     },
   ),
 };

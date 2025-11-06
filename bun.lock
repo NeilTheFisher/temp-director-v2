@@ -66,6 +66,7 @@
       "name": "@director_v2/api",
       "dependencies": {
         "@director_v2/auth": "workspace:*",
+        "@director_v2/contracts": "workspace:*",
         "@director_v2/db": "workspace:*",
         "@orpc/client": "catalog:",
         "@orpc/contract": "catalog:",
@@ -93,6 +94,22 @@
         "@polar-sh/sdk": "^0.34.16",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "tsdown": "catalog:",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/contracts": {
+      "name": "@director_v2/contracts",
+      "version": "0.0.1",
+      "dependencies": {
+        "@director_v2/db": "workspace:*",
+        "@orpc/contract": "catalog:",
+        "@orpc/zod": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
@@ -180,6 +197,8 @@
     "@director_v2/api": ["@director_v2/api@workspace:packages/api"],
 
     "@director_v2/auth": ["@director_v2/auth@workspace:packages/auth"],
+
+    "@director_v2/contracts": ["@director_v2/contracts@workspace:packages/contracts"],
 
     "@director_v2/db": ["@director_v2/db@workspace:packages/db"],
 
