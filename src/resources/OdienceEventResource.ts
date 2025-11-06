@@ -64,8 +64,8 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     downloads: getDownloadUrls(event.streams),
     sponsors: {custom: getCustomAds(event.id, event.ads), settings: getSponsorSettings(eventSettings), external: {}},
     host: getHost(eventSettings, event.owner),
-    onLocation: getOnLocation(event.location_info),
-    onLocationLock: getOnLocationLock(event.location_info)
+    onLocation: getOnLocation(event.locationInfo),
+    onLocationLock: getOnLocationLock(event.locationInfo)
   }
 }
 
@@ -111,14 +111,14 @@ function getSettings(settings: SettingInterface)
   }
 }
 
-function getOnLocation(location_info: LocationInfoInterface)
+function getOnLocation(locationInfo: LocationInfoInterface)
 {
-  return Boolean(location_info?.on_location_feature ?? 0)
+  return Boolean(locationInfo?.on_location_feature ?? 0)
 }
 
-function getOnLocationLock(location_info: LocationInfoInterface)
+function getOnLocationLock(locationInfo: LocationInfoInterface)
 {
-  return Boolean(location_info?.location_lock ?? 0)
+  return Boolean(locationInfo?.location_lock ?? 0)
 }
 
 function getBrand(event: any, settings: SettingInterface)

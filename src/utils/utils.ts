@@ -51,30 +51,30 @@ export async function verifyAccess(authHeader: string): Promise<string> {
 }
 
 export function getPhoneDetails(msisdn: string) {
-  let countryCode = 1;
-  let regionCode = 'CA';
+  let countryCode = 1
+  let regionCode = "CA"
   try {
-    const phoneUtil = PhoneNumberUtil.getInstance();
+    const phoneUtil = PhoneNumberUtil.getInstance()
 
     // Parse the phone number in international format
-    const phoneNumber = phoneUtil.parseAndKeepRawInput(`+${msisdn}`);
+    const phoneNumber = phoneUtil.parseAndKeepRawInput(`+${msisdn}`)
 
     // Get the region code (ISO 3166-1 alpha-2 format)
-    regionCode = phoneUtil.getRegionCodeForNumber(phoneNumber) || regionCode;
+    regionCode = phoneUtil.getRegionCodeForNumber(phoneNumber) || regionCode
 
     // Get the country calling code (E.164 format)
     if(regionCode)
     {
-      countryCode = phoneUtil.getCountryCodeForRegion(regionCode);
+      countryCode = phoneUtil.getCountryCodeForRegion(regionCode)
     }
 
   } catch (error) {
-    console.error("Error parsing phone number:", error);
+    console.error("Error parsing phone number:", error)
   }
   return {
     regionCode, // e.g., 'US'
     countryCode, // e.g., '1'
-  };
+  }
 }
 
 
@@ -99,9 +99,9 @@ export async function validateAndFormatPhoneNumber(
 
   try {
     const settingService = new SettingService()
-    const systemSettings =  await settingService.getSystemSettings();
-    const accountSid = systemSettings[Setting.TWILIO_ACCOUNT_SID] ?? ''
-    const authToken = systemSettings[Setting.TWILIO_AUTH_TOKEN] ?? ''
+    const systemSettings =  await settingService.getSystemSettings()
+    const accountSid = systemSettings[Setting.TWILIO_ACCOUNT_SID] ?? ""
+    const authToken = systemSettings[Setting.TWILIO_AUTH_TOKEN] ?? ""
     console.log("SID:", accountSid)
     const response = await axios.get(`https://lookups.twilio.com/v1/PhoneNumbers/+${strMsisdn}`, {
       auth: {
@@ -254,36 +254,82 @@ export function capitalize(string: string): string {
 }
 
 export function concatenateAndConvertToHex(length: number, string: string): string {
-  const randomHex = generateRandomHex(length);
-  const combinedString = randomHex + string; // Concatenate the random hex and userId
-  const buffer = Buffer.from(combinedString, 'utf8'); // Convert to a Buffer
-  return buffer.toString('hex'); // Convert the entire Buffer to hex
+  const randomHex = generateRandomHex(length)
+  const combinedString = randomHex + string // Concatenate the random hex and userId
+  const buffer = Buffer.from(combinedString, "utf8") // Convert to a Buffer
+  return buffer.toString("hex") // Convert the entire Buffer to hex
 }
 
 function generateRandomHex(length: number): string {
-  return randomBytes(length).toString('hex');
+  return randomBytes(length).toString("hex")
 }
 
 
 export function parseDomainDetails(urlString: string) {
-  const url = new URL(urlString);
+  const url = new URL(urlString)
 
   // Get the host without 'www.'
-  const currentHost = url.hostname.replace(/^www\./i, '');
+  const currentHost = url.hostname.replace(/^www\./i, "")
 
   // Get the port (if any)
-  const currentPort = url.port;
+  const currentPort = url.port
 
   // Format the port (prepend with ':' if it exists)
-  const currentPortFormatted = currentPort ? `:${currentPort}` : '';
+  const currentPortFormatted = currentPort ? `:${currentPort}` : ""
 
   // Combine host and formatted port
-  const currentDomain = currentHost + currentPortFormatted;
+  const currentDomain = currentHost + currentPortFormatted
 
   return {
     currentHost,
     currentPort,
     currentPortFormatted,
     currentDomain,
-  };
+  }
+}
+
+export function isIpAllowed(ipsList: string, ip: string): boolean {
+  // If no invited IPs are set, deny access
+  if (!ipsList) {
+    return false
+  }
+
+  return ipInCidrs(ip, ipsList)
+}
+
+function isIpInCidr(ip: string, cidr: string): boolean {
+  const [range, bits = "32"] = cidr.split("/")
+  const maskBits = parseInt(bits, 10)
+
+  const ipNum = ipToLong(ip)
+  const rangeNum = ipToLong(range)
+
+  const mask = maskBits === 0 ? 0 : (~0 << (32 - maskBits)) >>> 0
+
+  return (ipNum & mask) === (rangeNum & mask)
+}
+
+function ipToLong(ip: string): number {
+  return ip.split(".").reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0
+}
+
+function ipInCidrs(ip: string, cidrList: string): boolean {
+  console.log("ipInCidrs.check", { ip, list: cidrList })
+
+  if (!cidrList) {
+    console.log("ipInCidrs: empty list")
+    return false
+  }
+
+  const cidrs = cidrList.split(",").map((c) => c.trim()).filter(Boolean)
+
+  for (const cidr of cidrs) {
+    if (isIpInCidr(ip, cidr)) {
+      console.log("ipInCidrs.check SUCCESS", { ip, list: cidrList })
+      return true
+    }
+  }
+
+  console.log("ipInCidrs.check FAILED", { ip, list: cidrList })
+  return false
 }

@@ -7,6 +7,7 @@ import { Setting } from "../entity/Setting"
 import { Request } from "express"
 import RedisService from "./RedisService"
 import { OdienceEventCollection } from "../resources/OdienceEventResource"
+import { isIpAllowed } from "../utils/utils"
 
 export class EventService {
   private eventRepository: Repository<Event>
@@ -28,34 +29,85 @@ export class EventService {
   }
 
 
-  calcDis(lat1: number, lon1: number, lat2: number, lon2: number) : number {
+  calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) : number {
     return 6371*2000*Math.asin(Math.pow(Math.sin((lat1-lat2)*Math.PI/360),2) +
         Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)) *
         Math.pow(Math.sin((lon1-lon2)*Math.PI/360),2)
   }
 
-  hasUserInvite(invites: { recipient: string }[], userInfo: {
-  userId: number
-  msisdn: string
-  isSuperAdmin: boolean
-  emails: string[]
-}): boolean {
+  hasUserInvite(invites: { recipient: string }[], userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[]}): boolean {
     return invites.some(invite =>
       invite.recipient === userInfo.msisdn ||
     userInfo.emails.includes(invite.recipient)
     )
   }
 
+  async getInvitationAccepted(clientIp: string, event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
+  {
+    let invitationAccepted = this.hasUserInvite(event.invites, userInfo)
+    if(!invitationAccepted)
+    {
+      console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Doing location check...`)
+      if(event.locationInfo?.location_lock ?? 0)
+      {
+        console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Lock is on.`)
+        if(event.locationInfo.location_ips)
+        {
+          console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Checking ips.`)
+          invitationAccepted = isIpAllowed(event.locationInfo.location_ips, clientIp)
+          console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. ip check ${invitationAccepted ? "passed" : "failed"}`, {clientIp: clientIp, eventIps: event.locationInfo.location_ips})
+        }
+        if(!invitationAccepted)
+        {
+          console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Checking physical location.`)
+          const cacheKey =  `{user:${userInfo.msisdn}}:coordinates`
+          const cachedData = await this.redisClient.get(cacheKey)
+          const eventLatitude = event.locationInfo.location_latitude || 0
+          const eventLongitude = event.locationInfo.location_longitude || 0
+          const eventAccessRange = event.locationInfo.location_access_range || 100
+          if (cachedData) {
+            console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. User coordinates found.`)
+            const userLocation = cachedData.split(",")
+            if (userLocation.length >= 2) {
+              const distance = this.calculateDistance(eventLatitude, eventLongitude, parseFloat(userLocation[0]), parseFloat(userLocation[1]))
+              console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Checking physical location. Current distance ${distance}`)
+              if(distance <= eventAccessRange)
+              {
+                invitationAccepted = true
+                console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Checking physical location. Location check passed with distance ${distance}.`)
+              }
+              else
+              {
+                console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Checking physical location. Location check failed with distance ${distance}.`)
+              }
+            }
+          }else
+          {
+            console.log(`Event: ${event.id} User ${userInfo.msisdn} is not invited to an event. Checking physical location. User coordinates not found. Location check failed.`)
+          }
+        }
+      }else
+      {
+        console.log(`Event: ${event.id} User ${userInfo.msisdn}. Location lock is off.`)
+      }
+    }
+    else
+    {
+      console.log(`Event: ${event.id} User ${userInfo.msisdn} has been invited to an event`)
+    }
+    return invitationAccepted
+  }
+
   async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
     try {
-
-      const cacheKey =  `{user:${userInfo.msisdn}}:coordinates` // todo
-      const cachedData = await this.redisClient.get(cacheKey)
       const dateNow = Math.floor(Date.now() / 1000)
       const searchInitTimestamp = Number(req.query["date"] ?? 0)
       const isWeb = Boolean(parseInt((req.query["web"] as string) ?? "0", 10))
       const searchLocation = req.query["location"] ?? ""
       const searchCategory = req.query["category"] ?? ""
+      const clientIp = typeof req.headers["x-forwarded-for"] === "string"
+        ? req.headers["x-forwarded-for"].split(",")[0].trim() // Get the first IP in case of a list
+        : req.connection.remoteAddress || ""
       const dateStr = searchInitTimestamp
         ? new Date(searchInitTimestamp * 1000).toISOString().slice(0, 10) // YYYY-MM-DD
         : null
@@ -137,27 +189,11 @@ export class EventService {
         return true
       })
       //*/
-      for (const x of result as any[]) {
-        x.usersConnected = await this.getUsersConnected(x.id)
-        x.invitationAccepted = this.hasUserInvite(x.invites, userInfo)
-        if (x.invitationsOnly && !x.invitationAccepted) {
-          x.invitationAccepted = true
-          if (x.location) {  //&& event.locationLock
-            console.log("latitude:", x.latitude)
-            console.log("longitude:", x.longitude)
-            if (cachedData) {
-              console.log("cachedData", cachedData)
-              const loc = cachedData.split(",")
-              if (loc.length >= 2) {
-                const dis = this.calcDis(parseFloat(x.latitude!), parseFloat(x.longitude!), parseFloat(loc[0]), parseFloat(loc[1]))
-                console.log("dis:", dis)
-                x.invitationAccepted = false
-              }
-            }
-          }
-        }
-        delete x.invites
-        for (const e in x) if (null == x[e]) delete x[e]
+      for (const event of result as any[]) {
+        event.usersConnected = await this.getUsersConnected(event.id)
+        event.invitationAccepted = this.getInvitationAccepted(clientIp, event, userInfo)
+        delete event.invites
+        for (const e in event) if (null == event[e]) delete event[e]
       }
       const filteredEvents = OdienceEventCollection(result, isWeb, userInfo)
       return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
