@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm"
 import { Event } from "./Event"
+import { Ad } from "./Ad"
 
 @Entity("setting")
 export class Setting {
@@ -288,5 +289,29 @@ export class Setting {
 
   public static EVENT_ASSISTANT_PHONE_NUMBER = "event_assistant_phone_number"
   public static EVENT_INVITATION_MESSAGE = "event_invitation_message"
+  public static AD_INSIDE_STREAM_DISPLAY_DELAY  = "ad_inside_stream_display_delay" // in seconds
+  public static AD_INSIDE_STREAM_DISPLAY_INTERVAL = "ad_inisde_stream_show_interval" // in minutes
+  public static AD_INSIDE_STREAM_SKIP_AFTER = "ad_inside_stream_skip_after" // in seconds
+
+  public static AD_INVITATION_PAGE_DISPLAY_INTERVAL = "ad_invitation_page_display_interval" // in seconds
+  public static AD_EVENT_DETAILS_DISPLAY_INTERVAL = "ad_event_details_display_interval" // in seconds
+  public static AD_BRAND_PANEL_DISPLAY_INTERVAL = "ad_brand_panel_display_interval" // in seconds
+
+   static readonly SPONSOR_SETTING_KEYS: Record<string, string[]> = {
+     [Ad.CUSTOM_AD_LOCATION_IN_STREAM]: [
+       Setting.AD_INSIDE_STREAM_DISPLAY_DELAY,
+       Setting.AD_INSIDE_STREAM_DISPLAY_INTERVAL,
+       Setting.AD_INSIDE_STREAM_SKIP_AFTER,
+     ],
+     [Ad.CUSTOM_AD_LOCATION_INVITATION]: [
+       Setting.AD_INVITATION_PAGE_DISPLAY_INTERVAL,
+     ],
+     [Ad.CUSTOM_AD_LOCATION_EVENT_DETAILS]: [
+       Setting.AD_EVENT_DETAILS_DISPLAY_INTERVAL,
+     ],
+     [Ad.CUSTOM_AD_LOCATION_BRAND_PANEL]: [
+       Setting.AD_BRAND_PANEL_DISPLAY_INTERVAL,
+     ],
+   }
   //#endregion
 }

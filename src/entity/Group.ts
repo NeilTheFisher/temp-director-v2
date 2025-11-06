@@ -3,11 +3,13 @@ import { GroupStream } from "./GroupStream"
 import { MediaContent } from "./MediaContent"
 import { AddressListGroup } from "./AddressListGroup"
 import { DeviceGroup } from "./DeviceGroup"
+import { GroupSponsor } from "./GroupSponsor"
 import { Controller } from "./Controller"
 import { ProPublisher } from "./ProPublisher"
 import { GroupTemplate } from "./GroupTemplate"
 import { Role } from "./Role"
 import { Event } from "./Event"
+import { Sponsor } from "./Sponsor"
 import { User as User2, type User } from "./User"
 
 @Entity("group")
@@ -53,6 +55,17 @@ export class Group {
 
   @OneToMany(() => DeviceGroup, (deviceGroup) => deviceGroup.group)
   deviceGroups: DeviceGroup[]
+
+  @OneToMany(() => GroupSponsor, (groupSponsor) => groupSponsor.group)
+  groupSponsors: GroupSponsor[]
+
+  @ManyToMany(() => Sponsor, (sponsor) => sponsor.groups)
+  @JoinTable({
+    name: "sponsor_group", // your pivot table name
+    joinColumn: { name: "group_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "sponsor_id", referencedColumnName: "id" },
+  })
+  sponsors: Sponsor[]
 
   @OneToMany(() => Controller, (controller) => controller.group)
   controllers: Controller[]

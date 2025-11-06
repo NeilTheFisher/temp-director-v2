@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from "typeorm"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, ManyToMany, JoinTable, JoinColumn, ManyToOne } from "typeorm"
 import { EventRegistered } from "./EventRegistered"
 import { EventLogs } from "./EventLogs"
 import { EventUser } from "./EventUser"
@@ -9,12 +9,15 @@ import { EventRemoved } from "./EventRemoved"
 import { Feed } from "./Feed"
 import { Group } from "./Group"
 import { User } from "./User"
+import { Ad } from "./Ad"
+import { Stream } from "./Stream"
 import { Setting } from "./Setting"
 import { EventStream } from "./EventStream"
 import { MediaContent } from "./MediaContent"
 import { EventTemplate } from "./EventTemplate"
 import { EventFlagged } from "./EventFlagged"
 import { DeviceEvent } from "./DeviceEvent"
+import { AdEvent } from "./AdEvent"
 import { EventSimulation } from "./EventSimulation"
 import { ShoppingFeed } from "./ShoppingFeed"
 import { EventOpened } from "./EventOpened"
@@ -30,6 +33,13 @@ import { LocationInfoInterface } from "../interfaces/LocationInfo"
 
 @Entity("event")
 export class Event {
+  public static EVENT_STATUS_LIVE = "live"
+  public static EVENT_STATUS_RE_STREAM = "re-stream"
+  public static EVENT_STATUS_ON_DEMAND = "on-demand"
+  public static EVENT_STATUS_DRAFT = "draft"
+  public static EVENT_STATUS_ENDED = "ended"
+  public static EVENT_STATUS_UPCOMING = "upcoming"
+  public static EVENT_STATUS_DEACTIVATED = "deactivated"
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
   id: number
 
@@ -213,6 +223,14 @@ export class Event {
   @OneToMany(() => EventStream, (eventStream) => eventStream.event)
   eventStreams: EventStream[]
 
+  @ManyToMany(() => Ad, (ad) => ad.events)
+  @JoinTable({
+    name: "ad_event", // your pivot table name
+    joinColumn: { name: "event_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "ad_id", referencedColumnName: "id" },
+  })
+  ads: Ad[]
+
   @OneToMany(() => MediaContent, (mediaContent) => mediaContent.event)
   mediaContents: MediaContent[]
 
@@ -224,6 +242,17 @@ export class Event {
 
   @OneToMany(() => DeviceEvent, (deviceEvent) => deviceEvent.event)
   deviceEvents: DeviceEvent[]
+
+  @OneToMany(() => AdEvent, (adEvent) => adEvent.event)
+  eventAds: AdEvent[]
+
+  @ManyToMany(() => Stream, (stream) => stream.events)
+  @JoinTable({
+    name: "event_stream", // your pivot table name
+    joinColumn: { name: "event_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "stream_id", referencedColumnName: "id" },
+  })
+  streams: Stream[]
 
   @OneToMany(() => EventSimulation, (eventSimulation) => eventSimulation.event)
   eventSimulations: EventSimulation[]
@@ -258,8 +287,6 @@ export class Event {
   @OneToMany(() => Setting, (setting) => setting.event)
   settings: SettingInterface
 
-  hasRicoh?: boolean
   invitationAccepted?: boolean
   usersConnected?: number
-  downloadUrls?: string[]
 }

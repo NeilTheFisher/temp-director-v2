@@ -2,6 +2,9 @@ import { S3Service } from "../services/S3Service"
 import { Setting } from "../entity/Setting"
 import { User } from "../entity/User"
 import { Event } from "../entity/Event"
+import { Stream } from "../entity/Stream"
+import { Ad } from "../entity/Ad"
+import { EventSimulation } from "../entity/EventSimulation"
 import { SettingInterface } from "../interfaces/Setting"
 import { LocationInfoInterface } from "../interfaces/LocationInfo"
 
@@ -14,7 +17,7 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     id: String(event.id),
     namespace: `/${event.id}`,
     name: String(event.name),
-    label: String(event.label),
+    label: getLabel(event),
     duration: event.duration ?? -1,
     date: event.date,
     featured: Boolean(event.featured),
@@ -38,7 +41,7 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     map_image_url: getMapImageUrl(event.id),
     promo_video_url: String(event.promoVideoUrl),
     promo_video_aspect_ratio: event.promoVideoUrl ? (event.promoVideoAspectRatio || "fit_inside") : "",
-    has_ricoh_stream: event.hasRicoh,
+    has_ricoh_stream: hasRicoh(event.streams),
     payed: Boolean(event.payed),
     invitation_message: getInvitationMessage(event, eventSettings, appUrl),
     event_url: appUrl,
@@ -58,8 +61,8 @@ export function OdienceEventResource(event: any, forWeb = false, userInfo: {user
     appUrl: appUrl,
     settings: getSettings(eventSettings),
     active: Boolean(event.active),
-    downloads: event.downloadUrls,
-    sponsors: {}, //todo
+    downloads: getDownloadUrls(event.streams),
+    sponsors: {custom: getCustomAds(event.id, event.ads), settings: getSponsorSettings(eventSettings), external: {}},
     host: getHost(eventSettings, event.owner),
     onLocation: getOnLocation(event.location_info),
     onLocationLock: getOnLocationLock(event.location_info)
@@ -290,4 +293,107 @@ function hasRequested(event: Event, userInfo: {userId: number, msisdn: string, i
 function hasRegistered(event: Event, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]})
 {
   return event.usersRegistered.some(user => user.msisdn === userInfo.msisdn)
+}
+
+function getSponsorSettings(eventSettings: SettingInterface)
+{
+  const settings: Record<string, Record<string, number>> = {}
+  const SPONSOR_SETTING_KEYS: Record<string, string[]> = Setting.SPONSOR_SETTING_KEYS
+  for (const [location, settingKeys] of Object.entries(SPONSOR_SETTING_KEYS)) {
+    settings[location] = {}
+
+    for (const settingKey of settingKeys) {
+      let value = parseInt(eventSettings[settingKey] ?? "", 10) || 0
+
+      if (settingKey === Setting.AD_INSIDE_STREAM_DISPLAY_INTERVAL) {
+        value *= 60
+      }
+
+      settings[location][settingKey] = value
+    }
+  }
+
+  return settings
+}
+
+function getLabel(event: Event): string
+{
+  const now = new Date().valueOf() / 1000
+  const streams: Stream[] = event.streams
+  if (!event.active) return Event.EVENT_STATUS_DEACTIVATED
+  if (event.isDraft)  return Event.EVENT_STATUS_DRAFT
+  if (event.duration && event.date && event.date + event.duration <= now)
+    return Event.EVENT_STATUS_ENDED
+  if (streams.length == 0) return Event.EVENT_STATUS_DRAFT
+  const event_simulations : EventSimulation[] = event.eventSimulations || []
+
+  if (event.date && event.date <= now && (event.duration == null || event.date + event.duration > now))
+  {
+    if(streams.length === 0 && event_simulations.length > 0)
+      return Event.EVENT_STATUS_LIVE
+    if (undefined != streams.find((stream:Stream) => stream.recordedType == 0))
+      return Event.EVENT_STATUS_LIVE
+    if (event.restream || undefined != streams.find((stream:Stream) => stream.recordedType == 1) ) //nvr live
+      return Event.EVENT_STATUS_RE_STREAM
+    if (undefined != streams.find((stream:Stream) => stream.recordedType == 2))  //nvr live or resteam
+      return Event.EVENT_STATUS_ON_DEMAND
+  }
+  if (event.date && event.date > now)
+    return Event.EVENT_STATUS_UPCOMING
+
+  return Event.EVENT_STATUS_DEACTIVATED
+}
+
+function hasRicoh(streams: Stream[])
+{
+  return streams.some(stream => stream.code && stream.code.trim() !== "")
+}
+
+function getDownloadUrls(streams: Stream[])
+{
+  return Array.from(
+    new Set(
+      streams.flatMap((stream: Stream) =>
+        stream.streamUrls
+          .map(url => url.downloadUrl)
+          .filter(u => u) // remove null/undefined/empty strings
+      )
+    )
+  )
+}
+
+function getCustomAds(eventId: number, ads: Ad[])
+{
+  const mapped = ads.map((ad) => {
+    const mediaUrl = ad.mediaUrl ?? ""
+    const mediaType =
+      !mediaUrl ? "" : mediaUrl.includes(".mp4") ? "video" : "image"
+
+    return {
+      id: ad.id,
+      name: ad.name,
+      media_url: mediaUrl,
+      media_type: mediaType,
+      url: ad.url,
+      location: ad.location,
+      sponsor_name: ad.sponsor?.name ?? "",
+      clickUrl: getAddClickUrl(eventId, ad.id),
+    }
+  })
+
+  // group by location
+  const grouped: Record<string, any[]> = {}
+  for (const ad of mapped) {
+    if (!grouped[ad.location]) {
+      grouped[ad.location] = []
+    }
+    grouped[ad.location].push(ad)
+  }
+
+  return grouped
+}
+
+function getAddClickUrl(eventId: number, adId: number)
+{
+  return `https://${process.env.DIRECTOR_PUBLIC_SOCKET_ADDRESS}/add/click/${eventId}/${adId}`
 }

@@ -5,6 +5,8 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
   PrimaryGeneratedColumn,
 } from "typeorm"
 import { GroupStream } from "./GroupStream"
@@ -12,6 +14,7 @@ import { EventStream } from "./EventStream"
 import { StreamUrl } from "./StreamUrl"
 import { ProPublisher } from "./ProPublisher"
 import { Device } from "./Device"
+import { Event } from "./Event"
 
 @Index("stream_code_unique", ["code"], { unique: true })
 @Entity("stream")
@@ -118,6 +121,15 @@ export class Stream {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })
+
+  @ManyToMany(() => Event, (event) => event.streams)
+  @JoinTable({
+    name: "event_stream", // your pivot table name
+    joinColumn: { name: "event_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "stream_id", referencedColumnName: "id" },
+  })
+  events: Event[]
+
   @JoinColumn([{ name: "propublisher_uid", referencedColumnName: "uid" }])
   propublisher: ProPublisher
 
