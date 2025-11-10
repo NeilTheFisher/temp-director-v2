@@ -433,28 +433,27 @@ export class EventService {
 
       const result = events
 
-      const usersConnectedPromises = result.map(event =>
-        this.getUsersConnected(event.id)
-      )
-
-      const invitationAcceptedPromises = result.map(event =>
-        this.getInvitationAccepted(clientIp, event, userInfo)
-      )
-      // Wait for all Redis operations to complete in parallel
+      const usersConnectedPromises: Promise<number>[] = []
+      const invitationAcceptedPromises: Promise<boolean>[] = []
+      for (const event of result) {
+        usersConnectedPromises.push(this.getUsersConnected(event.id))
+        invitationAcceptedPromises.push(this.getInvitationAccepted(clientIp, event, userInfo))
+      }
       const [usersConnectedResults, invitationAcceptedResults] = await Promise.all([
         Promise.all(usersConnectedPromises),
         Promise.all(invitationAcceptedPromises)
       ])
-      for (let i = 0; i < result.length; i++) {
-        const event = result[i] as any
-        event.usersConnected = usersConnectedResults[i]
-        event.invitationAccepted = invitationAcceptedResults[i]
 
-        delete event.invites
+      for (const [i, event] of result.entries()) {
+        const e = event as any
+        e.usersConnected = usersConnectedResults[i]
+        e.invitationAccepted = invitationAcceptedResults[i]
+
+        delete e.invites
 
         // Clean up null values (more efficient)
-        Object.keys(event).forEach(key => {
-          if (event[key] === null) delete event[key]
+        Object.keys(e).forEach(key => {
+          if (e[key] === null) delete e[key]
         })
       }
       console.log(`${Date.now() - startTime} time took to get events list for user ${userInfo.msisdn}`)
