@@ -1,5 +1,4 @@
-import { createContext } from "@director_v2/api/context";
-import { appRouter } from "@director_v2/api/routers/index";
+import { appRouter, createContext } from "@director_v2/api";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";

@@ -21,7 +21,8 @@
       "decimal.js": "^10.6.0",
       "dotenv": "^17.2.2",
       "tsdown": "^0.15.5",
-      "jsonwebtoken": "^9.0.2"
+      "jsonwebtoken": "^9.0.2",
+      "@types/bun": "^1.3.2"
     }
   },
   "scripts": {
@@ -35,6 +36,7 @@
     "lint:biome": "biome check .",
     "lint:oxlint": "oxlint",
     "lint:types": "tsc --noEmit",
+    "openapi:generate": "turbo -F @director_v2/api openapi:generate",
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
     "db:pull": "turbo -F @director_v2/db db:pull",

@@ -1,0 +1,10 @@
+{
+  "name": "@director-api/clients",
+  "private": true,
+  "workspaces": [
+    "clients/*"
+  ],
+  "scripts": {
+    "publish-clients": "for d in clients/*/; do (cd \"$d\" && npm publish); done"
+  }
+}

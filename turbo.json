@@ -25,6 +25,10 @@
       "cache": false,
       "outputs": []
     },
+    "openapi:generate": {
+      "cache": false,
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true
