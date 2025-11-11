@@ -1,15 +1,11 @@
-import { auth } from "@director_v2/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  // const session = await auth.api.getSession({
+  //   headers: await headers(),
+  // });
 
-  if (!session?.user) {
-    redirect("/login");
-  }
+  // if (!session?.user) {
+  //   redirect("/login");
+  // }
 
   // const { data: customerState } = await authClient.customer.state({
   //   fetchOptions: {
@@ -20,7 +16,7 @@ export default async function DashboardPage() {
   return (
     <div>
       <h1>Dashboard</h1>
-      <p>Welcome {session.user.name}</p>
+      <p>Welcome {"test user"}</p>
       {/* <Dashboard session={session} customerState={customerState} /> */}
     </div>
   );
