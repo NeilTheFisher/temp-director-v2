@@ -401,7 +401,6 @@ export class EventService {
       })
 
       const adsMap = new Map<number, any[]>()
-      console.log("ads", ads)
       ads.forEach(ad => {
         if (!adsMap.has(ad.eventId)) adsMap.set(ad.eventId, [])
             adsMap.get(ad.eventId)!.push({
@@ -409,7 +408,7 @@ export class EventService {
               location: ad.location,
               name: ad.name,
               url: ad.url,
-              media_url: ad.mediaUrl,
+              mediaUrl: ad.mediaUrl,
               order: ad.order,  // Include order
               sponsor: ad.sponsorId ? { id: ad.sponsorId, name: ad.sponsorName } : null
             })

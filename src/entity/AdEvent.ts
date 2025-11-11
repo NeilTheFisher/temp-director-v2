@@ -1,4 +1,4 @@
-import { Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm"
+import { Entity, Index, JoinColumn, ManyToOne, PrimaryColumn, Column } from "typeorm"
 import { Ad } from "./Ad"
 import { Event } from "./Event"
 
@@ -12,8 +12,8 @@ export class AdEvent {
   @PrimaryColumn("bigint", { name: "event_id", unsigned: true })
   eventId: number
 
-  @PrimaryColumn("bigint", { name: "order", unsigned: true })
-  order: number
+  @Column("int", { name: "order", nullable: true })
+  order: number|null
 
   @ManyToOne(() => Ad, (ad) => ad.adEvents, {
     onDelete: "RESTRICT",

@@ -300,9 +300,7 @@ getCustomAds()
 {
   const mapped = this.event.ads.map((ad) => {
     const mediaUrl = ad.mediaUrl ?? ""
-    const mediaType =
-      !mediaUrl ? "" : mediaUrl.includes(".mp4") ? "video" : "image"
-
+    const mediaType = !mediaUrl ? "" : mediaUrl.includes(".mp4") ? "video" : "image"
     return {
       id: ad.id,
       name: ad.name,
