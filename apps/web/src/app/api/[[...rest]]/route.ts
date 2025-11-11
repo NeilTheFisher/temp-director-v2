@@ -9,6 +9,8 @@ import {
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
+// polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
+import "@ungap/compression-stream/poly";
 
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
@@ -48,7 +50,7 @@ async function handleRequest(req: NextRequest) {
   if (rpcResult.response) return rpcResult.response;
 
   const apiResult = await apiHandler.handle(req, {
-    prefix: "/api/rpc/api-reference",
+    prefix: "/api",
     context: await createContext(
       req as unknown as Parameters<typeof createContext>[0],
     ),

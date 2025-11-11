@@ -37,6 +37,7 @@
         "@prisma/client": "catalog:",
         "@tanstack/react-form": "^1.12.3",
         "@tanstack/react-query": "^5.85.5",
+        "@ungap/compression-stream": "^0.2.0",
         "babel-plugin-react-compiler": "^1.0.0",
         "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",
@@ -741,6 +742,8 @@
     "@typescript/native-preview-win32-arm64": ["@typescript/native-preview-win32-arm64@7.0.0-dev.20251105.1", "", { "os": "win32", "cpu": "arm64" }, "sha512-2XuEb1A1Ax9XwEhi306H5Jo/7VwvzXTr7uO92xGHnK2ihiZSZXDCIg4SeAA86L8hszds3NQcZkUFxYU5SfEVyQ=="],
 
     "@typescript/native-preview-win32-x64": ["@typescript/native-preview-win32-x64@7.0.0-dev.20251105.1", "", { "os": "win32", "cpu": "x64" }, "sha512-pykjFOqLaxpQHh81tgw7uhSEhntwujRnrH2nNNaLgNMh2s6y/+0YCSZkZ5dRGWJZVetexRNkAqZF4uM+u2tbZA=="],
+
+    "@ungap/compression-stream": ["@ungap/compression-stream@0.2.0", "", {}, "sha512-/f14F/pzsq5Dtrm+jA4hqKAawF8KTHvYPubQBry4aII34mQ34KXqDUV5cJDCCsL3bAudKT/IAtO5/oa0i/JAMw=="],
 
     "accepts": ["accepts@2.0.0", "", { "dependencies": { "mime-types": "^3.0.0", "negotiator": "^1.0.0" } }, "sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng=="],
 
