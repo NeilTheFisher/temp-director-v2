@@ -15,7 +15,7 @@ constructor(event:Event) {
 }
 getOrgName(): string {
   const groupName = this.event.group.name
-  const ownerName = this.event.owner.name
+  const ownerName = this.event?.owner?.name ?? null
   if (groupName.includes("PrivateGroup:[") && ownerName) {
     return ownerName
   }
