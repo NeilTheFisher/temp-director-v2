@@ -4,8 +4,6 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist",
-    "composite": true
-  },
-  "exclude": ["prisma/generated/zod/index.ts"]
+    "outDir": "dist"
+  }
 }

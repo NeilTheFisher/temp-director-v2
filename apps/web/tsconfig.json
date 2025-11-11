@@ -31,9 +31,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["./node_modules"],
-  "references": [
-    { "path": "../../packages/contracts" },
-    { "path": "../../packages/api" }
-  ]
+  "exclude": ["./node_modules"]
 }

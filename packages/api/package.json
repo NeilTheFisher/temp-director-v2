@@ -1,29 +1,17 @@
 {
   "name": "@director_v2/api",
   "version": "1.0.0",
+  "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "default": "./src/*.ts"
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
     }
   },
-  "type": "module",
   "scripts": {
-    "build": "tsdown",
     "lint": "biome check . && oxlint",
     "lint:types": "tsc --noEmit",
     "openapi:generate": "bun run openapi/openapi-generate.ts"
-  },
-  "devDependencies": {
-    "tsdown": "catalog:",
-    "@types/bun": "catalog:"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
   },
   "dependencies": {
     "@director_v2/auth": "workspace:*",
@@ -40,5 +28,12 @@
     "jsonwebtoken": "catalog:",
     "next": "catalog:",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "tsdown": "catalog:"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }

@@ -1,8 +1,9 @@
+import { ORPCError } from "@orpc/server";
 import * as eventRepository from "../lib/repositories/event";
 import * as userRepository from "../lib/user-handlers";
-import { authed } from "../orpc";
+import { authed, pub } from "../orpc";
 
-export const eventRouter = {
+export const eventRouter = pub.events.router({
   listEvents: authed.events.listEvents.handler(async ({ context }) => {
     console.log("EventController.list:");
 
@@ -26,6 +27,17 @@ export const eventRouter = {
     );
 
     return events as any;
+  }),
+
+  // biome-ignore lint/correctness/useYield: <explanation>
+  listEventsLive: authed.events.listEventsLive.handler(async function* ({
+    context,
+  }) {
+    console.log("EventController.listLive:");
+
+    // TODO
+
+    throw new ORPCError("NOT_IMPLEMENTED");
   }),
 
   listPartialEvents: authed.events.listPartialEvents.handler(
@@ -54,4 +66,4 @@ export const eventRouter = {
       return events as any;
     },
   ),
-};
+});

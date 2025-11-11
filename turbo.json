@@ -8,12 +8,7 @@
       "outputs": ["dist/**", ".next/**"]
     },
     "web#build": {
-      "dependsOn": [
-        "@director_v2/contracts#build",
-        "@director_v2/api#build",
-        "@director_v2/db#build",
-        "@director_v2/auth#build"
-      ],
+      "dependsOn": [],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**"]
     },
