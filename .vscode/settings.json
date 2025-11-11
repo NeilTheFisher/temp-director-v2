@@ -14,5 +14,7 @@
   },
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
-  }
+  },
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
+  "js/ts.hover.maximumLength": 1000
 }
