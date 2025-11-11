@@ -12,6 +12,9 @@ export class AdEvent {
   @PrimaryColumn("bigint", { name: "event_id", unsigned: true })
   eventId: number
 
+  @PrimaryColumn("bigint", { name: "order", unsigned: true })
+  order: number
+
   @ManyToOne(() => Ad, (ad) => ad.adEvents, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",

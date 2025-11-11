@@ -286,14 +286,22 @@ export class EventService {
         this.dataSource
           .createQueryBuilder()
           .select([
-            "a.id", "a.location", "a.name", "a.url", "a.media_url as mediaUrl",
-            "s.id as sponsorId", "s.name as sponsorName",
-            "ae.event_id as eventId"
+            "a.id AS id",
+            "a.location AS location",
+            "a.name AS name",
+            "a.url AS url",
+            "a.media_url AS mediaUrl",
+            "a.sponsor_id AS sponsorId",
+            "s.name AS sponsorName",
+            "ae.event_id AS eventId",
+            "ae.`order` AS `order`", // ✅ Escape 'order' properly
           ])
           .from("ad_event", "ae")
           .innerJoin("ad", "a", "a.id = ae.ad_id")
           .leftJoin("sponsor", "s", "s.id = a.sponsor_id")
           .where("ae.event_id IN (:...eventIds)", { eventIds })
+          .orderBy("ae.event_id", "ASC")
+          .addOrderBy("ae.`order`", "ASC")
           .getRawMany(),
 
         // Settings
@@ -393,17 +401,20 @@ export class EventService {
       })
 
       const adsMap = new Map<number, any[]>()
+      console.log("ads", ads)
       ads.forEach(ad => {
         if (!adsMap.has(ad.eventId)) adsMap.set(ad.eventId, [])
-                adsMap.get(ad.eventId)!.push({
-                  id: ad.id,
-                  location: ad.location,
-                  name: ad.name,
-                  url: ad.url,
-                  media_url: ad.mediaUrl,
-                  sponsor: ad.sponsorId ? { id: ad.sponsorId, name: ad.sponsorName } : null
-                })
+            adsMap.get(ad.eventId)!.push({
+              id: ad.id,
+              location: ad.location,
+              name: ad.name,
+              url: ad.url,
+              media_url: ad.mediaUrl,
+              order: ad.order,  // Include order
+              sponsor: ad.sponsorId ? { id: ad.sponsorId, name: ad.sponsorName } : null
+            })
       })
+      // The ads are already sorted by the ORDER BY clause in the query
 
       const settingsMap = new Map(settings.map(s => [s.configurableId, [{
         id: s.id,
@@ -483,7 +494,7 @@ export class EventService {
       console.log(`${Date.now() - startTime}ms time took to get events list for user ${userInfo.msisdn}`)
       const filteredEvents = boolPartial
         ? OdienceSimpleEventCollection(result, isWeb, userInfo)
-        :  (boolWebApi ? WebEventCollection(result, isWeb, userInfo) : OdienceEventCollection(result, isWeb, userInfo))
+        :  (boolWebApi ? WebEventCollection(result, userInfo) : OdienceEventCollection(result, isWeb, userInfo))
       console.log(`${Date.now() - startTime}ms time took to get events list and build schema for user ${userInfo.msisdn}`)
       if(boolWebApi)
       {

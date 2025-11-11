@@ -1,6 +1,6 @@
 import { EventModel } from "../models/EventModel"
 
-export function WebEventResource(event: any, forWeb = false, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
+export function WebEventResource(event: any,  userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
   const eventModel = new EventModel(event)
   return {
     id: String(event.id),
@@ -18,7 +18,7 @@ export function WebEventResource(event: any, forWeb = false, userInfo: {userId: 
     capacity: event.capacity,
     is_public: Boolean(event.isPublic),
     is_5g: Boolean(event.is5g),
-    imageUrl: eventModel.getImageUrl(forWeb),
+    imageUrl: eventModel.getImageUrl(true),
     organization_image_url: event.group.imageUrl ?? "",
     map_image_url: eventModel.getMapImageUrl(),
     promo_video_url: String(event.promoVideoUrl),
@@ -47,6 +47,6 @@ export function WebEventResource(event: any, forWeb = false, userInfo: {userId: 
   }
 }
 
-export function WebEventCollection(events: any[], forWeb = false, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
-  return events.map(event => WebEventResource(event, forWeb, userInfo))
+export function WebEventCollection(events: any[], userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}) {
+  return events.map(event => WebEventResource(event, userInfo))
 }

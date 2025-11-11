@@ -28,8 +28,8 @@ getCategoryImageUrl(): string{
 
 getImageUrl(forWeb = false)
 {
-  const imageUrl = String(this.event.imageUrl)
-  const webImageUrl = String(this.event.webImageUrl)
+  const imageUrl = this.event.imageUrl || ""
+  const webImageUrl =this.event.webImageUrl || ""
   if (forWeb && webImageUrl) {
     return webImageUrl
   }
