@@ -11,5 +11,3 @@ export const appContract = {
   stream: streamContract,
   user: userContract,
 };
-
-export type AppContract = typeof appContract;

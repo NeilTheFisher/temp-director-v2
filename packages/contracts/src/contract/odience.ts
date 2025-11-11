@@ -1,8 +1,8 @@
-import { oc } from "@orpc/contract";
 import { z } from "zod";
+import { base } from "./base";
 
 export const odienceContract = {
-  provisionUser: oc
+  provisionUser: base
     .input(
       z.object({
         msisdn: z.string(),
@@ -15,7 +15,7 @@ export const odienceContract = {
         message: z.string(),
       }),
     ),
-  validatePhoneNumber: oc
+  validatePhoneNumber: base
     .input(
       z.object({
         msisdn: z.string(),
@@ -31,5 +31,5 @@ export const odienceContract = {
         code: z.number(),
       }),
     ),
-  getCategoryList: oc.output(z.record(z.string(), z.string())),
+  getCategoryList: base.output(z.record(z.string(), z.string())),
 };

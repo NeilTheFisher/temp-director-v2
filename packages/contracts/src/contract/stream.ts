@@ -1,8 +1,8 @@
-import { oc } from "@orpc/contract";
 import z from "zod";
+import { base } from "./base";
 
 export const streamContract = {
-  getStreamUrls: oc
+  getStreamUrls: base
     .input(
       z.object({
         streamUrlId: z.number().int().positive(),

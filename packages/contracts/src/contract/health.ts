@@ -1,4 +1,4 @@
-import { oc } from "@orpc/contract";
 import z from "zod";
+import { base } from "./base";
 
-export const healthContract = oc.output(z.literal("OK"));
+export const healthContract = base.output(z.asdf("OK"));
