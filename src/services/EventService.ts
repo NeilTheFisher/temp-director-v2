@@ -7,6 +7,7 @@ import { Request } from "express"
 import RedisService from "./RedisService"
 import { OdienceEventCollection } from "../resources/OdienceEventResource"
 import { OdienceSimpleEventCollection } from "../resources/OdienceSimpleEventResource"
+import { WebEventCollection } from "../resources/WebEventResource"
 import { isIpAllowed } from "../utils/utils"
 
 export class EventService {
@@ -92,7 +93,7 @@ export class EventService {
     return invitationAccepted
   }
 
-  async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}, boolPartial = false): Promise<any> {
+  async getEvents(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}, boolPartial = false, boolWebApi = false): Promise<any> {
     try {
       console.log(userInfo)
       const startTime = Date.now()
@@ -101,6 +102,7 @@ export class EventService {
       const isWeb = Boolean(parseInt((req.query["web"] as string) ?? "0", 10))
       const searchLocation = req.query["location"] ?? ""
       const searchCategory = req.query["category"] ?? ""
+      const searchEventId = req.query["id"]
       const clientIp = typeof req.headers["x-forwarded-for"] === "string"
         ? req.headers["x-forwarded-for"].split(",")[0].trim() // Get the first IP in case of a list
         : req.connection.remoteAddress || ""
@@ -118,6 +120,11 @@ export class EventService {
 
       if (searchLocation) {
         mainQuery.andWhere("event.location LIKE :location", { location: `%${searchLocation}%` })
+      }
+
+      if(searchEventId)
+      {
+        mainQuery.andWhere("event.id = :id", { id: searchEventId })
       }
 
       mainQuery.andWhere(new Brackets(qb => {
@@ -150,59 +157,76 @@ export class EventService {
           })
       }))
 
-      mainQuery.andWhere(
-        new Brackets((qb) => {
+      if(boolWebApi)
+      {
+        mainQuery.andWhere("event.isPublic = :isPublic", { isPublic: true })
+      }
+      else
+      {
+        mainQuery.andWhere(
+          new Brackets((qb) => {
           // If SuperAdmin, can see all events (no restrictions)
-          if (userInfo.isSuperAdmin) {
-            console.log("SUPER ADMIN")
-            qb.where("1=1") // always true
-            return
-          }
+            if (userInfo.isSuperAdmin) {
+              console.log("SUPER ADMIN")
+              qb.where("1=1") // always true
+              return
+            }
 
-          // Non-superadmin logic
-          qb.where("event.isPublic = true") // Public events
+            // Non-superadmin logic
+            qb.where("event.isPublic = true") // Public events
 
-          qb.orWhere(
-            new Brackets((qb2) => {
-              qb2.where("event.isPublic = false").andWhere(
-                new Brackets((qb3) => {
+            qb.orWhere(
+              new Brackets((qb2) => {
+                qb2.where("event.isPublic = false").andWhere(
+                  new Brackets((qb3) => {
                   // User is owner
-                  qb3.where("event.ownerId = :userId", { userId: userInfo.userId })
+                    qb3.where("event.ownerId = :userId", { userId: userInfo.userId })
 
-                  // User is in orgs
-                  if (userInfo.orgIds && userInfo.orgIds.length > 0) {
-                    qb3.orWhere("event.groupId IN (:...orgIds)", { orgIds: userInfo.orgIds })
-                  }
+                    // User is in orgs
+                    if (userInfo.orgIds && userInfo.orgIds.length > 0) {
+                      qb3.orWhere("event.groupId IN (:...orgIds)", { orgIds: userInfo.orgIds })
+                    }
 
-                  // User is invited
-                  const recipients = [userInfo.msisdn]
-                  if (userInfo.emails && userInfo.emails.length > 0) {
-                    recipients.push(...userInfo.emails)
-                  }
+                    // User is invited
+                    const recipients = [userInfo.msisdn]
+                    if (userInfo.emails && userInfo.emails.length > 0) {
+                      recipients.push(...userInfo.emails)
+                    }
 
-                  qb3.orWhere(
-                    `EXISTS (
+                    qb3.orWhere(
+                      `EXISTS (
                 SELECT 1 FROM invite i
                 WHERE i.event_id = event.id
                 AND i.recipient IN (:...recipients)
               )`,
-                    { recipients }
-                  )
-                })
-              )
-            })
-          )
-        })
-      )
+                      { recipients }
+                    )
+                  })
+                )
+              })
+            )
+          })
+        )
+      }
       // ONLY join group and owner in main query (smallest relations)
       mainQuery
         .leftJoinAndSelect("event.group", "group")
         .leftJoinAndSelect("event.owner", "owner")
+        .orderBy("event.date", "ASC")
+
       const startMain = Date.now()
       const events =  await mainQuery.getMany()
       console.log(`Main query: ${Date.now() - startMain}ms, Events: ${events.length}`)
       if (events.length === 0) {
-        return { total_events : 0, per_page: 0, current_page: 0, events: []}
+        if(boolWebApi)
+        {
+          return {data: []}
+        }
+        else
+        {
+          return { total_events : 0, per_page: 0, current_page: 0, events: []}
+        }
+
       }
       const eventIds = events.map(e => e.id)
       // STEP 2: Load all other data in parallel
@@ -456,13 +480,29 @@ export class EventService {
           if (e[key] === null) delete e[key]
         })
       }
-      console.log(`${Date.now() - startTime} time took to get events list for user ${userInfo.msisdn}`)
-      const filteredEvents = boolPartial ? OdienceSimpleEventCollection(result, isWeb, userInfo) :  OdienceEventCollection(result, isWeb, userInfo)
-      console.log(`${Date.now() - startTime} time took to get events list and build schema for user ${userInfo.msisdn}`)
-      return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
+      console.log(`${Date.now() - startTime}ms time took to get events list for user ${userInfo.msisdn}`)
+      const filteredEvents = boolPartial
+        ? OdienceSimpleEventCollection(result, isWeb, userInfo)
+        :  (boolWebApi ? WebEventCollection(result, isWeb, userInfo) : OdienceEventCollection(result, isWeb, userInfo))
+      console.log(`${Date.now() - startTime}ms time took to get events list and build schema for user ${userInfo.msisdn}`)
+      if(boolWebApi)
+      {
+        return {data: filteredEvents}
+      }else
+      {
+        return { total_events : result.length, per_page: result.length, current_page: 1, events: filteredEvents}
+      }
+
     } catch (error) {
       console.log(error)
-      return { total_events : 0, per_page: 0, current_page: 1, events: [], error: error}
+      if(boolWebApi)
+      {
+        return {data: [], error: error}
+      }
+      else
+      {
+        return { total_events : 0, per_page: 0, current_page: 1, events: [], error: error}
+      }
     }
   }
 }

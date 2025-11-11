@@ -45,6 +45,16 @@ class EventController {
       }
       return res.status(401).send("No Authorization header")
     }
+
+        public static webEventsList = async (req: Request, res: Response) => {
+          console.log("EventController.partialList:")
+          const body = await eventService.getEvents(req, {userId: 0, msisdn: "", isSuperAdmin: false, emails: [], orgIds: []}, false, true)
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+          res.setHeader("Pragma", "no-cache")
+          res.setHeader("Expires", "0")
+          res.setHeader("Content-Type", "application/json")
+          return res.status(200).send(JSON.stringify(body))
+        }
 }
 
 export default EventController
