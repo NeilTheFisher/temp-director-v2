@@ -13,7 +13,7 @@
           "packageName": "DirectorV2.Client",
           "targetFramework": "net8.0",
           "nullableReferenceTypes": true,
-          "library": "httpclient",
+          "library": "unityWebRequest",
           "useDateTimeOffset": true
         }
       },

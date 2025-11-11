@@ -18,6 +18,56 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "500",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "NOT_IMPLEMENTED"
+                        },
+                        "status": {
+                          "const": 500
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Not implemented"
+                        },
+                        "data": {}
+                      },
+                      "required": ["defined", "code", "status", "message"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": ["defined", "code", "status", "message"]
+                    }
+                  ]
+                }
+              }
+            }
           }
         }
       }
@@ -371,6 +421,414 @@
                     "shop_bot_id",
                     "restream",
                     "group_id"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/listEventsLive": {
+      "post": {
+        "operationId": "events.listEventsLive",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "not": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "const": "message"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^-?[0-9]+$",
+                              "x-native-type": "bigint"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "location": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "location_info": {
+                              "anyOf": [
+                                {},
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "owner_id": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "duration": {
+                              "anyOf": [
+                                {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "date": {
+                              "anyOf": [
+                                {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "active": {
+                              "type": "boolean"
+                            },
+                            "capacity": {
+                              "anyOf": [
+                                {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "description": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "category": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "is_public": {
+                              "type": "boolean"
+                            },
+                            "profanity": {
+                              "type": "boolean",
+                              "default": true
+                            },
+                            "is_5g": {
+                              "anyOf": [
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "created_at": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991,
+                              "default": 1746167168
+                            },
+                            "updated_at": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991,
+                              "default": 1746167168
+                            },
+                            "latitude": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^-?\\d{1,10}(?:\\.\\d{1,8})?$"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "longitude": {
+                              "anyOf": [
+                                {
+                                  "type": "string",
+                                  "pattern": "^-?\\d{1,10}(?:\\.\\d{1,8})?$"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "image_uid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "promo_video_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "invitations_only": {
+                              "type": "boolean"
+                            },
+                            "is_draft": {
+                              "type": "boolean"
+                            },
+                            "payed": {
+                              "type": "boolean"
+                            },
+                            "image_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "brand_image_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "brand_background_image_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "brand_ad_image_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "featured": {
+                              "anyOf": [
+                                {
+                                  "type": "boolean"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "hashtags": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "app_allowed": {
+                              "type": "boolean",
+                              "default": true
+                            },
+                            "web_allowed": {
+                              "type": "boolean"
+                            },
+                            "hmd_allowed": {
+                              "type": "boolean"
+                            },
+                            "shop_bot_id": {
+                              "type": "string"
+                            },
+                            "promo_video_aspect_ratio": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "promo_video_status": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "restream": {
+                              "type": "boolean"
+                            },
+                            "short_description": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "featured_date": {
+                              "anyOf": [
+                                {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "featured_artist": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "web_image_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "group_id": {
+                              "type": "string",
+                              "pattern": "^-?[0-9]+$",
+                              "x-native-type": "bigint"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "owner_id",
+                            "active",
+                            "is_public",
+                            "invitations_only",
+                            "is_draft",
+                            "payed",
+                            "web_allowed",
+                            "hmd_allowed",
+                            "shop_bot_id",
+                            "restream",
+                            "group_id"
+                          ]
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "retry": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["event", "data"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "const": "done"
+                        },
+                        "data": {},
+                        "id": {
+                          "type": "string"
+                        },
+                        "retry": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["event"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "const": "error"
+                        },
+                        "data": {},
+                        "id": {
+                          "type": "string"
+                        },
+                        "retry": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["event"]
+                    }
                   ]
                 }
               }
@@ -753,9 +1211,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "msisdn"
-                ]
+                "required": ["msisdn"]
               }
             }
           }
@@ -775,10 +1231,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
+                  "required": ["code", "message"]
                 }
               }
             }
@@ -803,9 +1256,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "msisdn"
-                ]
+                "required": ["msisdn"]
               }
             }
           }
@@ -834,12 +1285,7 @@
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "valid",
-                    "formatted",
-                    "country_code",
-                    "code"
-                  ]
+                  "required": ["valid", "formatted", "country_code", "code"]
                 }
               }
             }
@@ -887,9 +1333,7 @@
                     "exclusiveMinimum": 0
                   }
                 },
-                "required": [
-                  "streamUrlId"
-                ]
+                "required": ["streamUrlId"]
               }
             }
           }
@@ -909,9 +1353,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "urls"
-                  ]
+                  "required": ["urls"]
                 }
               }
             }
@@ -976,9 +1418,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
@@ -1000,9 +1440,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "msisdn"
-                ]
+                "required": ["msisdn"]
               }
             }
           }
@@ -1051,9 +1489,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
