@@ -4,6 +4,7 @@ package {{apiPackage}}
 import java.io.IOException
 import okhttp3.Call
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 {{#imports}}import {{import}}
 {{/imports}}
@@ -46,6 +47,85 @@ import {{packageName}}.infrastructure.RequestMethod
 import {{packageName}}.infrastructure.ResponseType
 import {{packageName}}.infrastructure.Success
 import {{packageName}}.infrastructure.toMultiValue
+import okhttp3.Request
+import okhttp3.sse.EventSource
+import okhttp3.sse.EventSources
+import okhttp3.sse.EventSourceListener
+
+/**
+ * Callback interface for Server-Sent Events (SSE)
+ */
+{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}interface SseCallback {
+    /**
+     * Called when a new SSE event is received
+     * @param event The event type (e.g., "message", "done", "error")
+     * @param data The event data
+     * @param id The event ID (optional)
+     */
+    fun onEvent(event: String, data: String, id: String?)
+    
+    /**
+     * Called when the SSE connection is opened
+     */
+    fun onOpen()
+    
+    /**
+     * Called when the SSE connection is closed
+     */
+    fun onClosed()
+    
+    /**
+     * Called when an error occurs
+     * @param error The error that occurred
+     */
+    fun onFailure(error: Throwable)
+}
+
+/**
+ * OkHttp EventSourceListener adapter that delegates to SseCallback
+ */
+{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}class SseEventSourceListener(
+    private val callback: SseCallback
+) : EventSourceListener() {
+    
+    override fun onOpen(eventSource: EventSource, response: okhttp3.Response) {
+        callback.onOpen()
+    }
+    
+    override fun onEvent(
+        eventSource: EventSource, 
+        id: String?, 
+        type: String?, 
+        data: String
+    ) {
+        callback.onEvent(type ?: "message", data, id)
+    }
+    
+    override fun onClosed(eventSource: EventSource) {
+        callback.onClosed()
+    }
+    
+    override fun onFailure(eventSource: EventSource, t: Throwable?, response: okhttp3.Response?) {
+        val errorMessage = buildString {
+            append("SSE connection failed")
+            if (response != null) {
+                append(" - Status: ${response.code}")
+                append(", Message: ${response.message}")
+                response.body?.let { body ->
+                    try {
+                        append(", Body: ${body.string()}")
+                    } catch (e: Exception) {
+                        append(", Body: <error reading body>")
+                    }
+                }
+            }
+            if (t != null) {
+                append(", Error: ${t.message}")
+            }
+        }
+        callback.onFailure(t ?: Exception(errorMessage))
+    }
+}
 
 {{#operations}}
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}class {{classname}}(basePath: kotlin.String = defaultBasePath, client: Call.Factory = ApiClient.defaultClient) : ApiClient(basePath, client) {
@@ -159,6 +239,69 @@ import {{packageName}}.infrastructure.toMultiValue
             }
         }
     }
+{{#vendorExtensions.x-is-sse}}
+
+    /**
+     * {{{httpMethod}}} {{#sanitizePathComment}}{{{path}}}{{/sanitizePathComment}} (SSE)
+     * {{summary}}
+     * {{notes}}
+     *
+     * This endpoint returns Server-Sent Events. Use the callback to handle streaming events.
+     {{#allParams}}* @param {{{paramName}}} {{description}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}{{/required}}
+     {{/allParams}}* @param callback Callback to handle SSE events
+     * @return EventSource that can be used to close the connection
+     * @throws IllegalStateException If the request is not correctly configured
+     */
+    @Throws(IllegalStateException::class)
+    {{#isDeprecated}}
+    @Deprecated(message = "This operation is deprecated.")
+    {{/isDeprecated}}
+    {{^nonPublicApi}}{{#explicitApi}}public {{/explicitApi}}{{/nonPublicApi}}fun {{operationId}}Sse({{#allParams}}{{{paramName}}}: {{#isEnum}}{{#isContainer}}kotlin.collections.List<{{enumName}}{{operationIdCamelCase}}>{{/isContainer}}{{^isContainer}}{{enumName}}{{operationIdCamelCase}}{{/isContainer}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}{{#required}}{{#defaultValue}} = {{^isNumber}}{{#isEnum}}{{enumName}}{{operationIdCamelCase}}.{{enumDefaultValue}}{{/isEnum}}{{^isEnum}}{{{defaultValue}}}{{/isEnum}}{{/isNumber}}{{#isNumber}}{{{dataType}}}("{{{defaultValue}}}"){{/isNumber}}{{/defaultValue}}{{/required}}{{^required}}?{{#defaultValue}} = {{^isNumber}}{{#isEnum}}{{enumName}}{{operationIdCamelCase}}.{{enumDefaultValue}}{{/isEnum}}{{^isEnum}}{{{defaultValue}}}{{/isEnum}}{{/isNumber}}{{#isNumber}}{{{dataType}}}("{{{defaultValue}}}"){{/isNumber}}{{/defaultValue}}{{^defaultValue}} = null{{/defaultValue}}{{/required}}, {{/allParams}}callback: SseCallback) : EventSource {
+        {{#isDeprecated}}
+        @Suppress("DEPRECATION")
+        {{/isDeprecated}}
+        val localVariableConfig = {{operationId}}RequestConfig({{#allParams}}{{{paramName}}} = {{{paramName}}}{{^-last}}, {{/-last}}{{/allParams}})
+        
+        val baseHttpUrl = baseUrl.toHttpUrlOrNull() ?: throw IllegalStateException("Invalid base URL: $baseUrl")
+        val pathSegments = baseHttpUrl.encodedPathSegments.toMutableList()
+        // Add the operation path segments
+        localVariableConfig.path.trimStart('/').split('/').filter { it.isNotEmpty() }.forEach {
+            pathSegments.add(it)
+        }
+        
+        val url = HttpUrl.Builder()
+            .scheme(baseHttpUrl.scheme)
+            .host(baseHttpUrl.host)
+            .port(baseHttpUrl.port)
+            .apply {
+                pathSegments.forEach { segment ->
+                    addPathSegment(segment)
+                }
+            }
+        
+        localVariableConfig.query.forEach { (key, values) ->
+            values.forEach { value ->
+                url.addQueryParameter(key, value)
+            }
+        }
+        
+        val requestBuilder = Request.Builder()
+            .url(url.build())
+            .get()
+        
+        localVariableConfig.headers.forEach { (key, value) ->
+            requestBuilder.addHeader(key, value)
+        }
+        
+        requestBuilder.addHeader("Accept", "text/event-stream")
+        
+        val request = requestBuilder.build()
+        val listener = SseEventSourceListener(callback)
+        
+        return EventSources.createFactory(client as okhttp3.OkHttpClient)
+            .newEventSource(request, listener)
+    }
+{{/vendorExtensions.x-is-sse}}
 
     /**
      * {{{httpMethod}}} {{#sanitizePathComment}}{{{path}}}{{/sanitizePathComment}}

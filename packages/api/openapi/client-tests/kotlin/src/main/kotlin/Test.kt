@@ -1,6 +1,7 @@
 import director.v2.client.apis.DefaultApi
-import director.v2.client.infrastructure.ApiClient
+import director.v2.client.apis.SseCallback
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
@@ -29,14 +30,50 @@ fun main(args: Array<String>) {
             .hostnameVerifier { _, _ -> true }
 
         val okHttpClient = okHttpClientBuilder.build()
-        val apiClient = ApiClient(baseUrl = "https://localhost:3001/api", callFactory = okHttpClient)
-        val webService = apiClient.createService(DefaultApi::class.java)
+        val api = DefaultApi(basePath = "https://localhost:3001/api", client = okHttpClient)
 
         try {
-            val result = webService.healthOk()
-            println("Health OK: ${result.body()}")
+            // Test regular endpoint
+            val result = api.healthOk()
+            println("Health OK: $result")
+            
+            // Test SSE endpoint with callback
+            println("\nTesting SSE endpoint...")
+            var eventCount = 0
+            val eventSource = api.healthLiveOkSse(
+                maxOutputs = java.math.BigDecimal("5"),
+                callback = object : SseCallback {
+                    override fun onEvent(event: String, data: String, id: String?) {
+                        eventCount++
+                        println("SSE Event #$eventCount - Type: $event, Data: $data, ID: $id")
+                    }
+                    
+                    override fun onOpen() {
+                        println("SSE Connection opened")
+                    }
+                    
+                    override fun onClosed() {
+                        println("SSE Connection closed")
+                    }
+                    
+                    override fun onFailure(error: Throwable) {
+                        println("SSE Error: ${error.message}")
+                        error.printStackTrace()
+                    }
+                }
+            )
+            
+            // Wait for events to come in
+            println("Waiting for SSE events...")
+            delay(10000) // Wait 10 seconds for events
+            
+            // Close the event source
+            eventSource.cancel()
+            println("EventSource cancelled")
+            
         } catch (e: Exception) {
             println("Error: $e")
+            e.printStackTrace()
         } finally {
             // Force close connections to allow the program to exit
             okHttpClient.dispatcher.executorService.shutdown()
