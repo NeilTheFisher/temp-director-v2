@@ -9,12 +9,14 @@ import { OdienceEventCollection } from "../resources/OdienceEventResource"
 import { OdienceSimpleEventCollection } from "../resources/OdienceSimpleEventResource"
 import { WebEventCollection } from "../resources/WebEventResource"
 import { isIpAllowed } from "../utils/utils"
+import { S3Service } from "../services/S3Service"
 
 export class EventService {
   private eventRepository: Repository<Event>
   private redisService = RedisService.getInstance()
   private redisClient = this.redisService.getClient()
   private dataSource = AppDataSource
+  private s3Service = new S3Service()
   constructor() {
     this.eventRepository = AppDataSource.getRepository(Event)
   }
@@ -513,6 +515,101 @@ export class EventService {
       {
         return { total_events : 0, per_page: 0, current_page: 1, events: [], error: error}
       }
+    }
+  }
+
+  async getCategories(req: Request, userInfo: {userId: number, msisdn: string, isSuperAdmin: boolean, emails: string[], orgIds: number[]}): Promise<any> {
+    try {
+      console.log(userInfo)
+      const dateNow = Math.floor(Date.now() / 1000)
+      const mainQuery = this.eventRepository
+        .createQueryBuilder("event")
+        .select("DISTINCT event.category", "category")
+        .where("event.isDraft = :isDraft", { isDraft: false })
+        .andWhere("event.active = :active", { active: true })
+      mainQuery.andWhere(new Brackets(qb => {
+        qb.where(new Brackets(subQ => {
+          subQ.where("(event.date + event.duration) >= :dateNow", { dateNow })
+            .orWhere("event.duration IS NULL")
+        }))
+      }))
+
+      mainQuery.andWhere(new Brackets(qb => {
+        qb.where((qb2: SelectQueryBuilder<Event>) => {
+          const sub1 = qb2.subQuery()
+            .select("1")
+            .from("event_stream", "es")
+            .where("es.event_id = event.id")
+            .getQuery()
+          return `EXISTS ${sub1}`
+        })
+          .orWhere((qb2: SelectQueryBuilder<Event>) => {
+            const sub2 = qb2.subQuery()
+              .select("1")
+              .from("event_simulation", "sim")
+              .where("sim.event_id = event.id")
+              .getQuery()
+            return `EXISTS ${sub2}`
+          })
+      }))
+      mainQuery.andWhere(
+        new Brackets((qb) => {
+          // If SuperAdmin, can see all events (no restrictions)
+          if (userInfo.isSuperAdmin) {
+            console.log("SUPER ADMIN")
+            qb.where("1=1") // always true
+            return
+          }
+
+          // Non-superadmin logic
+          qb.where("event.isPublic = true") // Public events
+
+          qb.orWhere(
+            new Brackets((qb2) => {
+              qb2.where("event.isPublic = false").andWhere(
+                new Brackets((qb3) => {
+                  // User is owner
+                  qb3.where("event.ownerId = :userId", { userId: userInfo.userId })
+
+                  // User is in orgs
+                  if (userInfo.orgIds && userInfo.orgIds.length > 0) {
+                    qb3.orWhere("event.groupId IN (:...orgIds)", { orgIds: userInfo.orgIds })
+                  }
+
+                  // User is invited
+                  const recipients = [userInfo.msisdn]
+                  if (userInfo.emails && userInfo.emails.length > 0) {
+                    recipients.push(...userInfo.emails)
+                  }
+
+                  qb3.orWhere(
+                    `EXISTS (
+                SELECT 1 FROM invite i
+                WHERE i.event_id = event.id
+                AND i.recipient IN (:...recipients)
+              )`,
+                    { recipients }
+                  )
+                })
+              )
+            })
+          )
+        })
+      )
+      const startMain = Date.now()
+      const categories =  await mainQuery.getRawMany()
+      console.log(`Categories: Main query: ${Date.now() - startMain}ms, Categories: ${categories.length}`)
+      if (categories.length === 0) {
+        return {categories: []}
+      }
+      return {categories: categories.map(c => ({
+        category: c.category,
+        image: this.s3Service.getUrlFromPath("tags/" + c.category + ".png")
+      }))}
+
+    } catch (error) {
+      console.log(error)
+      return {categories: [], error: error}
     }
   }
 }
