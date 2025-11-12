@@ -18,66 +18,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
           }
         }
       }
@@ -164,68 +104,9 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
           }
-        }
+        },
+        "x-is-sse": true
       }
     },
     "/events/listEvents": {
@@ -577,66 +458,6 @@
                     "shop_bot_id",
                     "restream",
                     "group_id"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
                   ]
                 }
               }
@@ -1056,68 +877,9 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
           }
-        }
+        },
+        "x-is-sse": true
       }
     },
     "/events/listPartialEvents": {
@@ -1473,66 +1235,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
           }
         }
       }
@@ -1579,66 +1281,6 @@
                   "required": [
                     "code",
                     "message"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
                   ]
                 }
               }
@@ -1704,66 +1346,6 @@
                 }
               }
             }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
           }
         }
       }
@@ -1784,66 +1366,6 @@
                   "additionalProperties": {
                     "type": "string"
                   }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
                 }
               }
             }
@@ -1892,66 +1414,6 @@
                   },
                   "required": [
                     "urls"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
                   ]
                 }
               }
@@ -2019,66 +1481,6 @@
                   },
                   "required": [
                     "id"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
                   ]
                 }
               }
@@ -2154,66 +1556,6 @@
                   },
                   "required": [
                     "id"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "500",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_IMPLEMENTED"
-                        },
-                        "status": {
-                          "const": 500
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Not implemented"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
                   ]
                 }
               }
