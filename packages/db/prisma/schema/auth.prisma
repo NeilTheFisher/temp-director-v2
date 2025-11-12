@@ -24,9 +24,9 @@ model user {
   session_otp                         Int?
   email_user                          email_user[]
   event_requests                      event_requests[]
-  event_user                          event_user[]              @ignore
+  event_user                          event_user[]
   group_group_owner_idTouser          group[]                   @relation("group_owner_idTouser")
-  group_user                          group_user[]              @ignore
+  group_user                          group_user[]
   kpi_emotes_sent                     kpi_emotes_sent[]
   kpi_questions_sent                  kpi_questions_sent[]
   model_logs                          model_logs[]
