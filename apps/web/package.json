@@ -13,6 +13,7 @@
     "@director_v2/api": "workspace:*",
     "@director_v2/auth": "workspace:*",
     "@orpc/client": "catalog:",
+    "@orpc/json-schema": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/tanstack-query": "^1.11.1",

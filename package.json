@@ -10,6 +10,7 @@
     "catalog": {
       "@orpc/client": "^1.11.1",
       "@orpc/contract": "^1.11.1",
+      "@orpc/json-schema": "^1.11.1",
       "@orpc/openapi": "^1.11.1",
       "@orpc/server": "^1.11.1",
       "@orpc/zod": "^1.11.1",

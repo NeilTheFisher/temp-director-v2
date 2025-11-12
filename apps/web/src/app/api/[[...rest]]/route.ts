@@ -11,6 +11,7 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
 // polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
 import "@ungap/compression-stream/poly";
+import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
 
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
@@ -20,18 +21,23 @@ const rpcHandler = new RPCHandler(appRouter, {
   ],
   plugins: [
     new CompressionPlugin(),
+
     new SimpleCsrfProtectionHandlerPlugin(),
     new StrictGetMethodPlugin(),
   ],
 });
+
+const schemaConverters = [new ZodToJsonSchemaConverter()];
 const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
-    new OpenAPIReferencePlugin({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-    }),
     new CompressionPlugin(),
-    new SimpleCsrfProtectionHandlerPlugin(),
-    new StrictGetMethodPlugin(),
+
+    new OpenAPIReferencePlugin({
+      schemaConverters,
+    }),
+    new SmartCoercionPlugin({
+      schemaConverters,
+    }),
   ],
   interceptors: [
     onError((error) => {
