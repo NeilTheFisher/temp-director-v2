@@ -32,6 +32,7 @@
         "generatorName": "typescript",
         "inputSpec": "./openapi/openapi.json",
         "output": "./openapi/clients/typescript",
+        "templateDir": "./openapi/templates/typescript",
         "additionalProperties": {
           "npmName": "@director-v2/client-typescript",
           "supportsES6": true,

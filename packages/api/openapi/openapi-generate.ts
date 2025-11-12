@@ -17,6 +17,29 @@ const spec = await generator.generate(appRouter, {
   },
 });
 
+// Add x-is-sse vendor extension to SSE endpoints
+for (const pathItem of Object.values(spec.paths || {})) {
+  for (const operation of Object.values(pathItem || {})) {
+    if (
+      typeof operation === "object" &&
+      operation !== null &&
+      "responses" in operation
+    ) {
+      const responses = operation.responses as Record<string, unknown>;
+      for (const response of Object.values(responses)) {
+        const responseObj = response as Record<string, unknown>;
+        const content = responseObj?.content as
+          | Record<string, unknown>
+          | undefined;
+        if (content?.["text/event-stream"]) {
+          (operation as Record<string, unknown>)["x-is-sse"] = true;
+          break;
+        }
+      }
+    }
+  }
+}
+
 const output = "./openapi/openapi.json";
 await $`echo '${JSON.stringify(spec, null, 2)}' > ${output}`;
 console.log(`OpenAPI spec generated at ${output}`);
