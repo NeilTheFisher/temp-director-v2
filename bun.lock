@@ -29,6 +29,7 @@
         "@director_v2/api": "workspace:*",
         "@director_v2/auth": "workspace:*",
         "@orpc/client": "catalog:",
+        "@orpc/json-schema": "catalog:",
         "@orpc/openapi": "catalog:",
         "@orpc/server": "catalog:",
         "@orpc/tanstack-query": "^1.11.1",
@@ -144,6 +145,7 @@
   "catalog": {
     "@orpc/client": "^1.11.1",
     "@orpc/contract": "^1.11.1",
+    "@orpc/json-schema": "^1.11.1",
     "@orpc/openapi": "^1.11.1",
     "@orpc/server": "^1.11.1",
     "@orpc/zod": "^1.11.1",
