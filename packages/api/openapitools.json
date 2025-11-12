@@ -8,7 +8,7 @@
       "csharp": {
         "generatorName": "csharp",
         "inputSpec": "./openapi/openapi.json",
-        "output": "./openapi/clients/csharp/dist",
+        "output": "./openapi/clients/csharp",
         "additionalProperties": {
           "packageName": "DirectorV2.Client",
           "targetFramework": "net8.0",
@@ -20,12 +20,22 @@
       "kotlin": {
         "generatorName": "kotlin",
         "inputSpec": "./openapi/openapi.json",
-        "output": "./openapi/clients/kotlin/dist",
+        "output": "./openapi/clients/kotlin",
         "additionalProperties": {
           "packageName": "director.v2.client",
           "library": "jvm-retrofit2",
           "useCoroutines": true,
           "dateLibrary": "java8"
+        }
+      },
+      "typescript": {
+        "generatorName": "typescript",
+        "inputSpec": "./openapi/openapi.json",
+        "output": "./openapi/clients/typescript",
+        "additionalProperties": {
+          "npmName": "@director-v2/client-typescript",
+          "supportsES6": true,
+          "platform": "node"
         }
       }
     }
