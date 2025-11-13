@@ -1,0 +1,15 @@
+{
+    "name": "DirectorV2.Client.Test",
+    "references": [
+        "DirectorV2.Client",
+        "UnityEngine.TestRunner"
+    ],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Newtonsoft.Json.dll"
+    ],
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ]
+}

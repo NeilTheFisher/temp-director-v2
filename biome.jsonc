@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/.next", "!**/dist", "!**/.turbo", "!**/generated"]
+    "includes": [
+      "**",
+      "!**/.next",
+      "!**/dist",
+      "!**/.turbo",
+      "!**/generated",
+      "!**/openapi/clients"
+    ]
   },
   "formatter": {
     "enabled": true,

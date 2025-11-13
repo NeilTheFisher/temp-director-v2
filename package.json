@@ -47,12 +47,6 @@
     "unbuild": "rm -rf ./packages/*/dist ./apps/*/dist ./apps/*/.next",
     "update-deps": "bun ./scripts/update-catalog.ts && bun update -i"
   },
-  "lint-staged": {
-    "**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue,astro,svelte}": [
-      "biome check --write",
-      "oxlint"
-    ]
-  },
   "dependencies": {
     "dotenv": "^17.2.3",
     "zod": "^4.1.12"

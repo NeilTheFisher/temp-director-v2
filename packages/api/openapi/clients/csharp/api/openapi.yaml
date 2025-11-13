@@ -1,0 +1,691 @@
+openapi: 3.1.1
+info:
+  title: Director API
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /health/ok:
+    get:
+      operationId: health.ok
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+  /health/liveOk:
+    get:
+      operationId: health.liveOk
+      parameters:
+      - allowEmptyValue: true
+        allowReserved: true
+        explode: true
+        in: query
+        name: max_outputs
+        required: false
+        schema:
+          type: number
+        style: form
+      responses:
+        "200":
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/health_liveOk_200_response"
+          description: OK
+      x-is-sse: true
+  /events/listEvents:
+    post:
+      operationId: events.listEvents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              not: {}
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/events_listEvents_200_response"
+          description: OK
+  /events/listEventsLive:
+    post:
+      operationId: events.listEventsLive
+      requestBody:
+        content:
+          application/json:
+            schema:
+              not: {}
+        required: false
+      responses:
+        "200":
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/events_listEventsLive_200_response"
+          description: OK
+      x-is-sse: true
+  /events/listPartialEvents:
+    post:
+      operationId: events.listPartialEvents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              not: {}
+        required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/events_listEvents_200_response"
+          description: OK
+  /odience/provisionUser:
+    post:
+      operationId: odience.provisionUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/odience_provisionUser_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/odience_provisionUser_200_response"
+          description: OK
+  /odience/validatePhoneNumber:
+    post:
+      operationId: odience.validatePhoneNumber
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/odience_validatePhoneNumber_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/odience_validatePhoneNumber_200_response"
+          description: OK
+  /odience/getCategoryList:
+    post:
+      operationId: odience.getCategoryList
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  nullable: true
+                  type: string
+          description: OK
+  /stream/getStreamUrls:
+    post:
+      operationId: stream.getStreamUrls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/stream_getStreamUrls_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/stream_getStreamUrls_200_response"
+          description: OK
+  /user/getUserInfo:
+    post:
+      operationId: user.getUserInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_getUserInfo_200_response"
+          description: OK
+  /user/getUserInfoByMsisdn:
+    post:
+      operationId: user.getUserInfoByMsisdn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user_getUserInfoByMsisdn_request"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user_getUserInfo_200_response"
+          description: OK
+components:
+  schemas:
+    events_listEvents_200_response:
+      example:
+        date: -2147483648
+        image_uid: image_uid
+        short_description: short_description
+        featured: true
+        shop_bot_id: shop_bot_id
+        restream: true
+        hashtags: hashtags
+        web_allowed: true
+        owner_id: -2147483648
+        latitude: latitude
+        brand_ad_image_url: brand_ad_image_url
+        description: description
+        created_at: 2147483647
+        promo_video_status: promo_video_status
+        profanity: true
+        featured_artist: featured_artist
+        hmd_allowed: true
+        capacity: 2147483647
+        duration: 2147483647
+        brand_image_url: brand_image_url
+        updated_at: -2147483648
+        is_draft: true
+        web_image_url: web_image_url
+        id: id
+        location_info: ""
+        invitations_only: true
+        longitude: longitude
+        payed: true
+        brand_background_image_url: brand_background_image_url
+        promo_video_url: promo_video_url
+        image_url: image_url
+        active: true
+        promo_video_aspect_ratio: promo_video_aspect_ratio
+        featured_date: 2147483647
+        group_id: group_id
+        name: name
+        is_public: true
+        location: location
+        is_5g: true
+        category: category
+        app_allowed: true
+      properties:
+        id:
+          pattern: "^-?[0-9]+$"
+          type: string
+          x-native-type: bigint
+        name:
+          nullable: true
+          type: string
+        location:
+          nullable: true
+          type: string
+        location_info:
+          anyOf: []
+          nullable: true
+        owner_id:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+        duration:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        date:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        active:
+          type: boolean
+        capacity:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        description:
+          nullable: true
+          type: string
+        category:
+          nullable: true
+          type: string
+        is_public:
+          nullable: true
+          type: boolean
+        profanity:
+          default: true
+          type: boolean
+        is_5g:
+          nullable: true
+          type: boolean
+        created_at:
+          default: 1746167168
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+        updated_at:
+          default: 1746167168
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+        latitude:
+          nullable: true
+          pattern: "^-?\\d{1,10}(?:\\.\\d{1,8})?$"
+          type: string
+        longitude:
+          nullable: true
+          pattern: "^-?\\d{1,10}(?:\\.\\d{1,8})?$"
+          type: string
+        image_uid:
+          nullable: true
+          type: string
+        promo_video_url:
+          nullable: true
+          type: string
+        invitations_only:
+          nullable: true
+          type: boolean
+        is_draft:
+          nullable: true
+          type: boolean
+        payed:
+          nullable: true
+          type: boolean
+        image_url:
+          nullable: true
+          type: string
+        brand_image_url:
+          nullable: true
+          type: string
+        brand_background_image_url:
+          nullable: true
+          type: string
+        brand_ad_image_url:
+          nullable: true
+          type: string
+        featured:
+          nullable: true
+          type: boolean
+        hashtags:
+          nullable: true
+          type: string
+        app_allowed:
+          default: true
+          type: boolean
+        web_allowed:
+          nullable: true
+          type: boolean
+        hmd_allowed:
+          nullable: true
+          type: boolean
+        shop_bot_id:
+          nullable: true
+          type: string
+        promo_video_aspect_ratio:
+          nullable: true
+          type: string
+        promo_video_status:
+          nullable: true
+          type: string
+        restream:
+          nullable: true
+          type: boolean
+        short_description:
+          nullable: true
+          type: string
+        featured_date:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        featured_artist:
+          nullable: true
+          type: string
+        web_image_url:
+          nullable: true
+          type: string
+        group_id:
+          pattern: "^-?[0-9]+$"
+          type: string
+          x-native-type: bigint
+      required:
+      - active
+      - group_id
+      - hmd_allowed
+      - id
+      - invitations_only
+      - is_draft
+      - is_public
+      - name
+      - owner_id
+      - payed
+      - restream
+      - shop_bot_id
+      - web_allowed
+    stream_getStreamUrls_200_response:
+      example:
+        urls:
+        - urls
+        - urls
+      properties:
+        urls:
+          items:
+            nullable: true
+            type: string
+          type: array
+      required:
+      - urls
+    stream_getStreamUrls_request:
+      properties:
+        streamUrlId:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+      required:
+      - streamUrlId
+    odience_provisionUser_200_response:
+      example:
+        code: 0.8008281904610115
+        message: message
+      properties:
+        code:
+          type: number
+        message:
+          nullable: true
+          type: string
+      required:
+      - code
+      - message
+    health_liveOk_200_response_oneOf_1:
+      properties:
+        event: {}
+        data: {}
+        id:
+          nullable: true
+          type: string
+        retry:
+          type: number
+      required:
+      - event
+    odience_validatePhoneNumber_request:
+      properties:
+        msisdn:
+          type: string
+        country_code:
+          type: string
+      required:
+      - msisdn
+    user_getUserInfo_200_response:
+      example:
+        name: name
+        id: id
+        msisdn: msisdn
+        email: email
+      properties:
+        id:
+          pattern: "^-?[0-9]+$"
+          type: string
+          x-native-type: bigint
+        msisdn:
+          nullable: true
+          type: string
+        email:
+          nullable: true
+          type: string
+        name:
+          nullable: true
+          type: string
+      required:
+      - id
+    health_liveOk_200_response_oneOf:
+      properties:
+        event: {}
+        data:
+          nullable: true
+          type: string
+        id:
+          nullable: true
+          type: string
+        retry:
+          type: number
+      required:
+      - data
+      - event
+    events_listEventsLive_200_response:
+      oneOf:
+      - $ref: "#/components/schemas/events_listEventsLive_200_response_oneOf"
+      - $ref: "#/components/schemas/events_listEventsLive_200_response_oneOf_1"
+      - $ref: "#/components/schemas/events_listEventsLive_200_response_oneOf_1"
+    odience_provisionUser_request:
+      properties:
+        msisdn:
+          nullable: true
+          type: string
+        country_code:
+          nullable: true
+          type: string
+      required:
+      - msisdn
+    odience_validatePhoneNumber_200_response:
+      example:
+        valid: true
+        country_code: country_code
+        code: 0.8008281904610115
+        formatted: formatted
+        error: error
+      properties:
+        valid:
+          nullable: true
+          type: boolean
+        formatted:
+          nullable: true
+          type: string
+        country_code:
+          nullable: true
+          type: string
+        error:
+          nullable: true
+          type: string
+        code:
+          type: number
+      required:
+      - code
+      - country_code
+      - formatted
+      - valid
+    health_liveOk_200_response:
+      oneOf:
+      - $ref: "#/components/schemas/health_liveOk_200_response_oneOf"
+      - $ref: "#/components/schemas/health_liveOk_200_response_oneOf_1"
+      - $ref: "#/components/schemas/health_liveOk_200_response_oneOf_1"
+    events_listEventsLive_200_response_oneOf:
+      properties:
+        event: {}
+        data:
+          $ref: "#/components/schemas/events_listEventsLive_200_response_oneOf_data"
+        id:
+          nullable: true
+          type: string
+        retry:
+          type: number
+      required:
+      - data
+      - event
+    user_getUserInfoByMsisdn_request:
+      properties:
+        msisdn:
+          nullable: true
+          type: string
+      required:
+      - msisdn
+    events_listEventsLive_200_response_oneOf_1:
+      properties:
+        event: {}
+        data: {}
+        id:
+          type: string
+        retry:
+          type: number
+      required:
+      - event
+    events_listEventsLive_200_response_oneOf_data:
+      properties:
+        id:
+          pattern: "^-?[0-9]+$"
+          type: string
+          x-native-type: bigint
+        name:
+          type: string
+        location:
+          nullable: true
+          type: string
+        location_info:
+          anyOf: []
+          nullable: true
+        owner_id:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+        duration:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        date:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        active:
+          type: boolean
+        capacity:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        description:
+          nullable: true
+          type: string
+        category:
+          nullable: true
+          type: string
+        is_public:
+          type: boolean
+        profanity:
+          default: true
+          type: boolean
+        is_5g:
+          nullable: true
+          type: boolean
+        created_at:
+          default: 1746167168
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+        updated_at:
+          default: 1746167168
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          type: integer
+        latitude:
+          nullable: true
+          pattern: "^-?\\d{1,10}(?:\\.\\d{1,8})?$"
+          type: string
+        longitude:
+          nullable: true
+          pattern: "^-?\\d{1,10}(?:\\.\\d{1,8})?$"
+          type: string
+        image_uid:
+          nullable: true
+          type: string
+        promo_video_url:
+          nullable: true
+          type: string
+        invitations_only:
+          type: boolean
+        is_draft:
+          type: boolean
+        payed:
+          type: boolean
+        image_url:
+          nullable: true
+          type: string
+        brand_image_url:
+          nullable: true
+          type: string
+        brand_background_image_url:
+          nullable: true
+          type: string
+        brand_ad_image_url:
+          nullable: true
+          type: string
+        featured:
+          nullable: true
+          type: boolean
+        hashtags:
+          nullable: true
+          type: string
+        app_allowed:
+          default: true
+          type: boolean
+        web_allowed:
+          type: boolean
+        hmd_allowed:
+          type: boolean
+        shop_bot_id:
+          type: string
+        promo_video_aspect_ratio:
+          nullable: true
+          type: string
+        promo_video_status:
+          nullable: true
+          type: string
+        restream:
+          type: boolean
+        short_description:
+          nullable: true
+          type: string
+        featured_date:
+          maximum: 9007199254740991
+          minimum: -9007199254740991
+          nullable: true
+          type: integer
+        featured_artist:
+          nullable: true
+          type: string
+        web_image_url:
+          nullable: true
+          type: string
+        group_id:
+          pattern: "^-?[0-9]+$"
+          type: string
+          x-native-type: bigint
+      required:
+      - active
+      - group_id
+      - hmd_allowed
+      - id
+      - invitations_only
+      - is_draft
+      - is_public
+      - name
+      - owner_id
+      - payed
+      - restream
+      - shop_bot_id
+      - web_allowed
+
