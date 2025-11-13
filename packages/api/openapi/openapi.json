@@ -3,6 +3,11 @@
     "title": "Director API",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "https://director.odience.com/api"
+    }
+  ],
   "openapi": "3.1.1",
   "paths": {
     "/health/ok": {

@@ -15,6 +15,11 @@ const spec = await generator.generate(appRouter, {
     title: "Director API",
     version: directorVersion,
   },
+  servers: [
+    {
+      url: "https://director.odience.com/api",
+    },
+  ],
 });
 
 // Add x-is-sse vendor extension to SSE endpoints

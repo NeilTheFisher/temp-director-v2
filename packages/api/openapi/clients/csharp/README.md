@@ -60,7 +60,7 @@ namespace DirectorV2.ClientExample
         async void Start()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var body = null;  // Object? |  (optional) 
 
@@ -85,7 +85,7 @@ namespace DirectorV2.ClientExample
 <a id="documentation-for-api-endpoints"></a>
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://localhost*
+All URIs are relative to *https://director.odience.com/api*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------

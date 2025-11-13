@@ -1,6 +1,6 @@
 # DirectorV2.Client.Api.DefaultApi
 
-All URIs are relative to *http://localhost*
+All URIs are relative to *https://director.odience.com/api*
 
 | Method | HTTP request | Description |
 |--------|--------------|-------------|
@@ -37,7 +37,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var body = null;  // Object? |  (optional) 
 
@@ -124,7 +124,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var body = null;  // Object? |  (optional) 
 
@@ -211,7 +211,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var body = null;  // Object? |  (optional) 
 
@@ -298,7 +298,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var maxOutputs = 8.14D;  // decimal? |  (optional) 
 
@@ -385,7 +385,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
 
             try
@@ -467,7 +467,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
 
             try
@@ -549,7 +549,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var odienceProvisionUserRequest = new OdienceProvisionUserRequest(); // OdienceProvisionUserRequest | 
 
@@ -636,7 +636,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var odienceValidatePhoneNumberRequest = new OdienceValidatePhoneNumberRequest(); // OdienceValidatePhoneNumberRequest | 
 
@@ -723,7 +723,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var streamGetStreamUrlsRequest = new StreamGetStreamUrlsRequest(); // StreamGetStreamUrlsRequest | 
 
@@ -810,7 +810,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var body = null;  // Object | 
 
@@ -897,7 +897,7 @@ namespace Example
         public static void Main()
         {
             Configuration config = new Configuration();
-            config.BasePath = "http://localhost";
+            config.BasePath = "https://director.odience.com/api";
             var apiInstance = new DefaultApi(config);
             var userGetUserInfoByMsisdnRequest = new UserGetUserInfoByMsisdnRequest(); // UserGetUserInfoByMsisdnRequest | 
 

@@ -118,7 +118,7 @@ namespace DirectorV2.Client.Client
         {
             Proxy = null;
             UserAgent = WebUtility.UrlEncode("OpenAPI-Generator/1.0.0/csharp");
-            BasePath = "http://localhost";
+            BasePath = "https://director.odience.com/api";
             DefaultHeaders = new ConcurrentDictionary<string, string>();
             ApiKey = new ConcurrentDictionary<string, string>();
             ApiKeyPrefix = new ConcurrentDictionary<string, string>();
@@ -126,7 +126,7 @@ namespace DirectorV2.Client.Client
             {
                 {
                     new Dictionary<string, object> {
-                        {"url", ""},
+                        {"url", "https://director.odience.com/api"},
                         {"description", "No description provided"},
                     }
                 }
@@ -147,7 +147,7 @@ namespace DirectorV2.Client.Client
             IDictionary<string, string> defaultHeaders,
             IDictionary<string, string> apiKey,
             IDictionary<string, string> apiKeyPrefix,
-            string basePath = "http://localhost") : this()
+            string basePath = "https://director.odience.com/api") : this()
         {
             if (string.IsNullOrWhiteSpace(basePath))
                 throw new ArgumentException("The provided basePath is invalid.", "basePath");

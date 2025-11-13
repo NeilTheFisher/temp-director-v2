@@ -3,7 +3,7 @@ info:
   title: Director API
   version: 1.0.0
 servers:
-- url: /
+- url: https://director.odience.com/api
 paths:
   /health/ok:
     get:
