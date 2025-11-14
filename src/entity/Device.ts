@@ -6,35 +6,35 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-} from "typeorm";
-import { Sip } from "./Sip";
-import { Action } from "./Action";
-import { DeviceGroup } from "./DeviceGroup";
-import { DeviceEvent } from "./DeviceEvent";
-import { VideowallMedia } from "./VideowallMedia";
-import { Stream } from "./Stream";
+} from "typeorm"
+import { Sip } from "./Sip"
+import { Action } from "./Action"
+import { Group } from "./Group"
+import { DeviceEvent } from "./DeviceEvent"
+import { VideowallMedia } from "./VideowallMedia"
+import { Stream } from "./Stream"
 
 @Index("device_code_unique", ["code"], { unique: true })
 @Index("device_stream_id_foreign", ["streamId"], {})
 @Entity("device")
 export class Device {
   @PrimaryGeneratedColumn({ type: "bigint", name: "id", unsigned: true })
-  id: number;
+  id: number
 
   @Column("varchar", { name: "name", length: 191 })
-  name: string;
+  name: string
 
   @Column("varchar", { name: "type", length: 191 })
-  type: string;
+  type: string
 
   @Column("tinyint", { name: "active", width: 1, default: () => 1 })
-  active: boolean;
+  active: boolean
 
   @Column("int", { name: "created_at", default: () => "UNIX_TIMESTAMP()" })
-  createdAt: number;
+  createdAt: number
 
   @Column("int", { name: "updated_at", default: () => "UNIX_TIMESTAMP()" })
-  updatedAt: number;
+  updatedAt: number
 
   @Column("varchar", {
     name: "code",
@@ -42,42 +42,46 @@ export class Device {
     unique: true,
     length: 191,
   })
-  code: string | null;
+  code: string | null
 
   @Column("bigint", { name: "stream_id", nullable: true, unsigned: true })
-  streamId: number | null;
+  streamId: number | null
 
   @Column("longblob", { name: "image", nullable: true })
-  image: Buffer | null;
+  image: Buffer | null
 
   @Column("longblob", { name: "logo", nullable: true })
-  logo: Buffer | null;
+  logo: Buffer | null
 
   @Column("varchar", { name: "category", nullable: true, length: 191 })
-  category: string | null;
+  category: string | null
 
   @Column("tinyint", { name: "running", width: 1, default: () => 0 })
-  running: boolean;
+  running: boolean
 
   @OneToMany(() => Sip, (sip) => sip.device)
-  sips: Sip[];
+  sips: Sip[]
 
   @OneToMany(() => Action, (action) => action.device)
-  actions: Action[];
+  actions: Action[]
 
-  @OneToMany(() => DeviceGroup, (deviceGroup) => deviceGroup.device)
-  deviceGroups: DeviceGroup[];
+  @ManyToOne(() => Group, (group) => group.devices)
+  @JoinColumn({ name: "group_id" })
+  group: Group
+
+  @Column({name: "group_id", type: "bigint", unsigned: true })
+  groupId: number
 
   @OneToMany(() => DeviceEvent, (deviceEvent) => deviceEvent.device)
-  deviceEvents: DeviceEvent[];
+  deviceEvents: DeviceEvent[]
 
   @OneToMany(() => VideowallMedia, (videowallMedia) => videowallMedia.device)
-  videowallMedias: VideowallMedia[];
+  videowallMedias: VideowallMedia[]
 
   @ManyToOne(() => Stream, (stream) => stream.devices, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   })
   @JoinColumn([{ name: "stream_id", referencedColumnName: "id" }])
-  stream: Stream;
+  stream: Stream
 }

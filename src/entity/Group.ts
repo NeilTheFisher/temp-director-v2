@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { Stream } from "./Stream"
 import { MediaContent } from "./MediaContent"
 import { AddressListGroup } from "./AddressListGroup"
-import { DeviceGroup } from "./DeviceGroup"
+import { Device } from "./Device"
 import { GroupSponsor } from "./GroupSponsor"
 import { Controller } from "./Controller"
 import { ProPublisher } from "./ProPublisher"
@@ -53,8 +53,8 @@ export class Group {
   )
   addressListGroups: AddressListGroup[]
 
-  @OneToMany(() => DeviceGroup, (deviceGroup) => deviceGroup.group)
-  deviceGroups: DeviceGroup[]
+  @OneToMany(() => Device, (device) => device.group)
+  devices: Device[]
 
   @OneToMany(() => GroupSponsor, (groupSponsor) => groupSponsor.group)
   groupSponsors: GroupSponsor[]
