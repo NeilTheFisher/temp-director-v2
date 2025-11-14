@@ -9,7 +9,7 @@ import {
   JoinTable,
   PrimaryGeneratedColumn,
 } from "typeorm"
-import { GroupStream } from "./GroupStream"
+import { Group } from "./Group"
 import { EventStream } from "./EventStream"
 import { StreamUrl } from "./StreamUrl"
 import { ProPublisher } from "./ProPublisher"
@@ -108,8 +108,12 @@ export class Stream {
   @Column("varchar", { name: "propublisher_uid", nullable: true, length: 191 })
   propublisherUid: string | null
 
-  @OneToMany(() => GroupStream, (groupStream) => groupStream.stream)
-  groupStreams: GroupStream[]
+  @ManyToOne(() => Group, (group) => group.streams)
+  @JoinColumn({ name: "group_id" })
+  group: Group
+
+  @Column({name: "group_id", type: "bigint", unsigned: true })
+  groupId: number
 
   @OneToMany(() => EventStream, (eventStream) => eventStream.stream)
   eventStreams: EventStream[]

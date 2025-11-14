@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
-import { GroupStream } from "./GroupStream"
+import { Stream } from "./Stream"
 import { MediaContent } from "./MediaContent"
 import { AddressListGroup } from "./AddressListGroup"
 import { DeviceGroup } from "./DeviceGroup"
@@ -38,8 +38,8 @@ export class Group {
   @Column("varchar", { name: "image_url", nullable: true, length: 191 })
   imageUrl: string | null
 
-  @OneToMany(() => GroupStream, (groupStream) => groupStream.group)
-  groupStreams: GroupStream[]
+  @OneToMany(() => Stream, (stream) => stream.group)
+  streams: Stream[]
 
   @OneToMany(() => Event, (groupEvent) => groupEvent.group)
   events: Event[]

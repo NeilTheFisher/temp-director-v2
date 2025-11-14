@@ -7,14 +7,14 @@ const streamUrlService = new StreamUrlService()
 class StreamController {
   public static getStreamUrls = async (req: Request, res: Response) => {
     console.log("StreamController.getStreamUrls:")
-    const streamUrlId = req.params.streamUrlId;
+    const streamUrlId = req.params.streamUrlId
     if (req.headers.authorization) {
       const userId = await verifyAccess(req.headers.authorization)
       console.log("Jwt verify returned userId:", userId)
-      
-      const clientIp = typeof req.headers['x-forwarded-for'] === 'string'
-      ? req.headers['x-forwarded-for'].split(',')[0].trim() // Get the first IP in case of a list
-      : req.connection.remoteAddress || '';
+
+      const clientIp = typeof req.headers["x-forwarded-for"] === "string"
+        ? req.headers["x-forwarded-for"].split(",")[0].trim() // Get the first IP in case of a list
+        : req.connection.remoteAddress || ""
 
       const streamInfo = await streamUrlService.getStreamUrls(parseInt(streamUrlId), parseInt(userId), clientIp)
       console.log(streamInfo)
