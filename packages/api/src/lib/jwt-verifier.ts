@@ -1,12 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import jwt from "jsonwebtoken";
 
 let publicKey: string | null = null;
 
 function getPublicKey(): string {
   if (!publicKey) {
-    const keyPath = path.join(process.cwd(), "priv", "public.key");
+    const keyPath = path.join(
+      fileURLToPath(new URL(import.meta.url)),
+      "../../../../../",
+      "priv",
+      "public.key",
+    );
     publicKey = fs.readFileSync(keyPath, "utf8");
   }
   return publicKey;
@@ -48,7 +54,7 @@ export async function verifyJWTToken(
       },
       (errors, decoded) => {
         if (errors) {
-          console.error(errors);
+          console.error("JWT verification error", errors);
           resolve(undefined);
           return;
         }
@@ -75,7 +81,7 @@ export async function verifyJWTToken(
   } catch (error: unknown) {
     if (error instanceof jwt.JsonWebTokenError) {
       console.error(
-        "JWT verification error:",
+        "verifyJWTToken error:",
         (error as jwt.JsonWebTokenError).message,
       );
     } else {

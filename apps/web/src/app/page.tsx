@@ -19,7 +19,7 @@ const TITLE_TEXT = `
  `;
 
 export default function Home() {
-  const healthCheck = useQuery(orpc.health.queryOptions());
+  const healthCheck = useQuery(orpc.health.ok.queryOptions());
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-2">
