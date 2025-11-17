@@ -181,8 +181,16 @@ export class EventService {
               new Brackets((qb2) => {
                 qb2.where("event.isPublic = false").andWhere(
                   new Brackets((qb3) => {
-                  // User is owner
+
+                    // User is owner
                     qb3.where("event.ownerId = :userId", { userId: userInfo.userId })
+
+                    //if location lock = true → allow event and ip is set up
+                    qb3.orWhere(`
+                      JSON_EXTRACT(event.locationInfo, '$.location_lock') = true
+                      AND JSON_UNQUOTE(JSON_EXTRACT(event.locationInfo, '$.location_ips')) IS NOT NULL
+                      AND JSON_UNQUOTE(JSON_EXTRACT(event.locationInfo, '$.location_ips')) != ''
+                    `)
 
                     // User is in orgs
                     if (userInfo.orgIds && userInfo.orgIds.length > 0) {
@@ -464,10 +472,22 @@ export class EventService {
         }
 
       })
-
+      const notFilteredEvents = events
       console.log(`Mapping: ${Date.now() - startMapping}ms`)
 
-      const result = events
+      const result = notFilteredEvents.filter(event => {
+        if(!event.isPublic)
+        {
+          if((event.locationInfo?.location_lock ?? false) && String(event.locationInfo?.location_ips || "").length > 0)
+          {
+            const boolPassedIpCheck =  isIpAllowed(event.locationInfo.location_ips, clientIp)
+            console.log(`Filter events: for event ${event.id} boolPassedIpCheck: ${boolPassedIpCheck}`)
+            return boolPassedIpCheck
+          }
+        }
+
+        return true
+      })
 
       const usersConnectedPromises: Promise<number>[] = []
       const invitationAcceptedPromises: Promise<boolean>[] = []
