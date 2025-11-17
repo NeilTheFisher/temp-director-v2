@@ -1,7 +1,7 @@
 import { authMiddleware } from "./middlewares/auth";
+import { base } from "./middlewares/base";
+import { errorMiddleware } from "./middlewares/error";
 
-import { pub } from "./middlewares/pub";
-
-export { pub };
+export const pub = base.use(errorMiddleware);
 
 export const authed = pub.use(authMiddleware);

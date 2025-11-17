@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
-import { pub } from "./pub";
+import { base } from "./base";
 
-export const authMiddleware = pub.middleware(({ context, next }) => {
+export const authMiddleware = base.middleware(({ context, next }) => {
   if (!context.session?.user) {
     throw new ORPCError("UNAUTHORIZED");
   }
