@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { Stream } from "./Stream"
 import { MediaContent } from "./MediaContent"
-import { AddressListGroup } from "./AddressListGroup"
+import { AddressList } from "./AddressList"
 import { Device } from "./Device"
 import { GroupSponsor } from "./GroupSponsor"
 import { Controller } from "./Controller"
@@ -47,11 +47,8 @@ export class Group {
   @OneToMany(() => MediaContent, (mediaContent) => mediaContent.group)
   mediaContents: MediaContent[]
 
-  @OneToMany(
-    () => AddressListGroup,
-    (addressListGroup) => addressListGroup.group
-  )
-  addressListGroups: AddressListGroup[]
+  @OneToMany(() => AddressList, (groupList) => groupList.group)
+  addressLists: AddressList[]
 
   @OneToMany(() => Device, (device) => device.group)
   devices: Device[]
