@@ -6,7 +6,7 @@ import { Device } from "./Device"
 import { GroupSponsor } from "./GroupSponsor"
 import { Controller } from "./Controller"
 import { ProPublisher } from "./ProPublisher"
-import { GroupTemplate } from "./GroupTemplate"
+import { Template } from "./Template"
 import { Role } from "./Role"
 import { Event } from "./Event"
 import { Sponsor } from "./Sponsor"
@@ -70,8 +70,9 @@ export class Group {
   @OneToMany(() => ProPublisher, (proPublisher) => proPublisher.group)
   proPublishers: ProPublisher[]
 
-  @OneToMany(() => GroupTemplate, (groupTemplate) => groupTemplate.group)
-  groupTemplates: GroupTemplate[]
+
+  @OneToMany(() => Template, (groupTemplate) => groupTemplate.group)
+  templates: Template[]
 
   @ManyToMany(() => User2, (user: User) => user.groups)
   @JoinTable()
