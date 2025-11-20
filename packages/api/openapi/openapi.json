@@ -64,10 +64,7 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "event",
-                        "data"
-                      ]
+                      "required": ["event", "data"]
                     },
                     {
                       "type": "object",
@@ -83,9 +80,7 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "event"
-                      ]
+                      "required": ["event"]
                     },
                     {
                       "type": "object",
@@ -101,9 +96,7 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "event"
-                      ]
+                      "required": ["event"]
                     }
                   ]
                 }
@@ -837,10 +830,7 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "event",
-                        "data"
-                      ]
+                      "required": ["event", "data"]
                     },
                     {
                       "type": "object",
@@ -856,9 +846,7 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "event"
-                      ]
+                      "required": ["event"]
                     },
                     {
                       "type": "object",
@@ -874,9 +862,7 @@
                           "type": "number"
                         }
                       },
-                      "required": [
-                        "event"
-                      ]
+                      "required": ["event"]
                     }
                   ]
                 }
@@ -1261,9 +1247,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "msisdn"
-                ]
+                "required": ["msisdn"]
               }
             }
           }
@@ -1283,10 +1267,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "code",
-                    "message"
-                  ]
+                  "required": ["code", "message"]
                 }
               }
             }
@@ -1311,9 +1292,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "msisdn"
-                ]
+                "required": ["msisdn"]
               }
             }
           }
@@ -1342,12 +1321,7 @@
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "valid",
-                    "formatted",
-                    "country_code",
-                    "code"
-                  ]
+                  "required": ["valid", "formatted", "country_code", "code"]
                 }
               }
             }
@@ -1395,9 +1369,7 @@
                     "exclusiveMinimum": 0
                   }
                 },
-                "required": [
-                  "streamUrlId"
-                ]
+                "required": ["streamUrlId"]
               }
             }
           }
@@ -1417,9 +1389,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "urls"
-                  ]
+                  "required": ["urls"]
                 }
               }
             }
@@ -1484,9 +1454,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
@@ -1508,9 +1476,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "msisdn"
-                ]
+                "required": ["msisdn"]
               }
             }
           }
@@ -1559,9 +1525,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }

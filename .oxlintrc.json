@@ -138,5 +138,5 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": []
+  "ignorePatterns": ["**/openapi/clients", "**/openapi/client-tests"]
 }

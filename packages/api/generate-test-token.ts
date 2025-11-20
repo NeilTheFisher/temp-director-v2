@@ -16,11 +16,11 @@ const publicKey = fs.readFileSync(
 // user id 1
 const token = jwt.sign({ sub: "1" }, privateKey, {
   algorithm: "RS256",
-  expiresIn: "1h",
+  expiresIn: "10years",
 });
 
 console.log("Generated Token:");
-console.log("Authorization: Bearer " + token);
+console.log(`Authorization: Bearer ${token}`);
 console.log("\n--- Verifying Token ---");
 
 try {

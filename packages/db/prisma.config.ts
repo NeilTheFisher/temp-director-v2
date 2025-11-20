@@ -1,10 +1,6 @@
 import path from "node:path";
-import dotenv from "dotenv";
 import type { PrismaConfig } from "prisma";
-
-dotenv.config({
-  path: "../../apps/web/.env",
-});
+import "@director_v2/config";
 
 export default {
   schema: path.join("prisma", "schema"),

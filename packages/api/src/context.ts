@@ -1,4 +1,4 @@
-import { auth } from "@director_v2/auth";
+// import { auth } from "@director_v2/auth";
 import type { NextRequest } from "next/server";
 import { verifyJWTToken } from "./lib/jwt-verifier";
 
@@ -6,14 +6,14 @@ export async function createContext(req: NextRequest) {
   let session: { user: { id: string } } | null = null;
 
   // Try to get session from Better-Auth cookies
-  try {
-    const authSession = await auth.api.getSession({
-      headers: req.headers,
-    });
-    if (authSession?.user.id) session = { user: { id: authSession.user.id } };
-  } catch (error) {
-    console.debug("Failed to get session from Better-Auth:", error);
-  }
+  // try {
+  //   const authSession = await auth.api.getSession({
+  //     headers: req.headers,
+  //   });
+  //   if (authSession?.user.id) session = { user: { id: authSession.user.id } };
+  // } catch (error) {
+  //   console.debug("Failed to get session from Better-Auth:", error);
+  // }
 
   // Fallback to JWT token verification if no Better-Auth session
   if (!session) {
@@ -31,8 +31,12 @@ export async function createContext(req: NextRequest) {
     }
   }
 
+  const clientIp =
+    req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for");
+
   return {
     session,
+    clientIp: clientIp as string | undefined,
   };
 }
 

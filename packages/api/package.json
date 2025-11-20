@@ -23,15 +23,21 @@
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
+    "arkenv": "catalog:",
+    "arkregex": "catalog:",
+    "arktype": "catalog:",
+    "cidr-regex": "^5.0.1",
     "decimal.js": "catalog:",
     "dotenv": "catalog:",
+    "dotenv-expand": "catalog:",
     "jsonwebtoken": "catalog:",
     "next": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "typescript": "^5"

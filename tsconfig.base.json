@@ -19,6 +19,8 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["node"],
     "paths": {
+      "@director_v2/config": ["./packages/config/index.ts"],
+      "@director_v2/config/*": ["./packages/config/*"],
       "@director_v2/api": ["./packages/api/src/index.ts"],
       "@director_v2/api/*": ["./packages/api/src/*"],
       "@director_v2/contracts": ["./packages/contracts/src/index.ts"],
