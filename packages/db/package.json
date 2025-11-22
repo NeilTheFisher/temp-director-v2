@@ -25,6 +25,7 @@
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.0.0",
     "prisma-zod-generator": "^1.32.2",
