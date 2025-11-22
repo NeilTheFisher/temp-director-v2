@@ -72,6 +72,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@director_v2/auth": "workspace:*",
+        "@director_v2/config": "workspace:*",
         "@director_v2/contracts": "workspace:*",
         "@director_v2/db": "workspace:*",
         "@openapitools/openapi-generator-cli": "^2.25.2",
@@ -144,6 +145,7 @@
     "packages/db": {
       "name": "@director_v2/db",
       "dependencies": {
+        "@director_v2/config": "workspace:*",
         "@prisma/adapter-mariadb": "^7.0.0",
         "@prisma/client": "catalog:",
         "@prisma/client-runtime-utils": "^7.0.0",

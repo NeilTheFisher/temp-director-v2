@@ -4,6 +4,8 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist"
-  }
+    "outDir": "dist",
+    "composite": true
+  },
+  "references": [{ "path": "../../packages/config" }]
 }

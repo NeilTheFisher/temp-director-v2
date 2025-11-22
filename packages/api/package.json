@@ -3,18 +3,16 @@
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts"
-    }
+    ".": "./src/index.ts"
   },
   "scripts": {
     "lint": "biome check . && oxlint --type-aware",
-    "lint:types": "tsc --noEmit",
+    "lint:types": "tsc -b",
     "openapi:generate": "bun run openapi/openapi-generate.ts"
   },
   "dependencies": {
     "@director_v2/auth": "workspace:*",
+    "@director_v2/config": "workspace:*",
     "@director_v2/contracts": "workspace:*",
     "@director_v2/db": "workspace:*",
     "@openapitools/openapi-generator-cli": "^2.25.2",

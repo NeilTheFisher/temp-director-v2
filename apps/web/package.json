@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev --port=3001 --experimental-https",
     "lint": "biome check . && oxlint --type-aware",
-    "lint:types": "tsgo --noEmit",
+    "lint:types": "tsc -b",
     "start": "next start"
   },
   "dependencies": {

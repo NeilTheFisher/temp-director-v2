@@ -13,7 +13,7 @@
   },
   "scripts": {
     "lint": "biome check . && oxlint --type-aware",
-    "lint:types": "tsc --noEmit"
+    "lint:types": "tsc -b"
   },
   "dependencies": {
     "@director_v2/db": "workspace:*",

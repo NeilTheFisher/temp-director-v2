@@ -4,7 +4,9 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "composite": true
   },
-  "include": ["*.json"]
+  "include": ["*.json"],
+  "references": [{ "path": "../contracts" }]
 }

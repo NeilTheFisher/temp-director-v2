@@ -4,18 +4,11 @@
   "description": "oRPC config for Director v2",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./index.ts",
-      "import": "./index.ts"
-    },
-    "./*": {
-      "types": "./*.ts",
-      "import": "./*.ts"
-    }
+    ".": "./index.ts"
   },
   "scripts": {
     "lint": "biome check . && oxlint --type-aware",
-    "lint:types": "tsc --noEmit"
+    "lint:types": "tsc -b"
   },
   "dependencies": {
     "arkenv": "catalog:",

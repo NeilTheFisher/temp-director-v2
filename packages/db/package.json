@@ -22,9 +22,10 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio --browser none",
     "lint": "biome check . && oxlint --type-aware",
-    "lint:types": "tsc --noEmit"
+    "lint:types": "tsc -b"
   },
   "dependencies": {
+    "@director_v2/config": "workspace:*",
     "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.0.0",
