@@ -10,16 +10,13 @@ if (!process.env.NODE_ENV?.startsWith("prod")) {
     "../../../.env",
   );
 
-  console.log("Loading env vars from", envPath);
-
   dotenvExpand.expand(
     dotenv.config({
       path: envPath,
+      quiet: true,
     }),
   );
 }
-
-console.log("process.env.AWS_URL", process.env.AWS_URL);
 
 export const env = arkenv({
   AWS_URL: "string.url",

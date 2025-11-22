@@ -89,8 +89,6 @@ async function checkLocationAccess(
   userInfo: UserInfo,
   clientIp: string,
 ): Promise<boolean> {
-  return false;
-
   const locationInfo = event.location_info as Record<string, unknown> | null;
   const boolLocked = locationInfo?.location_lock ?? false;
 
@@ -534,7 +532,6 @@ function getOnLocation(locationInfo: Prisma.JsonValue): boolean {
  * Get number of users currently connected to an event from Redis
  */
 async function getUsersConnected(eventId: bigint) {
-  return 0;
   try {
     const key = `{event:${eventId}}:users:`;
     const usersConnected = await redis.hget(key, "users_connected_list");

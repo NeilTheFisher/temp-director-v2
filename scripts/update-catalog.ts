@@ -5,7 +5,7 @@ const { catalog } = pkg.workspaces;
 
 console.log("Checking catalog packages...\n");
 
-const updates: string[] = [];
+const updates: Map<string, string> = new Map();
 
 await Promise.all(
   Object.entries(catalog).map(async ([_name, version]) => {
@@ -15,18 +15,20 @@ await Promise.all(
     const prefix = version.match(/^[\^~]/)?.[0] || "^";
 
     if (latest !== current) {
-      updates.push(`${name}: ${version} → ${prefix}${latest}`);
+      updates.set(name, `${name}: ${version} → ${prefix}${latest}`);
       catalog[name] = `${prefix}${latest}`;
     }
   }),
 );
 
 // Print updates in order
-for (const update of updates) {
-  console.log(update);
+for (const name of Object.keys(catalog)) {
+  if (updates.has(name)) {
+    console.log(updates.get(name));
+  }
 }
 
-if (updates.length > 0) {
+if (updates.size > 0) {
   console.log("\nUpdated catalog:");
   console.log(JSON.stringify(catalog, null, 2));
   console.log("\nWrite to package.json? (Y/n):");

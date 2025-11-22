@@ -60,8 +60,11 @@ model address_list {
   name               String
   date               Int                  @default(1746167167)
   recipients         String?              @db.LongText
+  group_id           BigInt?              @db.UnsignedBigInt
+  group              group?               @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "address_list_group_id_foreign")
   address_list_event address_list_event[]
-  address_list_group address_list_group[]
+
+  @@index([group_id], map: "address_list_group_id_foreign")
 }
 
 model address_list_event {
@@ -73,17 +76,6 @@ model address_list_event {
   @@id([event_id, address_list_id])
   @@index([address_list_id], map: "address_list_event_address_list_id_foreign")
   @@index([event_id], map: "address_list_event_event_id_foreign")
-}
-
-model address_list_group {
-  group_id        BigInt       @db.UnsignedBigInt
-  address_list_id BigInt       @db.UnsignedBigInt
-  address_list    address_list @relation(fields: [address_list_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "address_list_group_address_list_id_foreign")
-  group           group        @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "address_list_group_group_id_foreign")
-
-  @@id([group_id, address_list_id])
-  @@index([address_list_id], map: "address_list_group_address_list_id_foreign")
-  @@index([group_id], map: "address_list_group_group_id_foreign")
 }
 
 model cache {
@@ -160,13 +152,15 @@ model device {
   logo            Bytes?
   category        String?
   running         Boolean           @default(false)
+  group_id        BigInt?           @db.UnsignedBigInt
   action          action[]
+  group           group?            @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "device_group_id_foreign")
   stream          stream?           @relation(fields: [stream_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "device_stream_id_foreign")
-  device_event    device_event[]
-  device_group    device_group[]
+  device_event    device_event[]    @ignore
   sip             sip[]
   videowall_media videowall_media[]
 
+  @@index([group_id], map: "device_group_id_foreign")
   @@index([stream_id], map: "device_stream_id_foreign")
 }
 
@@ -180,17 +174,6 @@ model device_event {
   @@id([device_id, event_id])
   @@index([device_id], map: "device_event_device_id_foreign")
   @@index([event_id], map: "device_event_event_id_foreign")
-}
-
-model device_group {
-  group_id  BigInt @db.UnsignedBigInt
-  device_id BigInt @db.UnsignedBigInt
-  device    device @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "device_group_device_id_foreign")
-  group     group  @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "device_group_group_id_foreign")
-
-  @@id([group_id, device_id])
-  @@index([device_id], map: "device_group_device_id_foreign")
-  @@index([group_id], map: "device_group_group_id_foreign")
 }
 
 model discovery_logs {
@@ -512,53 +495,31 @@ model feedback {
 }
 
 model group {
-  id                                 BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  id                                 BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
   name                               String
-  created_at                         Int                  @default(1746167167)
-  updated_at                         Int                  @default(1746167167)
+  created_at                         Int                @default(1746167167)
+  updated_at                         Int                @default(1746167167)
   is_public                          Boolean?
-  owner_id                           BigInt?              @db.UnsignedBigInt
-  image_uid                          String?              @db.Char(36)
+  owner_id                           BigInt?            @db.UnsignedBigInt
+  image_uid                          String?            @db.Char(36)
   image_url                          String?
-  slug                               String?              @unique(map: "group_slug_unique")
-  address_list_group                 address_list_group[]
+  slug                               String?            @unique(map: "group_slug_unique")
+  address_list                       address_list[]
   controller                         controller[]
-  device_group                       device_group[]
+  device                             device[]
   domain_group                       domain_group[]
   event                              event[]
-  user_group_owner_idTouser          user?                @relation("group_owner_idTouser", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_owner_id_foreign")
-  group_stream                       group_stream[]
-  group_template                     group_template[]
+  user_group_owner_idTouser          user?              @relation("group_owner_idTouser", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_owner_id_foreign")
   group_user                         group_user[]
   media_content                      media_content[]
   pro_publisher                      pro_publisher[]
   roles_user_group                   roles_user_group[]
   sponsor_group                      sponsor_group[]
-  user_user_personal_group_idTogroup user[]               @relation("user_personal_group_idTogroup")
+  stream                             stream[]
+  template                           template[]
+  user_user_personal_group_idTogroup user[]             @relation("user_personal_group_idTogroup")
 
   @@index([owner_id], map: "group_owner_id_foreign")
-}
-
-model group_stream {
-  group_id  BigInt @db.UnsignedBigInt
-  stream_id BigInt @db.UnsignedBigInt
-  group     group  @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_stream_group_id_foreign")
-  stream    stream @relation(fields: [stream_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_stream_stream_id_foreign")
-
-  @@id([group_id, stream_id])
-  @@index([group_id], map: "group_stream_group_id_foreign")
-  @@index([stream_id], map: "group_stream_stream_id_foreign")
-}
-
-model group_template {
-  group_id    BigInt   @db.UnsignedBigInt
-  template_id BigInt   @db.UnsignedBigInt
-  group       group    @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_template_group_id_foreign")
-  template    template @relation(fields: [template_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_template_template_id_foreign")
-
-  @@id([group_id, template_id])
-  @@index([group_id], map: "group_template_group_id_foreign")
-  @@index([template_id], map: "group_template_template_id_foreign")
 }
 
 model group_user {
@@ -1120,7 +1081,6 @@ model roles {
   roles_user_group roles_user_group[]
 }
 
-/// Explicit many-to-many relation between users, roles, and groups/organizations
 model roles_user_group {
   role_id  BigInt  @db.UnsignedBigInt
   group_id BigInt? @db.UnsignedBigInt
@@ -1154,10 +1114,10 @@ model setting {
   configurable_type String?
   configurable_id   BigInt? @db.UnsignedBigInt
 
-  @@index([configurable_type, configurable_id], map: "setting_configurable_type_configurable_id_index")
-  @@index([key], map: "setting_key_index")
   @@index([configurable_id], map: "setting_configurable_id_index")
+  @@index([configurable_type, configurable_id], map: "setting_configurable_type_configurable_id_index")
   @@index([key, configurable_id], map: "setting_key_configurable_id_index")
+  @@index([key], map: "setting_key_index")
 }
 
 model shopping_feed {
@@ -1275,10 +1235,13 @@ model stream {
   video_format       String
   mobile             Boolean
   vertical_rotation  Float?
+  group_id           BigInt?        @db.UnsignedBigInt
   device             device[]
   event_stream       event_stream[]
-  group_stream       group_stream[]
+  group              group?         @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stream_group_id_foreign")
   stream_url         stream_url[]
+
+  @@index([group_id], map: "stream_group_id_foreign")
 }
 
 model stream_url {
@@ -1312,9 +1275,12 @@ model template {
   message         String?
   date            Int               @default(1746167167)
   image           Bytes?
+  group_id        BigInt?           @db.UnsignedBigInt
   event_template  event_template[]
-  group_template  group_template[]
   invite_template invite_template[]
+  group           group?            @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "template_group_id_foreign")
+
+  @@index([group_id], map: "template_group_id_foreign")
 }
 
 model trigger_logs {
@@ -1331,6 +1297,49 @@ model trigger_logs {
 
   @@index([action_id], map: "trigger_logs_action_id_foreign")
   @@index([event_id], map: "trigger_logs_event_id_foreign")
+}
+
+model user {
+  id                                  BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  name                                String?
+  email                               String?                   @unique(map: "user_email_unique")
+  email_verified_at                   DateTime?                 @db.Timestamp(0)
+  password                            String
+  remember_token                      String?                   @db.VarChar(100)
+  created_at                          DateTime?                 @db.Timestamp(0)
+  updated_at                          DateTime?                 @db.Timestamp(0)
+  created_by                          Int?
+  msisdn                              String?                   @unique(map: "user_msisdn_unique")
+  otp                                 String?
+  otp_created_at                      DateTime?                 @db.Timestamp(0)
+  personal_group_id                   BigInt?                   @db.UnsignedBigInt
+  image_uid                           String?                   @db.Char(36)
+  verif_code                          Int?
+  verif_expir                         DateTime?                 @db.Timestamp(0)
+  type                                String                    @default("user")
+  timezone                            String?
+  avatar_url                          String?
+  account_type                        Int                       @default(1)
+  is_deleted                          Boolean                   @default(false)
+  deleted_timestamp                   Int?
+  session_otp                         Int?
+  email_user                          email_user[]
+  event_requests                      event_requests[]
+  event_user                          event_user[]
+  group_group_owner_idTouser          group[]                   @relation("group_owner_idTouser")
+  group_user                          group_user[]
+  kpi_emotes_sent                     kpi_emotes_sent[]
+  kpi_questions_sent                  kpi_questions_sent[]
+  model_logs                          model_logs[]
+  roles_user_group                    roles_user_group[]
+  session_logs                        session_logs[]
+  stream_url_token                    stream_url_token[]
+  group_user_personal_group_idTogroup group?                    @relation("user_personal_group_idTogroup", fields: [personal_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_personal_group_id_foreign")
+  users_blocked_by_users              users_blocked_by_users[]
+  users_reported_by_users             users_reported_by_users[]
+
+  @@index([msisdn], map: "user_msisdn_index")
+  @@index([personal_group_id], map: "user_personal_group_id_foreign")
 }
 
 model users_blocked_by_users {
