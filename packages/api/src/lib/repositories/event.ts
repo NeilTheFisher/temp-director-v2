@@ -39,20 +39,49 @@ function hasUserInvite(
 }
 
 /**
+ * Convert IP to long
+ */
+function ipToLong(ip: string): number {
+  return (
+    ip
+      .split(".")
+      .reduce((acc, octet) => (acc << 8) + Number.parseInt(octet, 10), 0) >>> 0
+  );
+}
+
+/**
+ * Check if IP is in CIDR range
+ */
+function isIpInCidr(ip: string, cidr: string): boolean {
+  const parts = cidr.split("/");
+  const range = parts[0] || "";
+  const bits = parts[1] || "32";
+  const maskBits = Number.parseInt(bits, 10);
+
+  const ipNum = ipToLong(ip);
+  const rangeNum = ipToLong(range);
+
+  const mask = maskBits === 0 ? 0 : (~0 << (32 - maskBits)) >>> 0;
+
+  return (ipNum & mask) === (rangeNum & mask);
+}
+
+/**
  * Check IP is allowed based on location restrictions
  */
 function isIpAllowed(allowedIps: string | string[], clientIp: string) {
   if (!clientIp) return false;
-  const ips = Array.isArray(allowedIps) ? allowedIps : [allowedIps];
-  return ips.some((ip: string) => {
-    if (!ip) return false;
-    // Support CIDR notation and partial IP matches
-    if (ip.includes("/")) {
-      // Simple CIDR check - just match the prefix
-      const [prefix] = ip.split("/");
-      return clientIp.startsWith(prefix || "");
-    }
-    return clientIp.includes(ip) || clientIp.startsWith(ip);
+
+  const ips = Array.isArray(allowedIps)
+    ? allowedIps
+    : allowedIps
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+  return ips.some((cidr) => {
+    if (!cidr) return false;
+    return isIpInCidr(clientIp, cidr);
   });
 }
 
@@ -675,8 +704,6 @@ export async function getVisibleEvents(
   const eventIds = events.map((e) => e.id);
 
   // STEP 2: Load all other data in parallel
-  const startParallel = Date.now();
-
   const [
     invites,
     streams,
@@ -829,10 +856,8 @@ export async function getVisibleEvents(
         }),
       ),
   ]);
-  console.log(`Parallel queries: ${Date.now() - startParallel}ms`);
 
   // STEP 3: Map data back to events
-  const startMapping = Date.now();
 
   // Create lookup maps
   const invitesMap = new Map<bigint, Array<{ recipient: string }>>();
@@ -933,7 +958,7 @@ export async function getVisibleEvents(
     interestedMap.set(d.event_id, Array(d._count.id).fill({ id: 0 }));
   }
 
-  console.log(`Mapping: ${Date.now() - startMapping}ms`); // STEP 4: Transform events to match contract schema
+  // STEP 4: Transform events to match contract schema
   const transformedEvents = await Promise.all(
     events.map(async (event) => {
       const eventInvites = invitesMap.get(event.id) || [];
@@ -1050,10 +1075,6 @@ export async function getVisibleEvents(
       const locationInfo = event.location_info;
       const onLocationLock = getOnLocationLock(locationInfo);
       const onLocation = getOnLocation(locationInfo);
-
-      if (event.id === BigInt(14)) {
-        console.log("Event14 locationInfo", locationInfo);
-      }
 
       // Get external ads/sponsors
       const eventAds = adsMap.get(event.id) || [];
