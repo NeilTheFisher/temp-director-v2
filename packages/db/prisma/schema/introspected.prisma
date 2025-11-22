@@ -25,9 +25,10 @@ model ad {
   sponsor_id Int
   created_at DateTime?  @db.Timestamp(0)
   updated_at DateTime?  @db.Timestamp(0)
-  ad_event   ad_event[]
+  ad_event   ad_event[] @ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model ad_event {
   ad_id    BigInt @db.UnsignedBigInt
   event_id BigInt @db.UnsignedBigInt
@@ -35,9 +36,9 @@ model ad_event {
   ad       ad     @relation(fields: [ad_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ad_event_ad_id_foreign")
   event    event  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ad_event_event_id_foreign")
 
-  @@id([ad_id, event_id])
   @@index([ad_id], map: "ad_event_ad_id_index")
   @@index([event_id], map: "ad_event_event_id_index")
+  @@ignore
 }
 
 model ad_kpi {
@@ -62,20 +63,21 @@ model address_list {
   recipients         String?              @db.LongText
   group_id           BigInt?              @db.UnsignedBigInt
   group              group?               @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "address_list_group_id_foreign")
-  address_list_event address_list_event[]
+  address_list_event address_list_event[] @ignore
 
   @@index([group_id], map: "address_list_group_id_foreign")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model address_list_event {
   event_id        BigInt       @db.UnsignedBigInt
   address_list_id BigInt       @db.UnsignedBigInt
   address_list    address_list @relation(fields: [address_list_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "address_list_event_address_list_id_foreign")
   event           event        @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "address_list_event_event_id_foreign")
 
-  @@id([event_id, address_list_id])
   @@index([address_list_id], map: "address_list_event_address_list_id_foreign")
   @@index([event_id], map: "address_list_event_event_id_foreign")
+  @@ignore
 }
 
 model cache {
@@ -102,18 +104,19 @@ model chatbot {
   style                  String          @default("medium_height")
   checkout               Boolean         @default(false)
   blurred_background     Boolean         @default(false)
-  chatbot_event          chatbot_event[]
+  chatbot_event          chatbot_event[] @ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model chatbot_event {
   chatbot_id BigInt  @db.UnsignedBigInt
   event_id   BigInt  @db.UnsignedBigInt
   chatbot    chatbot @relation(fields: [chatbot_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "chatbot_event_chatbot_id_foreign")
   event      event   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "chatbot_event_event_id_foreign")
 
-  @@id([chatbot_id, event_id])
   @@index([chatbot_id], map: "chatbot_event_chatbot_id_foreign")
   @@index([event_id], map: "chatbot_event_event_id_foreign")
+  @@ignore
 }
 
 model controller {
@@ -164,6 +167,7 @@ model device {
   @@index([stream_id], map: "device_stream_id_foreign")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model device_event {
   device_id BigInt @db.UnsignedBigInt
   event_id  BigInt @db.UnsignedBigInt
@@ -171,9 +175,9 @@ model device_event {
   device    device @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "device_event_device_id_foreign")
   event     event  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "device_event_event_id_foreign")
 
-  @@id([device_id, event_id])
   @@index([device_id], map: "device_event_device_id_foreign")
   @@index([event_id], map: "device_event_event_id_foreign")
+  @@ignore
 }
 
 model discovery_logs {
@@ -196,30 +200,32 @@ model domain {
   assign_to_all Boolean
   created_at    DateTime?      @db.Timestamp(0)
   updated_at    DateTime?      @db.Timestamp(0)
-  domain_event  domain_event[]
-  domain_group  domain_group[]
+  domain_event  domain_event[] @ignore
+  domain_group  domain_group[] @ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model domain_event {
   domain_id BigInt @db.UnsignedBigInt
   event_id  BigInt @db.UnsignedBigInt
   domain    domain @relation(fields: [domain_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "domain_event_domain_id_foreign")
   event     event  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "domain_event_event_id_foreign")
 
-  @@id([domain_id, event_id])
   @@index([domain_id], map: "domain_event_domain_id_index")
   @@index([event_id], map: "domain_event_event_id_index")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model domain_group {
   domain_id BigInt @db.UnsignedBigInt
   group_id  BigInt @db.UnsignedBigInt
   domain    domain @relation(fields: [domain_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "domain_group_domain_id_foreign")
   group     group  @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "domain_group_group_id_foreign")
 
-  @@id([domain_id, group_id])
   @@index([domain_id], map: "domain_group_domain_id_index")
   @@index([group_id], map: "domain_group_group_id_index")
+  @@ignore
 }
 
 model email_user {
@@ -276,11 +282,11 @@ model event {
   web_image_url              String?              @db.Text
   group_id                   BigInt               @db.UnsignedBigInt
   action                     action[]
-  ad_event                   ad_event[]
-  address_list_event         address_list_event[]
-  chatbot_event              chatbot_event[]
-  device_event               device_event[]
-  domain_event               domain_event[]
+  ad_event                   ad_event[]           @ignore
+  address_list_event         address_list_event[] @ignore
+  chatbot_event              chatbot_event[]      @ignore
+  device_event               device_event[]       @ignore
+  domain_event               domain_event[]       @ignore
   group                      group                @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_group_id_foreign")
   event_blocked              event_blocked[]
   event_flagged              event_flagged[]
@@ -291,16 +297,16 @@ model event {
   event_registered           event_registered[]
   event_removed              event_removed[]
   event_requests             event_requests[]
-  event_simulation           event_simulation[]
-  event_stream               event_stream[]
-  event_template             event_template[]
-  event_user                 event_user[]
+  event_simulation           event_simulation[]   @ignore
+  event_stream               event_stream[]       @ignore
+  event_template             event_template[]     @ignore
+  event_user                 event_user[]         @ignore
   feed                       feed[]
   feedback                   feedback[]
   invite                     invite[]
   media_content              media_content[]
   shopping_feed              shopping_feed[]
-  sponsor_event              sponsor_event[]
+  sponsor_event              sponsor_event[]      @ignore
   trigger_logs               trigger_logs[]
 
   @@index([group_id], map: "event_group_id_foreign")
@@ -412,17 +418,19 @@ model event_requests {
   @@index([user_id], map: "event_requests_user_id_index")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model event_simulation {
   simulation_id BigInt     @db.UnsignedBigInt
   event_id      BigInt     @db.UnsignedBigInt
   event         event      @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_simulation_event_id_foreign")
   simulation    simulation @relation(fields: [simulation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_simulation_simulation_id_foreign")
 
-  @@id([simulation_id, event_id])
   @@index([event_id], map: "event_simulation_event_id_foreign")
   @@index([simulation_id], map: "event_simulation_simulation_id_foreign")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model event_stream {
   stream_id BigInt  @db.UnsignedBigInt
   event_id  BigInt  @db.UnsignedBigInt
@@ -431,31 +439,33 @@ model event_stream {
   event     event   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_stream_event_id_foreign")
   stream    stream  @relation(fields: [stream_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_stream_stream_id_foreign")
 
-  @@id([stream_id, event_id])
   @@index([event_id], map: "event_stream_event_id_foreign")
   @@index([stream_id], map: "event_stream_stream_id_foreign")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model event_template {
   event_id    BigInt   @db.UnsignedBigInt
   template_id BigInt   @db.UnsignedBigInt
   event       event    @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_template_event_id_foreign")
   template    template @relation(fields: [template_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_template_template_id_foreign")
 
-  @@id([event_id, template_id])
   @@index([event_id], map: "event_template_event_id_foreign")
   @@index([template_id], map: "event_template_template_id_foreign")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model event_user {
   user_id  BigInt @db.UnsignedBigInt
   event_id BigInt @db.UnsignedBigInt
   event    event  @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_user_event_id_foreign")
   user     user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "event_user_user_id_foreign")
 
-  @@id([user_id, event_id])
   @@index([event_id], map: "event_user_event_id_foreign")
   @@index([user_id], map: "event_user_user_id_foreign")
+  @@ignore
 }
 
 model failed_jobs {
@@ -507,14 +517,14 @@ model group {
   address_list                       address_list[]
   controller                         controller[]
   device                             device[]
-  domain_group                       domain_group[]
+  domain_group                       domain_group[]     @ignore
   event                              event[]
   user_group_owner_idTouser          user?              @relation("group_owner_idTouser", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_owner_id_foreign")
-  group_user                         group_user[]
+  group_user                         group_user[]       @ignore
   media_content                      media_content[]
   pro_publisher                      pro_publisher[]
-  roles_user_group                   roles_user_group[]
-  sponsor_group                      sponsor_group[]
+  roles_user_group                   roles_user_group[] @ignore
+  sponsor_group                      sponsor_group[]    @ignore
   stream                             stream[]
   template                           template[]
   user_user_personal_group_idTogroup user[]             @relation("user_personal_group_idTogroup")
@@ -522,15 +532,16 @@ model group {
   @@index([owner_id], map: "group_owner_id_foreign")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model group_user {
   group_id BigInt @db.UnsignedBigInt
   user_id  BigInt @db.UnsignedBigInt
   group    group  @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_user_group_id_foreign")
   user     user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "group_user_user_id_foreign")
 
-  @@id([group_id, user_id])
   @@index([group_id], map: "group_user_group_id_foreign")
   @@index([user_id], map: "group_user_user_id_foreign")
+  @@ignore
 }
 
 model info_content_management {
@@ -560,22 +571,23 @@ model invite {
   device_info     Bytes?
   category        String            @default("standard")
   event           event?            @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invite_event_id_foreign")
-  invite_template invite_template[]
+  invite_template invite_template[] @ignore
 
   @@index([event_id], map: "invite_event_id_foreign")
   @@index([recipient, event_id], map: "invite_recipient_event_id_index")
   @@index([recipient], map: "invite_recipient_index")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model invite_template {
   template_id BigInt   @db.UnsignedBigInt
   invite_id   BigInt   @db.UnsignedBigInt
   invite      invite   @relation(fields: [invite_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invite_template_invite_id_foreign")
   template    template @relation(fields: [template_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invite_template_template_id_foreign")
 
-  @@id([template_id, invite_id])
   @@index([invite_id], map: "invite_template_invite_id_foreign")
   @@index([template_id], map: "invite_template_template_id_foreign")
+  @@ignore
 }
 
 model item {
@@ -993,13 +1005,14 @@ model oauth_refresh_tokens {
   expires_at      DateTime? @db.DateTime(0)
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model password_resets {
   email      String
   token      String
   created_at DateTime? @db.Timestamp(0)
 
-  @@unique([token])
   @@index([email], map: "password_resets_email_index")
+  @@ignore
 }
 
 model permission {
@@ -1078,9 +1091,10 @@ model role_has_permission {
 model roles {
   id               BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
   name             String             @unique(map: "roles_name_unique")
-  roles_user_group roles_user_group[]
+  roles_user_group roles_user_group[] @ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model roles_user_group {
   role_id  BigInt  @db.UnsignedBigInt
   group_id BigInt? @db.UnsignedBigInt
@@ -1089,10 +1103,10 @@ model roles_user_group {
   roles    roles   @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_role_id_foreign")
   user     user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "roles_user_group_user_id_foreign")
 
-  @@unique([role_id, user_id])
   @@index([group_id], map: "roles_user_group_group_id_foreign")
   @@index([role_id], map: "roles_user_group_role_id_foreign")
   @@index([user_id], map: "roles_user_group_user_id_foreign")
+  @@ignore
 }
 
 model session_logs {
@@ -1154,7 +1168,7 @@ model simulation {
   created_at       DateTime?          @db.Timestamp(0)
   updated_at       DateTime?          @db.Timestamp(0)
   web_settings     String?            @db.LongText
-  event_simulation event_simulation[]
+  event_simulation event_simulation[] @ignore
 }
 
 model sip {
@@ -1179,30 +1193,32 @@ model sponsor {
   created_at    DateTime?       @db.Timestamp(0)
   updated_at    DateTime?       @db.Timestamp(0)
   image_url     String?         @db.Text
-  sponsor_event sponsor_event[]
-  sponsor_group sponsor_group[]
+  sponsor_event sponsor_event[] @ignore
+  sponsor_group sponsor_group[] @ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model sponsor_event {
   sponsor_id BigInt  @db.UnsignedBigInt
   event_id   BigInt  @db.UnsignedBigInt
   event      event   @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sponsor_event_event_id_foreign")
   sponsor    sponsor @relation(fields: [sponsor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sponsor_event_sponsor_id_foreign")
 
-  @@id([sponsor_id, event_id])
   @@index([event_id], map: "sponsor_event_event_id_index")
   @@index([sponsor_id], map: "sponsor_event_sponsor_id_index")
+  @@ignore
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model sponsor_group {
   sponsor_id BigInt  @db.UnsignedBigInt
   group_id   BigInt  @db.UnsignedBigInt
   group      group   @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sponsor_group_group_id_foreign")
   sponsor    sponsor @relation(fields: [sponsor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sponsor_group_sponsor_id_foreign")
 
-  @@id([sponsor_id, group_id])
   @@index([group_id], map: "sponsor_group_group_id_index")
   @@index([sponsor_id], map: "sponsor_group_sponsor_id_index")
+  @@ignore
 }
 
 model stream {
@@ -1237,7 +1253,7 @@ model stream {
   vertical_rotation  Float?
   group_id           BigInt?        @db.UnsignedBigInt
   device             device[]
-  event_stream       event_stream[]
+  event_stream       event_stream[] @ignore
   group              group?         @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stream_group_id_foreign")
   stream_url         stream_url[]
 
@@ -1276,8 +1292,8 @@ model template {
   date            Int               @default(1746167167)
   image           Bytes?
   group_id        BigInt?           @db.UnsignedBigInt
-  event_template  event_template[]
-  invite_template invite_template[]
+  event_template  event_template[]  @ignore
+  invite_template invite_template[] @ignore
   group           group?            @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "template_group_id_foreign")
 
   @@index([group_id], map: "template_group_id_foreign")
@@ -1325,13 +1341,13 @@ model user {
   session_otp                         Int?
   email_user                          email_user[]
   event_requests                      event_requests[]
-  event_user                          event_user[]
+  event_user                          event_user[]              @ignore
   group_group_owner_idTouser          group[]                   @relation("group_owner_idTouser")
-  group_user                          group_user[]
+  group_user                          group_user[]              @ignore
   kpi_emotes_sent                     kpi_emotes_sent[]
   kpi_questions_sent                  kpi_questions_sent[]
   model_logs                          model_logs[]
-  roles_user_group                    roles_user_group[]
+  roles_user_group                    roles_user_group[]        @ignore
   session_logs                        session_logs[]
   stream_url_token                    stream_url_token[]
   group_user_personal_group_idTogroup group?                    @relation("user_personal_group_idTogroup", fields: [personal_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_personal_group_id_foreign")
