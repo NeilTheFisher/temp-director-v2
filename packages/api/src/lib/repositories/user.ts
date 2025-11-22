@@ -88,6 +88,10 @@ export async function getUserInfoForEvents(userId: number) {
   };
 }
 
+export type UserEventInfo = NonNullable<
+  Awaited<ReturnType<typeof getUserInfoForEvents>>
+>;
+
 /**
  * Get full user info including relationships
  */

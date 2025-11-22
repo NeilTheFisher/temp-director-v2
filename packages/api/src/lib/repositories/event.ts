@@ -4,34 +4,14 @@ import prisma from "@director_v2/db";
 import type { Prisma } from "@director_v2/db/prisma/generated/client";
 import { regex } from "arkregex";
 import { redis } from "bun";
-
-interface UserInfo {
-  userId: number;
-  msisdn: string;
-  isSuperAdmin: boolean;
-  emails: string[];
-  orgIds: number[];
-}
-
-interface EventQueryParams {
-  category?: string;
-  date?: number;
-  location?: string;
-  per_page?: number;
-  current_page?: number;
-  clientIp?: string;
-  isPartial?: boolean;
-  isWeb?: boolean;
-  id?: string;
-  isWebApi?: boolean;
-}
+import type { UserEventInfo } from "./user";
 
 /**
  * Check if user has an invitation to an event
  */
 function hasUserInvite(
   invites: Array<{ recipient: string }>,
-  userInfo: UserInfo,
+  userInfo: UserEventInfo,
 ): boolean {
   const recipients = new Set(invites.map((i) => i.recipient));
   if (recipients.has(userInfo.msisdn)) return true;
@@ -115,7 +95,7 @@ async function checkLocationAccess(
     id: bigint;
     location_info: Prisma.JsonValue;
   },
-  userInfo: UserInfo,
+  userInfo: UserEventInfo,
   clientIp: string,
 ) {
   const locationInfo = event.location_info as Record<string, unknown> | null;
@@ -179,7 +159,7 @@ async function getInvitationAccepted(
     location_info: Prisma.JsonValue;
     invites: Array<{ recipient: string }>;
   },
-  userInfo: UserInfo,
+  userInfo: UserEventInfo,
   clientIp = "",
 ): Promise<boolean> {
   let invitationAccepted = hasUserInvite(event.invites || [], userInfo);
@@ -580,7 +560,18 @@ export async function getVisibleEvents(
     emails: string[];
     orgIds: number[];
   },
-  queryParams: EventQueryParams = {},
+  queryParams: {
+    category?: string;
+    date?: number;
+    location?: string;
+    per_page?: number;
+    current_page?: number;
+    clientIp?: string;
+    isPartial?: boolean;
+    isWeb?: boolean;
+    id?: string;
+    isWebApi?: boolean;
+  } = {},
 ): Promise<listEventsResponseSchema> {
   const startTime = Date.now();
   const searchInitTimestamp = queryParams.date ?? 0;
