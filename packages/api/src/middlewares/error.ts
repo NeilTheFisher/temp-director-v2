@@ -1,6 +1,6 @@
 import { ORPCError, onError, ValidationError } from "@orpc/server";
 import z from "zod";
-import { base } from "./base";
+import { base } from "./1_base";
 
 export const errorMiddleware = base.middleware(
   onError((error) => {
@@ -9,6 +9,7 @@ export const errorMiddleware = base.middleware(
       error.code === "BAD_REQUEST" &&
       error.cause instanceof ValidationError
     ) {
+      // TODO fix for arktype
       // If you only use Zod you can safely cast to ZodIssue[]
       const zodError = new z.ZodError(error.cause.issues as z.core.$ZodIssue[]);
 
@@ -25,6 +26,7 @@ export const errorMiddleware = base.middleware(
       error.code === "INTERNAL_SERVER_ERROR" &&
       error.cause instanceof ValidationError
     ) {
+      // TODO fix for arktype
       const zodError = new z.ZodError(error.cause.issues as z.core.$ZodIssue[]);
       throw new ORPCError("OUTPUT_VALIDATION_FAILED", {
         message: z.prettifyError(zodError),

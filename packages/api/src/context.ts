@@ -1,4 +1,5 @@
 // import { auth } from "@director_v2/auth";
+
 import type { NextRequest } from "next/server";
 import { verifyJWTToken } from "./lib/jwt-verifier";
 

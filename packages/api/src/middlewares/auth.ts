@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { base } from "./base";
+import { base } from "./1_base";
 
 export const authMiddleware = base.middleware(({ context, next }) => {
   if (!context.session?.user) {
