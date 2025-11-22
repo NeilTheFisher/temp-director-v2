@@ -41,7 +41,7 @@ function hasUserInvite(
 /**
  * Check IP is allowed based on location restrictions
  */
-function isIpAllowed(allowedIps: string | string[], clientIp: string): boolean {
+function isIpAllowed(allowedIps: string | string[], clientIp: string) {
   if (!clientIp) return false;
   const ips = Array.isArray(allowedIps) ? allowedIps : [allowedIps];
   return ips.some((ip: string) => {
@@ -65,7 +65,7 @@ function calculateDistance(
   lon1: number,
   lat2: number,
   lon2: number,
-): number {
+) {
   return (
     6371 *
     2000 *
@@ -88,7 +88,7 @@ async function checkLocationAccess(
   },
   userInfo: UserInfo,
   clientIp: string,
-): Promise<boolean> {
+) {
   const locationInfo = event.location_info as Record<string, unknown> | null;
   const boolLocked = locationInfo?.location_lock ?? false;
 

@@ -42,7 +42,7 @@ describe("Events OpenAPI vs RPC parity", () => {
           session: {
             user: { id: "1" },
           },
-          clientIp: undefined,
+          clientIp: "192.168.0.1",
         },
       },
     );
