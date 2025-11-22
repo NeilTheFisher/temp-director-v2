@@ -28,7 +28,7 @@
     "@prisma/adapter-mariadb": "^7.0.0",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.0.0",
-    "prisma-zod-generator": "^1.32.2",
+    "prisma-zod-generator": "^2.1.2",
     "zod": "catalog:",
     "zod-prisma-types": "^3.3.5"
   },
