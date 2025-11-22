@@ -386,6 +386,8 @@ function getInvitationMessage(
     const dateObj = new Date(eventDate * 1000);
     dateFormatted = dateObj
       .toLocaleString("en-US", {
+        // TODO get proper timezone
+        timeZone: "America/New_York",
         month: "long",
         day: "2-digit",
         year: "numeric",
