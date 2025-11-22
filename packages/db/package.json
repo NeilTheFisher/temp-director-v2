@@ -21,7 +21,7 @@
     "db:pull": "prisma db pull",
     "db:push": "prisma db push",
     "db:studio": "prisma studio --browser none",
-    "lint": "biome check . && oxlint",
+    "lint": "biome check . && oxlint --type-aware",
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {

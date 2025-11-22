@@ -17,5 +17,6 @@
   },
   "typescript.preferences.preferTypeOnlyAutoImports": true,
   "js/ts.hover.maximumLength": 1000,
-  "deno.enable": false
+  "deno.enable": false,
+  "oxc.typeAware": true
 }

@@ -14,6 +14,12 @@ console.time("connected to redis");
 await redis.connect();
 console.timeEnd("connected to redis");
 
+async function asdf() {
+  await Promise.resolve();
+}
+
+asdf();
+
 console.log("connecting to db");
 console.time("connected to db");
 await prisma.$connect();

@@ -9,7 +9,7 @@
     }
   },
   "scripts": {
-    "lint": "biome check . && oxlint",
+    "lint": "biome check . && oxlint --type-aware",
     "lint:types": "tsc --noEmit",
     "openapi:generate": "bun run openapi/openapi-generate.ts"
   },
