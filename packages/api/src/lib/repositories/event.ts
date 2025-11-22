@@ -542,11 +542,13 @@ async function getUsersConnected(eventId: bigint) {
   }
 }
 export async function getVisibleEvents(
-  userId: number,
-  orgIds: number[],
-  msisdn: string,
-  emails: string[],
-  isSuperAdmin: boolean,
+  userInfo: {
+    userId: number;
+    msisdn: string;
+    isSuperAdmin: boolean;
+    emails: string[];
+    orgIds: number[];
+  },
   queryParams: EventQueryParams = {},
 ): Promise<listEventsResponseSchema> {
   const startTime = Date.now();
@@ -560,8 +562,6 @@ export async function getVisibleEvents(
   const dateStr = searchInitTimestamp
     ? new Date(searchInitTimestamp * 1000).toISOString().slice(0, 10)
     : null;
-
-  const userInfo: UserInfo = { userId, msisdn, isSuperAdmin, emails, orgIds };
 
   // Build the main WHERE clause
   const whereConditions: Prisma.eventWhereInput = {
@@ -621,7 +621,7 @@ export async function getVisibleEvents(
   // Public/private visibility logic
   if (isWebApi) {
     whereConditions.is_public = true;
-  } else if (!isSuperAdmin) {
+  } else if (!userInfo.isSuperAdmin) {
     whereConditions.OR = [
       { is_public: true },
       {
@@ -629,14 +629,18 @@ export async function getVisibleEvents(
           { is_public: false },
           {
             OR: [
-              { owner_id: userId },
-              ...(orgIds.length > 0
-                ? [{ group_id: { in: orgIds.map((id) => BigInt(id)) } }]
+              { owner_id: userInfo.userId },
+              ...(userInfo.orgIds.length > 0
+                ? [
+                    {
+                      group_id: { in: userInfo.orgIds.map((id) => BigInt(id)) },
+                    },
+                  ]
                 : []),
               {
                 invite: {
                   some: {
-                    recipient: { in: [msisdn, ...emails] },
+                    recipient: { in: [userInfo.msisdn, ...userInfo.emails] },
                   },
                 },
               },
@@ -1106,25 +1110,25 @@ export async function getVisibleEvents(
         complete: isComplete,
         invitation_accepted: invitationAccepted,
         invitation_requested: (requestsMap.get(event.id) || []).some(
-          (r) => r.msisdn === msisdn,
+          (r) => r.msisdn === userInfo.msisdn,
         ),
         registered: (registeredMap.get(event.id) || []).some(
-          (r) => r.msisdn === msisdn,
+          (r) => r.msisdn === userInfo.msisdn,
         ),
         usersInterestedCount: (interestedMap.get(event.id) || []).length,
         banned: (removedMap.get(event.id) || []).some(
-          (r) => r.msisdn === msisdn,
+          (r) => r.msisdn === userInfo.msisdn,
         ),
         blocked: (blockedMap.get(event.id) || []).some(
-          (r) => r.msisdn === msisdn,
+          (r) => r.msisdn === userInfo.msisdn,
         ),
         opened: (openedMap.get(event.id) || []).some(
-          (r) => r.msisdn === msisdn,
+          (r) => r.msisdn === userInfo.msisdn,
         ),
         pre_access:
-          isSuperAdmin ||
-          event.owner_id === userId ||
-          orgIds.includes(Number(event.group_id)),
+          userInfo.isSuperAdmin ||
+          event.owner_id === userInfo.userId ||
+          userInfo.orgIds.includes(Number(event.group_id)),
         web_allowed: event.web_allowed ? 1 : 0,
         app_allowed: event.app_allowed ? 1 : 0,
         appUrl: appUrl,
@@ -1147,7 +1151,7 @@ export async function getVisibleEvents(
   );
 
   console.log(
-    `${Date.now() - startTime}ms time took to get events list for user ${msisdn}`,
+    `${Date.now() - startTime}ms time took to get events list for user ${userInfo.msisdn}`,
   );
 
   return {

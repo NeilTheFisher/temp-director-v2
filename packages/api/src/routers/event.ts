@@ -20,23 +20,16 @@ export const eventRouter = pub.events.router({
     }
 
     // Fetch all events visible to this user based on permissions
-    const result = await eventRepository.getVisibleEvents(
-      userInfo.userId,
-      userInfo.orgIds,
-      userInfo.msisdn,
-      userInfo.emails,
-      userInfo.isSuperAdmin,
-      {
-        category: input.category,
-        date: input.date,
-        location: input.location,
-        per_page: input.per_page,
-        current_page: input.current_page,
-        isPartial: false,
-        isWeb: false,
-        clientIp: context.clientIp,
-      },
-    );
+    const result = await eventRepository.getVisibleEvents(userInfo, {
+      category: input.category,
+      date: input.date,
+      location: input.location,
+      per_page: input.per_page,
+      current_page: input.current_page,
+      isPartial: false,
+      isWeb: false,
+      clientIp: context.clientIp,
+    });
 
     return result;
   }),
@@ -112,23 +105,16 @@ export const eventRouter = pub.events.router({
       }
 
       // Fetch all events visible to this user based on permissions
-      const result = await eventRepository.getVisibleEvents(
-        userInfo.userId,
-        userInfo.orgIds,
-        userInfo.msisdn,
-        userInfo.emails,
-        userInfo.isSuperAdmin,
-        {
-          category: input.category,
-          date: input.date,
-          location: input.location,
-          per_page: input.per_page,
-          current_page: input.current_page,
-          isPartial: true,
-          isWeb: false,
-          clientIp: context.clientIp,
-        },
-      );
+      const result = await eventRepository.getVisibleEvents(userInfo, {
+        category: input.category,
+        date: input.date,
+        location: input.location,
+        per_page: input.per_page,
+        current_page: input.current_page,
+        isPartial: true,
+        isWeb: false,
+        clientIp: context.clientIp,
+      });
 
       return result as never;
     },
