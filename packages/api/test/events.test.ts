@@ -19,11 +19,14 @@ describe("Events OpenAPI vs RPC parity", () => {
       }),
     });
 
-    const data = (await res.json()) as { response: { access_token: string } };
+    try {
+      const data = (await res.json()) as { response: { access_token: string } };
 
-    // console.log("Login response:", data);
-
-    authToken = data.response.access_token;
+      authToken = data.response.access_token;
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      throw error;
+    }
   });
 
   it("returns same event data from GET /api/events and RPC events.listEvents", async () => {

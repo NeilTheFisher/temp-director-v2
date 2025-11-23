@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import * as eventRepository from "../lib/repositories/event";
+import * as eventRepository from "../lib/repositories/events";
 import * as userRepository from "../lib/user-handlers";
 import { authed, pub } from "../orpc";
 
