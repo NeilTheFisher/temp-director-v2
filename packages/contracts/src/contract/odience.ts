@@ -3,6 +3,9 @@ import { base } from "./base";
 
 export const odienceContract = {
   provisionUser: base
+    .route({
+      path: "/odience",
+    })
     .input(
       z.object({
         msisdn: z.string(),
@@ -16,6 +19,9 @@ export const odienceContract = {
       }),
     ),
   validatePhoneNumber: base
+    .route({
+      path: "/odience/validate/{msisdn}",
+    })
     .input(
       z.object({
         msisdn: z.string(),
@@ -24,12 +30,18 @@ export const odienceContract = {
     )
     .output(
       z.object({
+        msisdn: z.string(),
         valid: z.boolean(),
         formatted: z.string(),
         country_code: z.string(),
-        error: z.string().optional(),
+        error: z.string().optional().default(""),
         code: z.number(),
       }),
     ),
-  getCategoryList: base.output(z.record(z.string(), z.string())),
+  getCategoryList: base
+    .route({
+      path: "/odience/categories",
+    })
+    .input(z.void())
+    .output(z.record(z.string(), z.string())),
 };

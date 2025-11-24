@@ -4,4 +4,5 @@
  */
 
 export * from "./events/index";
+export * from "./stream";
 export * from "./user";

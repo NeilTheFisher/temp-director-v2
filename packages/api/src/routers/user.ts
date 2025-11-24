@@ -1,10 +1,6 @@
 import { ORPCError } from "@orpc/server";
+import * as userRepository from "../lib/repositories/user";
 import { authed } from "../orpc";
-
-// TODO: Import your actual services when they're available
-// import { UserService } from "../services/UserService";
-
-// const userService = new UserService();
 
 export const userRouter = {
   getUserInfo: authed.user.getUserInfo.handler(async ({ context }) => {
@@ -16,27 +12,18 @@ export const userRouter = {
       });
     }
 
-    const userId = context.session.user.id;
+    const userId = Number(context.session.user.id);
     console.log("User ID:", userId);
 
-    // TODO: Replace with actual service calls
-    // const userInfo = await userService.getUserInfo(parseInt(userId));
-    //
-    // if (!userInfo) {
-    //   throw new ORPCError("UNAUTHORIZED", {
-    //     message: "User not found or not authenticated"
-    //   });
-    // }
-    //
-    // return userInfo;
+    const userInfo = await userRepository.getFullUserInfo(userId);
 
-    // Temporary placeholder
-    return {
-      id: BigInt(userId),
-      msisdn: null,
-      email: null,
-      name: null,
-    };
+    if (!userInfo) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message: "User not found or not authenticated",
+      });
+    }
+
+    return userInfo;
   }),
 
   getUserInfoByMsisdn: authed.user.getUserInfoByMsisdn.handler(
@@ -51,24 +38,15 @@ export const userRouter = {
       }
 
       try {
-        // TODO: Replace with actual service calls
-        // const userInfo = await userService.getUserInfoByMsisdn(msisdn);
-        //
-        // if (!userInfo) {
-        //   throw new ORPCError("UNAUTHORIZED", {
-        //     message: "User not found or not authenticated"
-        //   });
-        // }
-        //
-        // return userInfo;
+        const userInfo = await userRepository.getUserInfoByMsisdn(msisdn);
 
-        // Temporary placeholder
-        return {
-          id: BigInt(1),
-          msisdn: msisdn || null,
-          email: `${msisdn}@example.com`,
-          name: "John Doe",
-        };
+        if (!userInfo) {
+          throw new ORPCError("UNAUTHORIZED", {
+            message: "User not found or not authenticated",
+          });
+        }
+
+        return userInfo;
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";

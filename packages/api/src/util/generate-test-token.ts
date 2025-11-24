@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import jwt from "jsonwebtoken";
 
 export function generateTestToken(userId = "1", verify = false) {
-  console.log("Generating test token for user ID", userId);
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const keyDir = path.join(__dirname, "../../../../priv");
   const privateKey = fs.readFileSync(path.join(keyDir, "private-key.pem"));

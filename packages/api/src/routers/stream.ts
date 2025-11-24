@@ -1,10 +1,6 @@
 import { ORPCError } from "@orpc/server";
+import * as streamRepository from "../lib/repositories/stream";
 import { authed } from "../orpc";
-
-// TODO: Import your actual services when they're available
-// import { StreamUrlService } from "../services/StreamUrlService";
-
-// const streamUrlService = new StreamUrlService();
 
 export const streamRouter = {
   getStreamUrls: authed.stream.getStreamUrls.handler(
@@ -17,39 +13,25 @@ export const streamRouter = {
         });
       }
 
-      const userId = context.session.user.id;
+      const userId = Number(context.session.user.id);
       console.log("User ID:", userId);
 
-      // TODO: Get client IP from context/headers
-      // In Next.js, you might need to pass this from the client or get it from headers
-      // const clientIp = ""; // Placeholder
+      // Get client IP from context
+      const clientIp = context.clientIp || "";
 
-      // TODO: Replace with actual service calls
-      // const streamInfo = await streamUrlService.getStreamUrls(
-      //   (input as Record<string, number>).streamUrlId,
-      //   parseInt(userId),
-      //   clientIp
-      // );
-      //
-      // if (!streamInfo) {
-      //   throw new ORPCError("NOT_FOUND", {
-      //     message: "Urls not found or not authenticated"
-      //   });
-      // }
-      //
-      // return streamInfo;
-
-      // Temporary placeholder
-      console.log(
-        "Stream URL ID:",
-        (input as Record<string, number>).streamUrlId,
+      const streamInfo = await streamRepository.getStreamUrls(
+        input.streamUrlId,
+        userId,
+        clientIp,
       );
-      return {
-        urls: [
-          "https://example.com/stream1.m3u8",
-          "https://example.com/stream2.m3u8",
-        ],
-      };
+
+      if (streamInfo.error) {
+        throw new ORPCError("NOT_FOUND", {
+          message: `Urls not found: ${streamInfo.error}`,
+        });
+      }
+
+      return streamInfo;
     },
   ),
 };

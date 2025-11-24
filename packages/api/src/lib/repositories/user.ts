@@ -94,37 +94,151 @@ export type UserEventInfo = NonNullable<
 
 /**
  * Get full user info including relationships
+ * Mirrors director-api UserService.getUserInfo
  */
 export async function getFullUserInfo(userId: number) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      email_user: true,
-    },
-  });
+  const reportedUsers: string[] = [];
+  let boolSuperAdmin = false;
+  const orgRoles: { [key: number]: string[] } = {};
 
-  if (!user) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        users_reported_by_users: true,
+        users_blocked_by_users: true,
+        email_user: true,
+        roles_user_group: {
+          include: {
+            roles: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    // Get reported users
+    const reportedUsersObjects = user.users_reported_by_users || [];
+    reportedUsers.push(...reportedUsersObjects.map((ru) => ru.reported));
+
+    // Get blocked users with full details
+    const blockedUsersObjects = user.users_blocked_by_users || [];
+    const blockedUsers = await Promise.all(
+      blockedUsersObjects.map(async (blocked) => {
+        const userBlocked = await prisma.user.findUnique({
+          where: { msisdn: blocked.blocked },
+        });
+        return userBlocked
+          ? {
+              id: userBlocked.msisdn || "",
+              name: userBlocked.name,
+              avatar: userBlocked.avatar_url,
+              sip: `+${userBlocked.msisdn}`,
+              type: "user",
+            }
+          : null;
+      }),
+    );
+
+    // Get users who blocked this user
+    const blockedByUsers = await prisma.users_blocked_by_users.findMany({
+      where: { blocked: user.msisdn || "" },
+      include: {
+        user: true,
+      },
+    });
+
+    // Collect emails
+    const userEmails: string[] = [];
+    if (user.email_user && user.email_user.length > 0) {
+      user.email_user.forEach((emailRecord: { email: string }) => {
+        userEmails.push(emailRecord.email);
+      });
+    }
+
+    // Get user roles with org id
+    const userRolesObject = user.roles_user_group || [];
+    const userRoles = await Promise.all(
+      userRolesObject.map(async (userRole) => {
+        return userRole.roles
+          ? { groupId: userRole.group_id, name: userRole.roles.name }
+          : null;
+      }),
+    );
+
+    userRoles.forEach((groupRole) => {
+      if (boolSuperAdmin || !groupRole) {
+        return;
+      }
+      if (groupRole.name === "ROLE_SUPER_ADMIN") {
+        boolSuperAdmin = true;
+        for (const key in orgRoles) {
+          delete orgRoles[Number(key)];
+        }
+        return;
+      }
+      if (groupRole.groupId === null) {
+        return;
+      }
+      const groupId = Number(groupRole.groupId);
+      if (!orgRoles[groupId]) {
+        orgRoles[groupId] = [];
+      }
+      orgRoles[groupId].push(groupRole.name);
+    });
+
+    return {
+      user_id: Number(user.id),
+      group_id: user.personal_group_id,
+      name: user.name,
+      email: user.email ?? "",
+      emails: userEmails,
+      avatar: user.avatar_url,
+      msisdn: user.msisdn,
+      image_uid: user.image_uid,
+      account_type: Number(user.account_type),
+      pns_settings: {
+        // TODO: These values are currently saved in Redis in director-api
+        // For now, return default values
+        pns_event_created: true,
+        pns_event_updated: true,
+        pns_event_registered: true,
+        pns_event_mention: true,
+      },
+      usersReported: reportedUsers,
+      usersBlocked: blockedUsers.filter((u) => u !== null),
+      usersBlockedBy: blockedByUsers.map((b) => b.user.msisdn),
+      roles: {
+        super_admin: boolSuperAdmin,
+        organizations: orgRoles,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getFullUserInfo:", error);
     return null;
   }
+}
 
-  // Collect emails
-  const userEmails: string[] = [];
-  if (user.email) {
-    userEmails.push(user.email);
-  }
-  if (user.email_user && user.email_user.length > 0) {
-    user.email_user.forEach((emailRecord: { email: string }) => {
-      userEmails.push(emailRecord.email);
-    });
-  }
+/**
+ * Get user info by MSISDN
+ * Mirrors director-api UserService.getUserInfoByMsisdn
+ */
+export async function getUserInfoByMsisdn(msisdn: string) {
+  const user = await prisma.user.findUnique({
+    where: { msisdn: msisdn },
+  });
 
-  return {
-    user_id: Number(user.id),
-    msisdn: user.msisdn,
-    email: user.email,
-    emails: [...new Set(userEmails)],
-    name: user.name,
-    avatar: user.avatar_url,
-    account_type: user.account_type,
-  };
+  return !user
+    ? null
+    : {
+        id: String(msisdn),
+        name: String(user.name),
+        avatar: String(user.avatar_url),
+        type: "standard",
+        role: "user",
+        sip: `+${msisdn}`,
+      };
 }

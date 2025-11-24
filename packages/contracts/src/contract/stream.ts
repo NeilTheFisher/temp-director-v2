@@ -3,6 +3,9 @@ import { base } from "./base";
 
 export const streamContract = {
   getStreamUrls: base
+    .route({
+      path: "/stream/{streamUrlId}",
+    })
     .input(
       z.object({
         streamUrlId: z.number().int().positive(),
@@ -11,6 +14,7 @@ export const streamContract = {
     .output(
       z.object({
         urls: z.array(z.string()),
+        error: z.string().optional().default(""),
       }),
     ),
 };

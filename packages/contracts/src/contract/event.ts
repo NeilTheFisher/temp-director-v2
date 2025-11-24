@@ -67,7 +67,7 @@ const FeaturedCatalogue = z
   .partial()
   .loose();
 const EventCoordinates = z
-  .object({ latitude: z.number(), longitude: z.number() })
+  .object({ lat: z.number(), lng: z.number() })
   .partial()
   .loose();
 const Brand = z
@@ -97,26 +97,26 @@ const RestEvent = z
     brand: Brand,
     featured_catalogue: FeaturedCatalogue,
     organization: z.string(),
-    organization_image_url: z.string(),
+    organization_image_url: z.string().nullable(),
     owner_id: z.string(),
     organization_id: z.string(),
-    description: z.string(),
+    description: z.string().nullable(),
     category: z.string(),
-    categoryImage: z.string(),
+    categoryImage: z.string().nullable(),
     capacity: z.number().int(),
-    coordinates: EventCoordinates,
+    coordinates: EventCoordinates.nullable(),
     is_public: z.boolean(),
     is_5g: z.boolean(),
-    imageUrl: z.string(),
-    min_price: z.number(),
-    ticket_url: z.string(),
-    ticket_platform: z.string(),
-    map_image_url: z.string(),
-    promo_video_url: z.string(),
-    promo_video_aspect_ratio: z.string(),
+    imageUrl: z.string().nullable(),
+    min_price: z.number().nullable(),
+    ticket_url: z.string().nullable(),
+    ticket_platform: z.string().nullable(),
+    map_image_url: z.string().nullable(),
+    promo_video_url: z.string().nullable(),
+    promo_video_aspect_ratio: z.string().nullable(),
     has_ricoh_stream: z.boolean(),
     payed: z.boolean(),
-    invitation_message: z.string(),
+    invitation_message: z.string().nullable(),
     invitations_only: z.boolean(),
     usersConnected: z.number().int(),
     complete: z.boolean(),
@@ -160,6 +160,15 @@ export const categoriesResponseSchema = z.object({
 });
 export type categoriesResponseSchema = z.infer<typeof categoriesResponseSchema>;
 
+const WebEvent = RestEvent;
+
+export const webEventsListResponseSchema = z.object({
+  data: z.array(WebEvent),
+});
+export type webEventsListResponseSchema = z.infer<
+  typeof webEventsListResponseSchema
+>;
+
 export const eventContract = base.prefix("/events").router({
   listEvents: base
     .route({
@@ -177,6 +186,12 @@ export const eventContract = base.prefix("/events").router({
   listPartialEvents: base
     .input(listEventsInputSchema)
     .output(listEventsResponseSchema),
+  webEventsList: base
+    .route({
+      path: "/web/api/eventsList",
+    })
+    .input(listEventsInputSchema)
+    .output(webEventsListResponseSchema),
   categories: base
     .route({
       path: "/categories",
