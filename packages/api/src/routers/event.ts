@@ -34,6 +34,12 @@ export const eventRouter = pub.events.router({
     return result;
   }),
 
+  get: authed.events.get.handler(async ({ input, context }) => {
+    console.log("EventController.get:", input.id);
+
+    throw new ORPCError("NOT_IMPLEMENTED");
+  }),
+
   listEventsLive: authed.events.listEventsLive.handler(async function* () {
     console.log("EventController.listLive:");
 
@@ -119,4 +125,27 @@ export const eventRouter = pub.events.router({
       return result as never;
     },
   ),
+
+  categories: authed.events.categories.handler(async ({ context }) => {
+    console.log("EventController.categories:");
+
+    // Extract user ID from authenticated session
+    const userId = Number(context.session.user.id);
+
+    // Get user info for event filtering (roles, orgs, contacts)
+    const userInfo = await userRepository.getUserInfoForEvents(userId);
+
+    if (!userInfo) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message: "User not found or not authenticated",
+      });
+    }
+
+    // Fetch all categories visible to this user
+    const categories = await eventRepository.getCategories(userInfo);
+
+    return {
+      categories,
+    };
+  }),
 });

@@ -147,12 +147,40 @@ export const listEventsResponseSchema = z.object({
 });
 export type listEventsResponseSchema = z.infer<typeof listEventsResponseSchema>;
 
-export const eventContract = {
+export const categoriesResponseSchema = z.object({
+  categories: z
+    .array(
+      z.object({
+        category: z.string(),
+        image: z.string(),
+      }),
+    )
+    .nullable()
+    .default([]),
+});
+export type categoriesResponseSchema = z.infer<typeof categoriesResponseSchema>;
+
+export const eventContract = base.prefix("/events").router({
   listEvents: base
+    .route({
+      path: "/",
+    })
     .input(listEventsInputSchema)
     .output(listEventsResponseSchema),
+  get: base
+    .route({
+      path: "/{id}",
+    })
+    .input(z.object({ id: z.string() }))
+    .output(RestEvent),
   listEventsLive: base.input(z.void()).output(eventIterator(eventSchema)),
   listPartialEvents: base
     .input(listEventsInputSchema)
     .output(listEventsResponseSchema),
-};
+  categories: base
+    .route({
+      path: "/categories",
+    })
+    .input(z.void())
+    .output(categoriesResponseSchema),
+});

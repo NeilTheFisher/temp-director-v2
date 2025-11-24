@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "lint": "biome check . && oxlint --type-aware",
     "lint:types": "tsc -b",
+    "generate-token": "bun -e 'import { generateTestToken } from \"./src/util/generate-test-token\"; console.log(`Authorization: Bearer ${generateTestToken(process.argv[1])}`);'",
     "openapi:generate": "bun run openapi/openapi-generate.ts"
   },
   "dependencies": {

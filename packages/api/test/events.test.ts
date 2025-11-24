@@ -25,6 +25,9 @@ describe("Events OpenAPI vs RPC parity", () => {
       authToken = data.response.access_token;
     } catch (error) {
       console.error("Error parsing JSON:", error);
+      console.log(
+        "Make sure the director_web container is started, or `docker restart director_web`/``dev-run-with-v2.sh` in director",
+      );
       throw error;
     }
   });
@@ -75,5 +78,28 @@ describe("Events OpenAPI vs RPC parity", () => {
     const cleanRpcResponse = deleteProps(rpcResponse);
 
     expect(cleanApiJson).toEqual(cleanRpcResponse);
+  });
+
+  it("returns same categories data from GET /api/events/categories and RPC events.categories", async () => {
+    const apiResponse = await fetch(
+      new URL("/api/events/categories", env.DIRECTOR_URL),
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    const apiJson = await apiResponse.json();
+
+    const rpcResponse = await call(appRouter.events.categories, undefined, {
+      context: {
+        session: {
+          user: { id: "1" },
+        },
+        clientIp: "192.168.0.1",
+      },
+    });
+
+    expect(apiJson).toEqual(rpcResponse);
   });
 });

@@ -42,9 +42,7 @@ function settingToFloat(value: unknown, fallback = 0): number {
  * Get S3 URL for a given path
  */
 export function getS3Url(path: string): string {
-  const s3Bucket = process.env.AWS_S3_BUCKET ?? "odience-assets";
-  const s3Region = process.env.AWS_S3_REGION ?? "eu-west-1";
-  return `https://${s3Bucket}.s3.${s3Region}.amazonaws.com/${path}`;
+  return `${env.AWS_URL}/${path}`;
 }
 
 /**
