@@ -31,6 +31,12 @@ if (existsSync(envSpecificPath)) {
   }
 }
 
+if (dotenvResult.parsed) {
+  Object.assign(dotenvResult.parsed, {
+    ENV: nodeEnv,
+  });
+}
+
 export const env = arkenv(
   {
     AWS_URL: "string.url",
@@ -39,6 +45,7 @@ export const env = arkenv(
     "DIRECTOR_TEST_USER_EMAIL?": "string.email",
     "DIRECTOR_TEST_USER_PASSWORD?": "string",
     REDIS_URL: "string.url",
+    ENV: "'development' | 'production' | 'test'",
   },
   dotenvResult.parsed,
 );

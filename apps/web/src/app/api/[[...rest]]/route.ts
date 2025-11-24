@@ -2,6 +2,8 @@
 import "@ungap/compression-stream/poly";
 
 import { appRouter, createContext } from "@director_v2/api";
+import { generateTestToken } from "@director_v2/api/util/generate-test-token";
+import { env } from "@director_v2/config";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
 import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
@@ -17,6 +19,7 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
 import pino from "pino";
 import pretty from "pino-pretty";
+import { version } from "../../../../package.json";
 
 const stream = pretty({
   colorize: true,
@@ -65,6 +68,32 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 
     new OpenAPIReferencePlugin({
       schemaConverters,
+      specGenerateOptions: {
+        info: {
+          title: "Director API Reference",
+          version: version,
+        },
+        security: [{ bearerAuth: [] }],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+            },
+          },
+        },
+      },
+      docsConfig: {
+        persistAuth: true,
+        authentication: {
+          securitySchemes: {
+            bearerAuth: {
+              token:
+                env.ENV === "development" ? generateTestToken() : undefined,
+            },
+          },
+        },
+      },
     }),
     new SmartCoercionPlugin({
       schemaConverters,
