@@ -1,3 +1,4 @@
+import { env } from "@director_v2/config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -8,6 +9,8 @@ const nextConfig: NextConfig = {
     preloadEntriesOnStart: true,
   },
   reactCompiler: true,
+  serverExternalPackages: ["pino", "pino-pretty"],
+  env: env,
 };
 
 export default nextConfig;

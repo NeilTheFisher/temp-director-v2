@@ -1,5 +1,10 @@
+// polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
+import "@ungap/compression-stream/poly";
+
 import { appRouter, createContext } from "@director_v2/api";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
+import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
+import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
@@ -10,10 +15,6 @@ import {
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import type { NextRequest } from "next/server";
-// polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
-import "@ungap/compression-stream/poly";
-import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
-import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
 import pino from "pino";
 import pretty from "pino-pretty";
 
@@ -79,17 +80,13 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 async function handleRequest(req: NextRequest) {
   const rpcResult = await rpcHandler.handle(req, {
     prefix: "/api/rpc",
-    context: await createContext(
-      req as unknown as Parameters<typeof createContext>[0],
-    ),
+    context: await createContext(req),
   });
   if (rpcResult.response) return rpcResult.response;
 
   const apiResult = await apiHandler.handle(req, {
     prefix: "/api",
-    context: await createContext(
-      req as unknown as Parameters<typeof createContext>[0],
-    ),
+    context: await createContext(req),
   });
   if (apiResult.response) return apiResult.response;
 

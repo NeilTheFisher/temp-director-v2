@@ -12,6 +12,7 @@
   "dependencies": {
     "@director_v2/api": "workspace:*",
     "@director_v2/auth": "workspace:*",
+    "@director_v2/config": "workspace:*",
     "@orpc/arktype": "catalog:",
     "@orpc/client": "catalog:",
     "@orpc/experimental-pino": "catalog:",
