@@ -35,6 +35,7 @@
   },
   "scripts": {
     "build": "turbo build",
+    "start": "cd apps/web && bun run start",
     "check": "oxlint",
     "db:generate": "turbo -F @director_v2/db db:generate",
     "db:migrate": "turbo -F @director_v2/db db:migrate",

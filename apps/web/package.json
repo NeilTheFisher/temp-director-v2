@@ -7,7 +7,7 @@
     "dev": "next dev --port=3001 --experimental-https",
     "lint": "biome check . && oxlint --type-aware",
     "lint:types": "tsc -b",
-    "start": "next start"
+    "start": "next start --port=3001"
   },
   "dependencies": {
     "@director_v2/api": "workspace:*",

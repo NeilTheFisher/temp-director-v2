@@ -7,11 +7,6 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "web#build": {
-      "dependsOn": [],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**"]
-    },
     "lint": {
       "cache": false,
       "outputs": []
