@@ -51,6 +51,8 @@
     "lint:oxlint": "oxlint",
     "lint:types": "turbo run lint:types",
     "openapi:generate": "turbo -F @director_v2/api openapi:generate",
+    "otel:run": "cd apps/web && bun run otel:run",
+    "otel:stop": "cd apps/web && bun run otel:stop",
     "prepare": "husky",
     "test": "BUN_SSL_VERIFY=false bun test",
     "unbuild": "rm -rf ./packages/*/dist ./apps/*/dist ./apps/*/.next",
