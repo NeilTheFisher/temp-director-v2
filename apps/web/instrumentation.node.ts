@@ -6,6 +6,7 @@ import { resourceFromAttributes } from "@opentelemetry/resources";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import {
   BatchSpanProcessor,
+  type ReadableSpan,
   SimpleSpanProcessor,
 } from "@opentelemetry/sdk-trace-node";
 import { ORPCInstrumentation } from "@orpc/otel";
@@ -13,8 +14,21 @@ import { PrismaInstrumentation } from "@prisma/instrumentation";
 
 const OTEL_TRACE_EXPORTER_URL =
   process.env.OTEL_TRACE_EXPORTER_URL || "http://localhost:4318/v1/traces";
+class CustomOTLPTraceExporter extends OTLPTraceExporter {
+  // biome-ignore lint/suspicious/noExplicitAny: don't feel like doing `import { ExportResult } from '@opentelemetry/core';`
+  export(spans: ReadableSpan[], resultCallback: (result: any) => void): void {
+    // fix span name for Next.js API routes like /api/[[...rest]]
+    // readonly span but writing it anyway works
+    for (const span of spans) {
+      if (!span.attributes["http.target"]) continue;
+      Object.assign(span, { name: span.attributes["http.target"] });
+    }
 
-const traceExporter = new OTLPTraceExporter({
+    super.export(spans, resultCallback);
+  }
+}
+
+const traceExporter = new CustomOTLPTraceExporter({
   url: OTEL_TRACE_EXPORTER_URL,
 });
 

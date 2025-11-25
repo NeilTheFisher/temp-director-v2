@@ -7,7 +7,7 @@
     "dev": "bun --bun next dev --port=3001 --experimental-https",
     "lint": "biome check . && oxlint --type-aware",
     "lint:types": "tsc -b",
-    "otel:run": "docker run --rm --name jaeger -d -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4318:4318 jaegertracing/all-in-one:latest",
+    "otel:start": "docker run --rm --name jaeger -d -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4318:4318 jaegertracing/all-in-one:latest",
     "otel:stop": "docker stop jaeger"
   },
   "dependencies": {

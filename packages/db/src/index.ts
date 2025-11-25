@@ -4,7 +4,6 @@ import { PrismaClient } from "../prisma/generated/client";
 
 const prisma = new PrismaClient({
   adapter: new PrismaMySQL(env.DATABASE_URL),
-  log: env.ENV === "test" ? undefined : ["query"],
 });
 
 export default prisma;
