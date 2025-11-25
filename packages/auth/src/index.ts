@@ -5,6 +5,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { polarClient } from "./lib/payments";
 
+// TODO this isn't being used yet
 export const auth = betterAuth<BetterAuthOptions>({
   database: prismaAdapter(prisma, {
     provider: "mysql",

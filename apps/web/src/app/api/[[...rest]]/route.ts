@@ -68,11 +68,16 @@ const apiHandler = new OpenAPIHandler(appRouter, {
 
     new OpenAPIReferencePlugin({
       schemaConverters,
-      specGenerateOptions: {
+      specGenerateOptions: ({ request }) => ({
         info: {
           title: "Director API Reference",
           version: version,
         },
+        servers: [
+          { url: `${request.url.origin}/api` },
+          { url: `${env.DIRECTOR_URL}/api` },
+          { url: "https://director.odience.com/api" },
+        ],
         security: [{ bearerAuth: [] }],
         components: {
           securitySchemes: {
@@ -82,7 +87,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
             },
           },
         },
-      },
+      }),
       docsConfig: {
         persistAuth: true,
         authentication: {

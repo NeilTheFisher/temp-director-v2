@@ -1,4 +1,3 @@
-import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import arkenv from "arkenv";
@@ -6,36 +5,30 @@ import dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
 
 const rootDir = path.join(fileURLToPath(new URL(import.meta.url)), "../../../");
-const nodeEnv = process.env.NODE_ENV || "development";
+const nodeEnv = process.env.NODE_ENV || process.env.ENV || "development";
 
 // Load base .env first
 const baseEnvPath = path.join(rootDir, ".env");
-const dotenvResult = dotenvExpand.expand(
+dotenvExpand.expand(
   dotenv.config({
     path: baseEnvPath,
     quiet: true,
   }),
 );
 
-// Load environment-specific .env file if it exists and merge
-const envSpecificPath = path.join(rootDir, `.env.${nodeEnv}`);
-if (existsSync(envSpecificPath)) {
-  const envSpecificResult = dotenvExpand.expand(
-    dotenv.config({
-      path: envSpecificPath,
-      quiet: true,
-    }),
-  );
-  if (envSpecificResult.parsed && dotenvResult.parsed) {
-    Object.assign(dotenvResult.parsed, envSpecificResult.parsed);
-  }
-}
+Object.assign(process.env, {
+  ENV: nodeEnv,
+});
 
-if (dotenvResult.parsed) {
-  Object.assign(dotenvResult.parsed, {
-    ENV: nodeEnv,
-  });
-}
+const {
+  NODE_ENV: _NODE_ENV,
+  NEXT_RUNTIME: _NEXT_RUNTIME,
+  NODE_OPTIONS: _NODE_OPTIONS,
+  NODE_EXTRA_CA_CERTS: _NODE_EXTRA_CA_CERTS,
+  __NEXT_PRIVATE_ORIGIN: ___NEXT_PRIVATE_ORIGIN,
+  __NEXT_EXPERIMENTAL_HTTPS: ___NEXT_EXPERIMENTAL_HTTPS,
+  ...processedEnv
+} = process.env;
 
 export const env = arkenv(
   {
@@ -47,5 +40,5 @@ export const env = arkenv(
     REDIS_URL: "string.url",
     ENV: "'development' | 'production' | 'test'",
   },
-  dotenvResult.parsed,
+  processedEnv,
 );

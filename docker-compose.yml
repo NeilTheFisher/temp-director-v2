@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    network_mode: host
+    environment:
+      CORS_ORIGIN: http://localhost:3001
+      DNS_RECORD: neil
+      DIRECTOR_URL: https://$DNS_RECORD.dev.plusrcs.com:8443
+      AWS_URL: https://$DNS_RECORD.dev.plusrcs.com:9443/director
+      DATABASE_URL: mysql://admin:admin@$DNS_RECORD.dev.plusrcs.com:3306/db_spotlight
+      REDIS_URL: redis://localhost:6379
+      DIRECTOR_TEST_USER_EMAIL: admin@summit-tech.ca
+      DIRECTOR_TEST_USER_PASSWORD: summit123
+      HOSTNAME: 0.0.0.0

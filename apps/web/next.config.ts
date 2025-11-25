@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   serverExternalPackages: ["pino", "pino-pretty"],
   env: env,
+  output: "standalone",
 };
 
 export default nextConfig;

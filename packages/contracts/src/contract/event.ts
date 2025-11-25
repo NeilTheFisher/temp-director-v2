@@ -173,12 +173,14 @@ export const eventContract = base.prefix("/events").router({
   listEvents: base
     .route({
       path: "/",
+      method: "GET",
     })
     .input(listEventsInputSchema)
     .output(listEventsResponseSchema),
   get: base
     .route({
       path: "/{id}",
+      method: "GET",
     })
     .input(z.object({ id: z.string() }))
     .output(RestEvent),
