@@ -35,7 +35,6 @@
   },
   "scripts": {
     "build": "turbo build",
-    "start": "cd apps/web && bun run start",
     "check": "oxlint",
     "db:generate": "turbo -F @director_v2/db db:generate",
     "db:migrate": "turbo -F @director_v2/db db:migrate",
@@ -51,9 +50,8 @@
     "lint:oxlint": "oxlint",
     "lint:types": "turbo run lint:types",
     "openapi:generate": "turbo -F @director_v2/api openapi:generate",
-    "otel:start": "cd apps/web && bun run otel:start",
-    "otel:stop": "cd apps/web && bun run otel:stop",
     "prepare": "husky",
+    "start": "cd apps/web && bun run start",
     "test": "BUN_SSL_VERIFY=false bun test",
     "unbuild": "rm -rf ./packages/*/dist ./apps/*/dist ./apps/*/.next",
     "update-deps": "bun ./scripts/update-catalog.ts && bun update -i -r"

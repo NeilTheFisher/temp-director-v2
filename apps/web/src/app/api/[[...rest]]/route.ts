@@ -4,7 +4,6 @@ import "@ungap/compression-stream/poly";
 import { appRouter, createContext } from "@director_v2/api";
 import { generateTestToken } from "@director_v2/api/util/generate-test-token";
 import { env } from "@director_v2/config";
-import { trace } from "@opentelemetry/api";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
 import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
@@ -17,6 +16,7 @@ import {
   StrictGetMethodPlugin,
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
+import * as Sentry from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 import pino from "pino";
 import pretty from "pino-pretty";
@@ -47,17 +47,8 @@ const sharedPlugins = [
 
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
-    // oxlint-disable-next-line unbound-method
-    ({ request, next }) => {
-      const span = trace.getActiveSpan();
-
-      request.signal?.addEventListener("abort", () => {
-        span?.addEvent("aborted", { reason: String(request.signal?.reason) });
-      });
-
-      return next();
-    },
     onError((error) => {
+      Sentry.captureException(error);
       console.error(error);
     }),
   ],
@@ -75,17 +66,8 @@ const schemaConverters = [
 ];
 const apiHandler = new OpenAPIHandler(appRouter, {
   interceptors: [
-    // oxlint-disable-next-line unbound-method
-    ({ request, next }) => {
-      const span = trace.getActiveSpan();
-
-      request.signal?.addEventListener("abort", () => {
-        span?.addEvent("aborted", { reason: String(request.signal?.reason) });
-      });
-
-      return next();
-    },
     onError((error) => {
+      Sentry.captureException(error);
       console.error(error);
     }),
   ],
