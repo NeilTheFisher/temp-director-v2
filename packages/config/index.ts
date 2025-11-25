@@ -39,6 +39,7 @@ export const env = arkenv(
     "DIRECTOR_TEST_USER_PASSWORD?": "string",
     REDIS_URL: "string.url",
     ENV: "'development' | 'production' | 'test'",
+    "SENTRY_DSN?": "string.url",
   },
   processedEnv,
 );

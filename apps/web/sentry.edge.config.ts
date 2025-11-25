@@ -1,8 +1,9 @@
+import { env } from "@director_v2/config";
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV,
-  tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE) || 0.1,
+  dsn: env.SENTRY_DSN,
+  environment: env.ENV,
+  tracesSampleRate: 0.1,
   debug: false,
 });
