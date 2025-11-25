@@ -45,16 +45,18 @@ export const userInfoByMsisdnResponseSchema = z.object({
   sip: z.string(),
 });
 
-export const userContract = {
+export const userContract = base.prefix("/api").router({
   getUserInfo: base
     .route({
-      path: "/user/info",
+      path: "/getUserInfo",
+      method: "GET",
     })
-    .input(z.void())
+    .input(z.unknown())
     .output(userInfoResponseSchema),
   getUserInfoByMsisdn: base
     .route({
-      path: "/user/info/{msisdn}",
+      path: "/getUserInfoByMsisdn/{msisdn}",
+      method: "GET",
     })
     .input(
       z.object({
@@ -62,4 +64,4 @@ export const userContract = {
       }),
     )
     .output(userInfoByMsisdnResponseSchema),
-};
+});

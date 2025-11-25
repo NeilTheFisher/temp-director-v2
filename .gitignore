@@ -49,3 +49,5 @@ coverage
 tmp
 temp
 priv
+
+# ? not sure if I should ignore the clients or not

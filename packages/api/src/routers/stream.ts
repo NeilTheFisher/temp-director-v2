@@ -20,7 +20,7 @@ export const streamRouter = {
       const clientIp = context.clientIp || "";
 
       const streamInfo = await streamRepository.getStreamUrls(
-        input.streamUrlId,
+        Number.parseInt(input.streamUrlId, 10),
         userId,
         clientIp,
       );

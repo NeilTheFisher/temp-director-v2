@@ -9,7 +9,7 @@ Sentry.init({
   debug: false,
   integrations: [Sentry.prismaIntegration()],
   // Uses experimental Sentry API for OpenTelemetry instrumentation
-  registerEsmLoaderHooks: { onlyIncludeInstrumentedModules: true },
+  registerEsmLoaderHooks: true,
   _experiments: {
     openTelemetryInstrumentations: [new PrismaInstrumentation()],
   },

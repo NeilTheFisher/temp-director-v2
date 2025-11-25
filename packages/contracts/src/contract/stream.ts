@@ -1,20 +1,24 @@
 import z from "zod";
 import { base } from "./base";
 
-export const streamContract = {
+export const streamContract = base.prefix("/api").router({
   getStreamUrls: base
     .route({
-      path: "/stream/{streamUrlId}",
+      path: "/getStreamUrls/{streamUrlId}",
+      method: "GET",
     })
     .input(
       z.object({
-        streamUrlId: z.number().int().positive(),
+        streamUrlId: z.string(),
       }),
     )
     .output(
-      z.object({
-        urls: z.array(z.string()),
-        error: z.string().optional().default(""),
-      }),
+      z
+        .object({
+          urls: z.array(z.string()),
+          error: z.string().optional().default(""),
+        })
+        .partial()
+        .loose(),
     ),
-};
+});

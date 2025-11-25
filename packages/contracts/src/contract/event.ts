@@ -13,55 +13,6 @@ export const listEventsInputSchema = z.object({
 });
 
 // Extended event response with computed fields
-// export const eventResponseSchema = eventSchema.extend({
-//   id: z.string(), // Convert to string for API
-//   namespace: z.string(),
-//   label: z.string(),
-//   featured: z.boolean(),
-//   brand: z.unknown(),
-//   featured_catalogue: z.unknown(),
-//   organization: z.string(),
-//   organization_image_url: z.string(),
-//   organization_id: z.bigint(),
-//   owner_id: z.string(),
-//   categoryImage: z.string(),
-//   capacity: z.number().int().nullable(),
-//   imageUrl: z.string(),
-//   min_price: z.number().nullable(),
-//   ticket_url: z.string().nullable(),
-//   ticket_platform: z.string().nullable(),
-//   map_image_url: z.string().nullable(),
-//   has_ricoh_stream: z.boolean(),
-//   payed: z.boolean(),
-//   invitation_message: z.string().nullable(),
-//   event_url: z.string(),
-//   invitations_only: z.boolean(),
-//   usersConnected: z.number().int(),
-//   complete: z.boolean(),
-//   invitation_accepted: z.boolean(),
-//   invitation_requested: z.boolean(),
-//   registered: z.boolean(),
-//   usersInterestedCount: z.number().int(),
-//   banned: z.boolean(),
-//   blocked: z.boolean(),
-//   opened: z.boolean(),
-//   pre_access: z.unknown(),
-//   web_allowed: z.boolean(),
-//   app_allowed: z.boolean(),
-//   appUrl: z.string(),
-//   settings: z.unknown(),
-//   active: z.boolean(),
-//   downloads: z.array(z.string()),
-//   sponsors: z.object({
-//     custom: z.unknown(),
-//     settings: z.unknown(),
-//     external: z.unknown(),
-//   }),
-//   host: z.unknown(),
-//   onLocation: z.unknown(),
-//   onLocationLock: z.unknown(),
-// });
-
 const FeaturedCatalogue = z
   .object({ image_alignment: z.string(), blurred_background: z.boolean() })
   .partial()
@@ -160,44 +111,34 @@ export const categoriesResponseSchema = z.object({
 });
 export type categoriesResponseSchema = z.infer<typeof categoriesResponseSchema>;
 
-const WebEvent = RestEvent;
-
-export const webEventsListResponseSchema = z.object({
-  data: z.array(WebEvent),
-});
-export type webEventsListResponseSchema = z.infer<
-  typeof webEventsListResponseSchema
->;
-
-export const eventContract = base.prefix("/events").router({
+export const eventContract = base.prefix("/api").router({
   listEvents: base
     .route({
-      path: "/",
+      path: "/events",
       method: "GET",
     })
     .input(listEventsInputSchema)
     .output(listEventsResponseSchema),
   get: base
     .route({
-      path: "/{id}",
+      path: "/events/{id}",
       method: "GET",
     })
     .input(z.object({ id: z.string() }))
     .output(RestEvent),
   listEventsLive: base.input(z.void()).output(eventIterator(eventSchema)),
   listPartialEvents: base
+    .route({
+      path: "/partialEvents",
+      method: "GET",
+    })
     .input(listEventsInputSchema)
     .output(listEventsResponseSchema),
-  webEventsList: base
-    .route({
-      path: "/web/api/eventsList",
-    })
-    .input(listEventsInputSchema)
-    .output(webEventsListResponseSchema),
   categories: base
     .route({
-      path: "/categories",
+      path: "/events/categories",
+      method: "GET",
     })
-    .input(z.void())
+    .input(z.unknown())
     .output(categoriesResponseSchema),
 });

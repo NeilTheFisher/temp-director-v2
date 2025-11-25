@@ -5,6 +5,7 @@ import { healthRouter } from "./health";
 import { odienceRouter } from "./odience";
 import { streamRouter } from "./stream";
 import { userRouter } from "./user";
+import { webRouter } from "./web";
 
 export const appRouter = pub.router({
   health: healthRouter,
@@ -12,6 +13,7 @@ export const appRouter = pub.router({
   odience: odienceRouter,
   stream: streamRouter,
   user: userRouter,
+  web: webRouter,
 });
 
 export type AppRouterClient = RouterClient<typeof appRouter>;
