@@ -1,7 +1,6 @@
 import { SpanStatusCode, trace } from "@opentelemetry/api";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { PinoInstrumentation } from "@opentelemetry/instrumentation-pino";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import {
@@ -45,7 +44,6 @@ const otelSdk = new NodeSDK({
     getNodeAutoInstrumentations(),
     new ORPCInstrumentation(),
     new PrismaInstrumentation(),
-    new PinoInstrumentation(),
   ],
 });
 
