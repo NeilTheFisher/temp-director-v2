@@ -1,7 +1,0 @@
-{
-    "name": "DirectorV2.Client",
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "Newtonsoft.Json.dll"
-    ]
-}

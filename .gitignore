@@ -51,3 +51,4 @@ temp
 priv
 
 # ? not sure if I should ignore the clients or not
+packages/api/openapi/clients
