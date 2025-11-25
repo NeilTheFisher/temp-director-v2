@@ -12,8 +12,8 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
 import {
-	SimpleCsrfProtectionHandlerPlugin,
-	StrictGetMethodPlugin,
+  SimpleCsrfProtectionHandlerPlugin,
+  StrictGetMethodPlugin,
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import * as Sentry from "@sentry/nextjs";
@@ -23,111 +23,111 @@ import pretty from "pino-pretty";
 import { version } from "../../../../package.json";
 
 const stream = pretty({
-	colorize: true,
+  colorize: true,
 });
 const logger = pino({ level: "debug" }, stream);
 
 declare global {
-	var log: typeof logger;
+  var log: typeof logger;
 }
 globalThis.log = logger;
 
 const sharedPlugins = [
-	new CompressionPlugin(),
-	new LoggingHandlerPlugin({
-		logger,
-		generateId: ({ context }) =>
-			context.session
-				? `user-${context.session?.user.id}_${crypto.randomUUID()}`
-				: crypto.randomUUID(),
-		logRequestResponse: true,
-		logRequestAbort: true,
-	}),
+  new CompressionPlugin(),
+  new LoggingHandlerPlugin({
+    logger,
+    generateId: ({ context }) =>
+      context.session
+        ? `user-${context.session?.user.id}_${crypto.randomUUID()}`
+        : crypto.randomUUID(),
+    logRequestResponse: true,
+    logRequestAbort: true,
+  }),
 ];
 
 const rpcHandler = new RPCHandler(appRouter, {
-	interceptors: [
-		onError((error) => {
-			Sentry.captureException(error);
-			console.error(error);
-		}),
-	],
-	plugins: [
-		...sharedPlugins,
+  interceptors: [
+    onError((error) => {
+      Sentry.captureException(error);
+      console.error(error);
+    }),
+  ],
+  plugins: [
+    ...sharedPlugins,
 
-		new SimpleCsrfProtectionHandlerPlugin(),
-		new StrictGetMethodPlugin(),
-	],
+    new SimpleCsrfProtectionHandlerPlugin(),
+    new StrictGetMethodPlugin(),
+  ],
 });
 
 const schemaConverters = [
-	new ZodToJsonSchemaConverter(),
-	new ArkTypeToJsonSchemaConverter(),
+  new ZodToJsonSchemaConverter(),
+  new ArkTypeToJsonSchemaConverter(),
 ];
 const apiHandler = new OpenAPIHandler(appRouter, {
-	interceptors: [
-		onError((error) => {
-			Sentry.captureException(error);
-			console.error(error);
-		}),
-	],
-	plugins: [
-		...sharedPlugins,
+  interceptors: [
+    onError((error) => {
+      Sentry.captureException(error);
+      console.error(error);
+    }),
+  ],
+  plugins: [
+    ...sharedPlugins,
 
-		new OpenAPIReferencePlugin({
-			schemaConverters,
-			specGenerateOptions: ({ request }) => ({
-				info: {
-					title: "Director API Reference",
-					version: version,
-				},
-				servers: [
-					{ url: `${request.url.origin}/api` },
-					{ url: `${env.DIRECTOR_URL}/api` },
-					{ url: "https://director.odience.com/api" },
-				],
-				security: [{ bearerAuth: [] }],
-				components: {
-					securitySchemes: {
-						bearerAuth: {
-							type: "http",
-							scheme: "bearer",
-						},
-					},
-				},
-			}),
-			docsConfig: {
-				persistAuth: true,
-				authentication: {
-					securitySchemes: {
-						bearerAuth: {
-							token:
-								env.ENV === "development" ? generateTestToken() : undefined,
-						},
-					},
-				},
-			},
-		}),
-		new SmartCoercionPlugin({
-			schemaConverters,
-		}),
-	],
+    new OpenAPIReferencePlugin({
+      schemaConverters,
+      specGenerateOptions: ({ request }) => ({
+        info: {
+          title: "Director API Reference",
+          version: version,
+        },
+        servers: [
+          { url: `${request.url.origin}/api` },
+          { url: `${env.DIRECTOR_URL}/api` },
+          { url: "https://director.odience.com/api" },
+        ],
+        security: [{ bearerAuth: [] }],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+            },
+          },
+        },
+      }),
+      docsConfig: {
+        persistAuth: true,
+        authentication: {
+          securitySchemes: {
+            bearerAuth: {
+              token:
+                env.ENV === "development" ? generateTestToken() : undefined,
+            },
+          },
+        },
+      },
+    }),
+    new SmartCoercionPlugin({
+      schemaConverters,
+    }),
+  ],
 });
 
 async function handleRequest(req: NextRequest) {
-	const rpcResult = await rpcHandler.handle(req, {
-		prefix: "/api/rpc",
-		context: await createContext(req),
-	});
-	if (rpcResult.response) return rpcResult.response;
+  const rpcResult = await rpcHandler.handle(req, {
+    prefix: "/api/rpc",
+    context: await createContext(req),
+  });
+  if (rpcResult.response) return rpcResult.response;
 
-	const apiResult = await apiHandler.handle(req, {
-		prefix: "/api",
-		context: await createContext(req),
-	});
-	if (apiResult.response) return apiResult.response;
+  const apiResult = await apiHandler.handle(req, {
+    prefix: "/api",
+    context: await createContext(req),
+  });
+  if (apiResult.response) return apiResult.response;
 
-	return new Response("Not found", { status: 404 });
+  return new Response("Not found", { status: 404 });
 }
 
 export const GET = handleRequest;
