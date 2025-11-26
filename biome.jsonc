@@ -60,6 +60,9 @@
         "noInferrableTypes": "error",
         "noUselessElse": "error",
         "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "off"
       }
     }
   },

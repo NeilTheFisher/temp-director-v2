@@ -1,7 +1,9 @@
 // polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
 import "@ungap/compression-stream/poly";
 
-import http, { type IncomingMessage, type ServerResponse } from "node:http";
+import fs from "node:fs";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import https from "node:https";
 import { networkInterfaces } from "node:os";
 import { env } from "@director_v2/config";
 import { preconnectToDbAndRedis } from "@director_v2/db";
@@ -35,13 +37,19 @@ const handleNext = async (req: IncomingMessage, res: ServerResponse) => {
   await requestHandler(req, res);
 };
 
-const server = http.createServer(async (req, res) => {
-  const matched = await handleRPC(req, res);
+const server = https.createServer(
+  {
+    key: fs.readFileSync("./certificates/localhost-key.pem"),
+    cert: fs.readFileSync("./certificates/localhost.pem"),
+  },
+  async (req, res) => {
+    const matched = await handleRPC(req, res);
 
-  if (!matched) {
-    await handleNext(req, res);
-  }
-});
+    if (!matched) {
+      await handleNext(req, res);
+    }
+  },
+);
 
 const port = Number(process.env.PORT) || 3001;
 server.listen(port, "0.0.0.0", () => {

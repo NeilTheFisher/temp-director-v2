@@ -118,15 +118,17 @@ const apiHandler = new OpenAPIHandler(appRouter, {
  * @returns Response if handled, null otherwise
  */
 export async function handleRPC(req: IncomingMessage, res: ServerResponse) {
+  const context = await createContext(req);
+
   const rpcResult = await rpcHandler.handle(req, res, {
     prefix: "/api/rpc",
-    context: await createContext(req),
+    context,
   });
   if (rpcResult.matched) return true;
 
   const apiResult = await apiHandler.handle(req, res, {
     prefix: "/",
-    context: await createContext(req),
+    context,
   });
   if (apiResult.matched) return true;
 

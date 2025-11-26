@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "bun --bun next build && cp -r .next/static .next/standalone/.next/",
-    "dev": "bun server.ts",
+    "dev": "bun --watch server.ts",
     "dev:next": "bun --bun next dev --port=3001 --experimental-https",
     "start": "NODE_ENV=production bun server.ts",
     "lint": "biome check . && oxlint --type-aware",
