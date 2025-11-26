@@ -3,6 +3,12 @@
     "oxc.oxc-vscode",
     "biomejs.biome",
     "gruntfuggly.todo-tree",
-    "arktypeio.arkdark"
+    "arktypeio.arkdark",
+    "YoavBls.pretty-ts-errors",
+    "mhutchie.git-graph"
+  ],
+  "unwantedRecommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
   ]
 }
