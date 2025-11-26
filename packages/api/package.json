@@ -13,6 +13,7 @@
     "openapi:generate": "bun run openapi/openapi-generate.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-ec2": "^3.940.0",
     "@director_v2/auth": "workspace:*",
     "@director_v2/config": "workspace:*",
     "@director_v2/contracts": "workspace:*",
@@ -32,6 +33,7 @@
     "dotenv": "catalog:",
     "dotenv-expand": "catalog:",
     "jsonwebtoken": "catalog:",
+    "libphonenumber-js": "^1.12.29",
     "next": "catalog:",
     "zod": "catalog:"
   },

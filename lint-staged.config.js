@@ -5,6 +5,7 @@ export default {
     );
     if (filteredFilenames.length === 0) return [];
     return [
+      "bun run format:sort-package-json",
       `biome check --write ${filteredFilenames.join(" ")}`,
       `oxlint ${filteredFilenames.join(" ")}`,
     ];

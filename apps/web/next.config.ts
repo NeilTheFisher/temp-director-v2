@@ -1,4 +1,4 @@
-import { env } from "@director_v2/config";
+import { envClean } from "@director_v2/config";
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   },
   reactCompiler: true,
   serverExternalPackages: ["pino", "pino-pretty"],
-  env: env,
+  env: envClean,
 };
 
 export default withSentryConfig(nextConfig, {

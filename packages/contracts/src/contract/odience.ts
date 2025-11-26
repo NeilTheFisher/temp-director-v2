@@ -7,7 +7,12 @@ export const odienceContract = base.prefix("/").router({
       path: "/odience",
       method: "GET",
     })
-    .input(z.object({ msisdn: z.string() }))
+    .input(
+      z.object({
+        msisdn: z.string(),
+        country_code: z.string().optional(),
+      }),
+    )
     .output(
       z.object({
         code: z.number(),

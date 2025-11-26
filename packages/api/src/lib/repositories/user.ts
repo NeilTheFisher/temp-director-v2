@@ -1,4 +1,5 @@
 import prisma from "@director_v2/db";
+import { getPnsSettings } from "../redis";
 
 /**
  * User Repository
@@ -200,14 +201,7 @@ export async function getFullUserInfo(userId: number) {
       msisdn: user.msisdn,
       image_uid: user.image_uid,
       account_type: Number(user.account_type),
-      pns_settings: {
-        // TODO: These values are currently saved in Redis in director-api
-        // For now, return default values
-        pns_event_created: true,
-        pns_event_updated: true,
-        pns_event_registered: true,
-        pns_event_mention: true,
-      },
+      pns_settings: await getPnsSettings(Number(user.id)),
       usersReported: reportedUsers,
       usersBlocked: blockedUsers.filter((u) => u !== null),
       usersBlockedBy: blockedByUsers.map((b) => b.user.msisdn),

@@ -59,7 +59,7 @@ server.listen(port, "0.0.0.0", () => {
 });
 
 function printDevServerInfo() {
-  const protocol = "http:";
+  const protocol = "https:";
 
   console.log(`Environment: ${process.env.NODE_ENV ?? "development"}`);
   console.log();

@@ -1,37 +1,50 @@
-interface ValidationResult {
-  msisdn: string;
-  code: number;
-  error: string;
-  formatted: string;
-  valid: boolean;
-  country_code: string;
-}
+import { type CountryCode, parsePhoneNumberWithError } from "libphonenumber-js";
 
-/**
- * Validate and format phone number
- * Mirrors director-api validateAndFormatPhoneNumber
- * Note: This is a simplified placeholder. Full implementation requires google-libphonenumber package.
- * TODO: Install google-libphonenumber and implement full validation logic
- */
 export async function validateAndFormatPhoneNumber(
   strMsisdn: string,
   strCountryCode = "",
-): Promise<ValidationResult> {
-  const normalizedCountryCode = strCountryCode.toUpperCase();
+) {
+  const normalizedCountryCode = (strCountryCode.toUpperCase() ||
+    "US") as CountryCode;
   const strFormattedMsisdn = strMsisdn.replace(/\D/g, "");
 
-  const result: ValidationResult = {
+  const result = {
     msisdn: strFormattedMsisdn,
     code: 200,
     error: "",
     formatted: strFormattedMsisdn,
-    valid: true, // Temporarily accept all numbers
-    country_code: normalizedCountryCode || "US",
+    valid: false,
+    country_code: normalizedCountryCode,
   };
 
-  // TODO: Implement full validation using google-libphonenumber
-  // For now, just return a basic validation result
-  console.log("Phone validation placeholder - number:", strMsisdn);
+  try {
+    // Try to parse the phone number with country code
+    const phoneNumber = parsePhoneNumberWithError(
+      strMsisdn.startsWith("+") ? strMsisdn : `+${strMsisdn}`,
+      normalizedCountryCode,
+    );
+    if (!phoneNumber.isValid?.()) {
+      result.error = "Phone number is not valid for the region";
+      result.code = 400;
+      return result;
+    }
+
+    // Format the phone number to E.164 format (international format)
+    result.formatted = phoneNumber.format("E.164").replace(/\D/g, "");
+    result.valid = true;
+    result.code = 200;
+    result.error = "";
+    result.country_code = phoneNumber.country || normalizedCountryCode;
+  } catch (objException: unknown) {
+    const errorMessage =
+      objException instanceof Error ? objException.message : "Unknown error";
+    console.error(
+      `Phone validation error for number: ${strMsisdn}, error: ${errorMessage}`,
+    );
+    result.code = 500;
+    result.error = errorMessage;
+    result.valid = false;
+  }
 
   return result;
 }

@@ -1,23 +1,26 @@
 import { env } from "@director_v2/config";
 import { ORPCError } from "@orpc/server";
+import * as odienceService from "../lib/services/odience";
 import { validateAndFormatPhoneNumber } from "../lib/utils/phone-validation";
 import { pub } from "../orpc";
 
 const CATEGORY_LIST = [
-  "personal",
   "concert",
-  "shopping",
-  "assistant",
-  "gaming",
   "sport",
-  "conference",
-  "activities",
-  "location",
-  "simulation",
-  "bingo",
-  "collaboration",
+  "shopping",
+  "gaming",
   "entertainment",
+  "collaboration",
+  "conference",
+  "simulation",
+  "museum",
   "travel",
+  "bingo",
+  "interview",
+  "location",
+  "personal",
+  "activities",
+  "assistant",
 ];
 
 export const odienceRouter = {
@@ -26,11 +29,13 @@ export const odienceRouter = {
     const rawMsisdn = input.msisdn;
 
     try {
-      // TODO: Replace with actual OdienceService.provisionUser implementation
-      // For now, return placeholder
+      const objResponse = await odienceService.provisionUser(
+        rawMsisdn,
+        input.country_code || "",
+      );
       return {
-        code: 200,
-        message: "User provisioned successfully (placeholder)",
+        code: objResponse.code,
+        message: objResponse.message || "",
       };
     } catch (error: unknown) {
       const errorMessage =

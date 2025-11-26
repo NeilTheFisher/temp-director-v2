@@ -116,7 +116,9 @@ export const appRouter = {
 
 **Error Handling:** Use `ORPCError` from `@orpc/server` with error codes like `"UNAUTHORIZED"`, `"BAD_REQUEST"`, `"INTERNAL_SERVER_ERROR"`.
 
-**Type Safety:** Always use `unknown` for catch blocks, not `any`. Biome enforces this.
+**Type Safety:**
+- Always use `unknown` for catch blocks, not `any`
+- Try to avoid adding typescript types and rather let things type themselves. like function return types for example, try to avoid them.
 
 ## Migration Context (Important)
 
