@@ -1,6 +1,3 @@
-// polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
-import "@ungap/compression-stream/poly";
-
 import { appRouter, createContext } from "@director_v2/api";
 import { generateTestToken } from "@director_v2/api/util/generate-test-token";
 import { env } from "@director_v2/config";
@@ -17,10 +14,9 @@ import {
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import * as Sentry from "@sentry/nextjs";
-import type { NextRequest } from "next/server";
 import pino from "pino";
 import pretty from "pino-pretty";
-import { version } from "../../../../package.json";
+import { version } from "../../package.json";
 
 const stream = pretty({
   colorize: true,
@@ -40,8 +36,8 @@ const sharedPlugins = [
       context.session
         ? `user-${context.session?.user.id}_${crypto.randomUUID()}`
         : crypto.randomUUID(),
-    logRequestResponse: true,
-    logRequestAbort: true,
+    // logRequestResponse: true,
+    // logRequestAbort: true,
   }),
 ];
 
@@ -75,6 +71,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
     ...sharedPlugins,
 
     new OpenAPIReferencePlugin({
+      docsPath: "/api-reference",
       schemaConverters,
       specGenerateOptions: ({ request }) => ({
         info: {
@@ -82,9 +79,9 @@ const apiHandler = new OpenAPIHandler(appRouter, {
           version: version,
         },
         servers: [
-          { url: `${request.url.origin}/api` },
-          { url: `${env.DIRECTOR_URL}/api` },
-          { url: "https://director.odience.com/api" },
+          { url: `${request.url.origin}` },
+          { url: `${env.DIRECTOR_URL}` },
+          { url: "https://director.odience.com" },
         ],
         security: [{ bearerAuth: [] }],
         components: {
@@ -114,7 +111,12 @@ const apiHandler = new OpenAPIHandler(appRouter, {
   ],
 });
 
-async function handleRequest(req: NextRequest) {
+/**
+ * Handle oRPC requests
+ * @param req - The incoming request
+ * @returns Response if handled, null otherwise
+ */
+export async function handleRPC(req: Request): Promise<Response | null> {
   const rpcResult = await rpcHandler.handle(req, {
     prefix: "/api/rpc",
     context: await createContext(req),
@@ -122,16 +124,10 @@ async function handleRequest(req: NextRequest) {
   if (rpcResult.response) return rpcResult.response;
 
   const apiResult = await apiHandler.handle(req, {
-    prefix: "/api",
+    prefix: "/",
     context: await createContext(req),
   });
   if (apiResult.response) return apiResult.response;
 
-  return new Response("Not found", { status: 404 });
+  return null;
 }
-
-export const GET = handleRequest;
-export const POST = handleRequest;
-export const PUT = handleRequest;
-export const PATCH = handleRequest;
-export const DELETE = handleRequest;
