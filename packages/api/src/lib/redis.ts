@@ -1,9 +1,4 @@
-import { redis } from "bun";
-
-/**
- * Redis utilities using Bun's native redis
- * PNS settings are stored in Redis under pns_settings:{userId}
- */
+import { redis } from "@director_v2/db";
 
 /**
  * Get PNS settings for a user from Redis

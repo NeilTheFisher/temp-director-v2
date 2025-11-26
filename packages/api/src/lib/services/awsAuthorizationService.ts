@@ -10,7 +10,7 @@ import {
   EC2Client,
 } from "@aws-sdk/client-ec2";
 import { env } from "@director_v2/config";
-import { redis } from "bun";
+import { redis } from "@director_v2/db";
 
 interface AggregatorUrl {
   url: string;

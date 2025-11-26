@@ -4,7 +4,7 @@
  */
 
 import { env } from "@director_v2/config";
-import { redis } from "bun";
+import { redis } from "@director_v2/db";
 
 interface MobileUserInfo {
   mcc: number;
