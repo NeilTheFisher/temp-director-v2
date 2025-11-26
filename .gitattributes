@@ -1,0 +1,3 @@
+*.kt linguist-detectable-false
+*.cpp linguist-detectable-false
+*.cs linguist-detectable-false

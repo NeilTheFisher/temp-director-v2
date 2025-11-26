@@ -1,0 +1,49 @@
+{
+  "name": "@director_v2/api",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "generate-token": "bun -e 'import { generateTestToken } from \"./src/util/generate-test-token\"; console.log(generateTestToken(process.argv[1]));'",
+    "lint": "biome check . && oxlint --type-aware",
+    "lint:types": "tsc -b",
+    "openapi:generate": "bun run openapi/openapi-generate.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.940.0",
+    "@director_v2/auth": "workspace:*",
+    "@director_v2/config": "workspace:*",
+    "@director_v2/contracts": "workspace:*",
+    "@director_v2/db": "workspace:*",
+    "@openapitools/openapi-generator-cli": "^2.25.2",
+    "@opentelemetry/sdk-node": "^0.208.0",
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/experimental-pino": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "arkenv": "catalog:",
+    "arkregex": "catalog:",
+    "arktype": "catalog:",
+    "cidr-regex": "^5.0.1",
+    "decimal.js": "catalog:",
+    "dotenv": "catalog:",
+    "dotenv-expand": "catalog:",
+    "jsonwebtoken": "catalog:",
+    "libphonenumber-js": "^1.12.29",
+    "next": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "tsdown": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

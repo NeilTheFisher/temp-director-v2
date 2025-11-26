@@ -1,29 +1,3 @@
 {
-  "compilerOptions": {
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["es2021"],
-    "module": "commonjs",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "pretty": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2021",
-    "checkJs": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true,
-    "rootDir": "src",
-    "outDir": "build",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strictPropertyInitialization": false,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "resolveJsonModule": true,
-    "incremental": false
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "extends": "./tsconfig.base.json"
 }

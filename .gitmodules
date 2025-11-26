@@ -1,3 +1,0 @@
-[submodule "odienceapis"]
-	path = odienceapis
-	url = git@gitlab.summit-tech.org:summit-tech/odience/lib/proto/odienceapis.git

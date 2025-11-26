@@ -1,0 +1,26 @@
+{
+  "name": "@director_v2/contracts",
+  "version": "0.0.1",
+  "description": "oRPC contract definitions for Director v2",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "lint": "biome check . && oxlint",
+    "lint:types": "tsc -b"
+  },
+  "dependencies": {
+    "@director_v2/db": "workspace:*",
+    "@orpc/contract": "catalog:",
+    "@orpc/zod": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "tsdown": "catalog:"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

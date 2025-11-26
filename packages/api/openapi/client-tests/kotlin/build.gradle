@@ -1,0 +1,29 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+    id 'application'
+}
+
+group 'org.openapitools'
+version '1.0.0'
+
+repositories {
+    maven { url "https://repo1.maven.org/maven2" }
+}
+
+dependencies {
+    implementation files('../../clients/kotlin/build/libs/kotlin-client-1.0.0.jar')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
+    implementation "com.squareup.moshi:moshi-kotlin:1.15.2"
+    implementation "com.squareup.moshi:moshi-adapters:1.15.2"
+    implementation "com.squareup.okhttp3:okhttp:5.1.0"
+    implementation "com.squareup.okhttp3:okhttp-sse:5.1.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.1.0"
+    implementation "com.squareup.retrofit2:retrofit:3.0.0"
+    implementation "com.squareup.retrofit2:converter-moshi:3.0.0"
+    implementation "com.squareup.retrofit2:converter-scalars:3.0.0"
+}
+
+application {
+    mainClassName = 'TestKt'
+}

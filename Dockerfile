@@ -1,38 +1,42 @@
-FROM oven/bun:1.1.4-alpine AS deps
+FROM oven/bun:1.3.3-alpine AS base
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-RUN apk add npm
+FROM base AS builder
 
-COPY package.json bun.lockb ./
-# RUN bun install
-# Instead of `bun install`, to avoid issues with aws-sdk reflection:
-RUN npm install --omit dev
+# Install dependencies
 
-FROM deps as builder
+COPY package.json bun.lock turbo.json ./
+COPY apps/web/package.json ./apps/web/package.json
+COPY packages/api/package.json ./packages/api/package.json
+COPY packages/auth/package.json ./packages/auth/package.json
+COPY packages/config/package.json ./packages/config/package.json
+COPY packages/contracts/package.json ./packages/contracts/package.json
+COPY packages/db/package.json ./packages/db/package.json
+
+RUN bun install --no-save --no-cache
+
+# Build the application
 
 COPY . .
 
-RUN npm install
-# RUN bun run lint
+RUN bun run db:generate
+
+ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN bun run build
 
-FROM oven/bun:1.1.4-alpine as built
+FROM base AS runner
+WORKDIR /app
 
-WORKDIR /usr/src/app
+ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY --from=builder /usr/src/app/build ./
-COPY --from=builder /usr/src/app/priv/public.key ./priv/public.key
-COPY --from=builder /usr/src/app/odienceapis ./odienceapis
-COPY --from=builder /usr/src/app/generated-protos ./generated-protos
-COPY --from=deps /usr/src/app/node_modules ./node_modules
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOSTNAME="0.0.0.0"
 
-CMD bun app.js
+COPY --from=builder /app/apps/web/.next/standalone ./
 
-FROM built as test
+EXPOSE 3000
 
-RUN bun app.js test && touch /.test-passed
-
-FROM built as final
-
-COPY --from=test /.test-passed /.test-passed
+CMD ["bun", "./apps/web/server.js"]

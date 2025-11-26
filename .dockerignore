@@ -1,3 +1,10 @@
+Dockerfile
+.dockerignore
 node_modules
-build
-tsconfig.tsbuildinfo
+npm-debug.log
+README.md
+dist
+.next
+.git
+.turbo
+prisma/**/generated

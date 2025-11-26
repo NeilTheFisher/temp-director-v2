@@ -1,39 +1,72 @@
-**ENV var required**
+# director_v2
 
-_This is the Director MYSQL variables:_
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Self, ORPC, and more.
 
-- MYSQL_SOCKET_ADDRESS
-- MYSQL_SOCKET_PORT
-- MYSQL_DATABASE
-- MYSQL_USER=
-- MYSQL_PASSWORD
+## Features
 
-_This is for the express server:_
+- **TypeScript** - For type safety and improved developer experience
+- **Next.js** - Full-stack React framework
+- **TailwindCSS** - Utility-first CSS for rapid UI development
+- **shadcn/ui** - Reusable UI components
+- **oRPC** - End-to-end type-safe APIs with OpenAPI integration
+- **Prisma** - TypeScript-first ORM
+- **MySQL** - Database engine
+- **Authentication** - Better-Auth
+- **Turborepo** - Optimized monorepo build system
+- **Husky** - Git hooks for code quality
+- **Biome** - Linting and formatting
 
-- SESSION_SECRET="thisismysessionsecret"
+## Getting Started
 
-_This is for the ACS endpoint so we can send Subscriber API request (soap)_
+First, install the dependencies:
 
-- ACS_API_ENDPOINT (this is the ACS-UI actually)
-- ACS_API_IMPU_TEMPLATE="sip:+<MDN>@test.5grcs.com,tel:+<MDN>"
-- ACS_API_IMPI_TEMPLATE="+<MDN>@test.5grcs.com"
-- ACS_PROVISIONING_PATH="/soap/?wsdl"
+```bash
+bun install
+```
+## Database Setup
 
-_This is the port of this HTTP server._
-HTTP_PORT="3000"
+This project uses MySQL with Prisma.
 
-You can run the project locally using npm run dev.
+1. Make sure you have a MySQL database set up.
+2. Update your `apps/web/.env` file with your MySQL connection details.
 
-I have created a structure in the repo where there is a model folder, but those are currently simple type objects. The goal is to eventually have full classes using ORM.
-Because we have no ORM at the moment, we need to do manual SQL queries.
-When we have moved ALL the routes from PHP Laravel Director project to this new node.js Director-API, we will be able to remove passport from Director and use it 100% here.
-For now we need the user to hit Director (PHP) with oauth/token route to generate the jwt required. Then all other requests can be sent here since we have the public key to authenticate it.
+3. Generate the Prisma client and push the schema:
+```bash
+bun run db:push
+```
 
-_Certificates_
-The repo currently contains self-signed certificates which should NOT be used in production.
 
-ANOTHER SUPER IMPORTANT TODO, the private key and public key for the jwt are currently comitted inside Director's repo. Here we only have the public key. Still those keys should be generated at deploy time inside Terraform.
+Then, run the development server:
 
-_ORM entities generation_
-- Install: npm i -g typeorm-model-generator
-- Generate: (replace user/pass/db/path if needed) typeorm-model-generator -h localhost -d db_spotlight -u admin -x admin -e mysql -p 3306 -o . && mv ./entities/* src/entity/ && rm -rf entities
+```bash
+bun run dev
+```
+
+Open [http://localhost:3001](http://localhost:3001) in your browser to see your fullstack application.
+
+
+
+
+
+
+
+## Project Structure
+
+```
+director_v2/
+├── apps/
+│   └── web/         # Fullstack application (Next.js)
+├── packages/
+│   ├── api/         # API layer / business logic
+│   ├── auth/        # Authentication configuration & logic
+│   └── db/          # Database schema & queries
+```
+
+## Available Scripts
+
+- `bun run dev`: Start all applications in development mode
+- `bun run build`: Build all applications
+- `bun run check-types`: Check TypeScript types across all apps
+- `bun run db:push`: Push schema changes to database
+- `bun run db:studio`: Open database studio UI
+- `bun run check`: Run Biome formatting and linting
