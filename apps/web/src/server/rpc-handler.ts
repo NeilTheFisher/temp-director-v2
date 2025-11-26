@@ -14,7 +14,7 @@ import {
   StrictGetMethodPlugin,
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from "@sentry/bun";
 import pino from "pino";
 import pretty from "pino-pretty";
 import { version } from "../../package.json";
@@ -118,19 +118,34 @@ const apiHandler = new OpenAPIHandler(appRouter, {
  * @returns Response if handled, null otherwise
  */
 export async function handleRPC(req: IncomingMessage, res: ServerResponse) {
-  const context = await createContext(req);
+  return Sentry.startSpan(
+    {
+      name: `RPC ${req.method} ${req.url}`,
+    },
+    async (span) => {
+      const context = await createContext(req);
 
-  const rpcResult = await rpcHandler.handle(req, res, {
-    prefix: "/api/rpc",
-    context,
-  });
-  if (rpcResult.matched) return true;
+      if (context?.session?.user) {
+        Sentry.setUser({
+          id: context.session.user.id,
+        });
+      }
 
-  const apiResult = await apiHandler.handle(req, res, {
-    prefix: "/",
-    context,
-  });
-  if (apiResult.matched) return true;
+      const rpcResult = await rpcHandler.handle(req, res, {
+        prefix: "/api/rpc",
+        context,
+      });
+      if (rpcResult.matched) return true;
 
-  return false;
+      const apiResult = await apiHandler.handle(req, res, {
+        prefix: "/",
+        context,
+      });
+      if (apiResult.matched) {
+        span.updateName(`${req.method ?? "API"} ${req.url}`);
+        return true;
+      }
+      return false;
+    },
+  );
 }

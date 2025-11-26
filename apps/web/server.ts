@@ -1,6 +1,9 @@
 // polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
 import "@ungap/compression-stream/poly";
 
+// Initialize Sentry
+import "./src/server/sentry.server.config";
+
 import fs from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import https from "node:https";
