@@ -64,7 +64,10 @@
                           "type": "number"
                         }
                       },
-                      "required": ["event", "data"]
+                      "required": [
+                        "event",
+                        "data"
+                      ]
                     },
                     {
                       "type": "object",
@@ -80,7 +83,9 @@
                           "type": "number"
                         }
                       },
-                      "required": ["event"]
+                      "required": [
+                        "event"
+                      ]
                     },
                     {
                       "type": "object",
@@ -96,7 +101,9 @@
                           "type": "number"
                         }
                       },
-                      "required": ["event"]
+                      "required": [
+                        "event"
+                      ]
                     }
                   ]
                 }
@@ -1221,7 +1228,10 @@
                           "type": "number"
                         }
                       },
-                      "required": ["event", "data"]
+                      "required": [
+                        "event",
+                        "data"
+                      ]
                     },
                     {
                       "type": "object",
@@ -1237,7 +1247,9 @@
                           "type": "number"
                         }
                       },
-                      "required": ["event"]
+                      "required": [
+                        "event"
+                      ]
                     },
                     {
                       "type": "object",
@@ -1253,7 +1265,9 @@
                           "type": "number"
                         }
                       },
-                      "required": ["event"]
+                      "required": [
+                        "event"
+                      ]
                     }
                   ]
                 }
@@ -1698,7 +1712,10 @@
                                 "type": "string"
                               }
                             },
-                            "required": ["category", "image"]
+                            "required": [
+                              "category",
+                              "image"
+                            ]
                           }
                         },
                         {
@@ -1728,6 +1745,16 @@
             },
             "allowEmptyValue": true,
             "allowReserved": true
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
@@ -1745,7 +1772,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["code", "message"]
+                  "required": [
+                    "code",
+                    "message"
+                  ]
                 }
               }
             }
@@ -2025,7 +2055,13 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "name", "avatar", "sip", "type"]
+                        "required": [
+                          "id",
+                          "name",
+                          "avatar",
+                          "sip",
+                          "type"
+                        ]
                       }
                     },
                     "usersBlockedBy": {
@@ -2060,7 +2096,10 @@
                           }
                         }
                       },
-                      "required": ["super_admin", "organizations"]
+                      "required": [
+                        "super_admin",
+                        "organizations"
+                      ]
                     }
                   },
                   "required": [
@@ -2126,7 +2165,14 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name", "avatar", "type", "role", "sip"]
+                  "required": [
+                    "id",
+                    "name",
+                    "avatar",
+                    "type",
+                    "role",
+                    "sip"
+                  ]
                 }
               }
             }
@@ -2432,7 +2478,9 @@
                       }
                     }
                   },
-                  "required": ["data"]
+                  "required": [
+                    "data"
+                  ]
                 }
               }
             }

@@ -35,7 +35,7 @@ const envType = type({
   DIRECTOR_TEST_USER_PASSWORD: type("string").optional(),
   REDIS_URL: "string.url",
   ENV: "'development' | 'production' | 'test'",
-  SENTRY_DSN: type("string.url").optional(),
+  SENTRY_DSN: type("string.url | ''").optional(),
   ACS_API_ENDPOINT: type("string").optional(),
   ACS_PROVISIONING_PATH: type("string").optional(),
   ACS_API_IMPU_TEMPLATE: type("string").optional(),
