@@ -14,7 +14,7 @@ import {
   StrictGetMethodPlugin,
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import * as Sentry from "@sentry/bun";
+import * as Sentry from "@sentry/node";
 import pino from "pino";
 import pretty from "pino-pretty";
 import { version } from "../../package.json";

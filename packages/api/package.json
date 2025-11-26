@@ -19,6 +19,7 @@
     "@director_v2/contracts": "workspace:*",
     "@director_v2/db": "workspace:*",
     "@openapitools/openapi-generator-cli": "^2.25.2",
+    "@opentelemetry/sdk-node": "^0.208.0",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/experimental-pino": "catalog:",
