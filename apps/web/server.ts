@@ -1,13 +1,13 @@
 // polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
 import "@ungap/compression-stream/poly";
 
+import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import { networkInterfaces } from "node:os";
 import { env } from "@director_v2/config";
 import { preconnectToDbAndRedis } from "@director_v2/db";
-import { toFetchResponse, toReqRes } from "fetch-to-node";
 import next from "next";
+import { handleRPC } from "@/server/rpc-handler";
 import nextConfig from "./next.config";
-import { handleRPC } from "./src/server/rpc-handler";
 
 const preconnectPromise = preconnectToDbAndRedis();
 
@@ -23,52 +23,35 @@ const requestHandler = app.getRequestHandler();
 
 await preconnectPromise;
 
-// Required globals for translating Bun API to Node
 const EMPTY_BUFFER = Buffer.alloc(0);
-const INTERNAL_SOCKET_DATA = Symbol.for("::bunternal::");
 
-/**
- * Handles Next.js routes
- */
-const handleNext = async (request: Request) => {
-  const { req, res } = toReqRes(request);
-
+const handleNext = async (req: IncomingMessage, res: ServerResponse) => {
   // Check if it's a ws upgrade request
-  if (request.headers.get("Connection") === "Upgrade") {
-    void upgradeHandler(req, req.socket, EMPTY_BUFFER);
+  if (req.headers.connection === "Upgrade") {
+    await upgradeHandler(req, req.socket, EMPTY_BUFFER);
     return;
   }
 
-  // Render the page
-  void requestHandler(req, res);
-
-  return toFetchResponse(res);
+  await requestHandler(req, res);
 };
 
-// Start the server
-const server = Bun.serve({
-  port: Number(process.env.PORT ?? "3001"),
-  hostname: process.env.HOSTNAME ?? "0.0.0.0",
-  development: process.env.NODE_ENV !== "production",
+const server = http.createServer(async (req, res) => {
+  const matched = await handleRPC(req, res);
 
-  reusePort: true,
+  if (!matched) {
+    await handleNext(req, res);
+  }
+});
 
-  async fetch(req, _server) {
-    // Handle oRPC routes first
-    const response = await handleRPC(req);
-    if (response) return response;
-
-    // Fall back to Next.js for all other routes
-    const nextResponse = await handleNext(req);
-    if (nextResponse) return nextResponse;
-
-    return new Response("Not found", { status: 404 });
-  },
+const port = Number(process.env.PORT) || 3001;
+server.listen(port, "0.0.0.0", () => {
+  if (env.ENV !== "production") {
+    printDevServerInfo();
+  }
 });
 
 function printDevServerInfo() {
-  const protocol = server.url.protocol;
-  const port = server.port;
+  const protocol = "http:";
 
   console.log(`Environment: ${process.env.NODE_ENV ?? "development"}`);
   console.log();
@@ -93,8 +76,4 @@ function printDevServerInfo() {
   }
 
   console.log();
-}
-
-if (env.ENV !== "production") {
-  printDevServerInfo();
 }

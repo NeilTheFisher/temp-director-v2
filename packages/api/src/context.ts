@@ -1,8 +1,9 @@
 // import { auth } from "@director_v2/auth";
 
+import type { IncomingMessage } from "node:http";
 import { verifyJWTToken } from "./lib/jwt-verifier";
 
-export async function createContext(req: Request) {
+export async function createContext(req: IncomingMessage) {
   let session: { user: { id: string } } | null = null;
 
   // Try to get session from Better-Auth cookies
@@ -17,7 +18,7 @@ export async function createContext(req: Request) {
 
   // Fallback to JWT token verification if no Better-Auth session
   if (!session) {
-    const authHeader = req.headers.get("authorization");
+    const authHeader = req.headers.authorization;
     if (authHeader) {
       const userId = await verifyJWTToken(authHeader);
       if (userId && userId !== "false") {
@@ -31,8 +32,7 @@ export async function createContext(req: Request) {
     }
   }
 
-  const clientIp =
-    req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for");
+  const clientIp = req.headers["x-real-ip"] || req.headers["x-forwarded-for"];
 
   return {
     session,

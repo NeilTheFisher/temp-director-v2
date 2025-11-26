@@ -1,20 +1,26 @@
-import { spawn } from "bun";
+import cluster from "node:cluster";
+import { availableParallelism } from "node:os";
 
-const cpus = Number(process.env.MAX_WORKERS) || navigator.hardwareConcurrency; // Number of CPU cores
-const buns = Array.from({ length: cpus }) as Bun.Subprocess[];
+const MAX_CPU = availableParallelism();
 
-for (let i = 0; i < cpus; i++) {
-  buns[i] = spawn({
-    cmd: ["bun", "./server.ts"],
-    stdout: "inherit",
-    stderr: "inherit",
-    stdin: "inherit",
+if (cluster.isPrimary) {
+  console.log(`Master ${process.pid} is running`);
+
+  for (let i = 0; i < MAX_CPU; i++) {
+    const worker = cluster.fork();
+    console.log("Worker created", worker.id);
+  }
+  cluster.on("exit", (worker) => {
+    console.log(`Worker ${worker.process.pid} died`);
   });
+} else {
+  void import("./server");
 }
 
 function kill() {
-  for (const bun of buns) {
-    bun.kill();
+  if (!cluster.workers) return;
+  for (const fork of Object.values(cluster.workers)) {
+    fork?.kill();
   }
 }
 

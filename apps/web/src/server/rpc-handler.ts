@@ -1,13 +1,14 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { appRouter, createContext } from "@director_v2/api";
 import { generateTestToken } from "@director_v2/api/util/generate-test-token";
 import { env } from "@director_v2/config";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
 import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
-import { OpenAPIHandler } from "@orpc/openapi/fetch";
+import { OpenAPIHandler } from "@orpc/openapi/node";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
-import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
+import { CompressionPlugin, RPCHandler } from "@orpc/server/node";
 import {
   SimpleCsrfProtectionHandlerPlugin,
   StrictGetMethodPlugin,
@@ -116,18 +117,18 @@ const apiHandler = new OpenAPIHandler(appRouter, {
  * @param req - The incoming request
  * @returns Response if handled, null otherwise
  */
-export async function handleRPC(req: Request): Promise<Response | null> {
-  const rpcResult = await rpcHandler.handle(req, {
+export async function handleRPC(req: IncomingMessage, res: ServerResponse) {
+  const rpcResult = await rpcHandler.handle(req, res, {
     prefix: "/api/rpc",
     context: await createContext(req),
   });
-  if (rpcResult.response) return rpcResult.response;
+  if (rpcResult.matched) return true;
 
-  const apiResult = await apiHandler.handle(req, {
+  const apiResult = await apiHandler.handle(req, res, {
     prefix: "/",
     context: await createContext(req),
   });
-  if (apiResult.response) return apiResult.response;
+  if (apiResult.matched) return true;
 
-  return null;
+  return false;
 }
