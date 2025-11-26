@@ -33,6 +33,7 @@
     "@prisma/instrumentation": "^7.0.1",
     "@sentry/nextjs": "^9.0.0",
     "@sentry/node": "^10.27.0",
+    "@sentry/opentelemetry": "^10.27.0",
     "@tanstack/react-form": "^1.23.8",
     "@tanstack/react-query": "^5.90.7",
     "@ungap/compression-stream": "^0.2.0",
