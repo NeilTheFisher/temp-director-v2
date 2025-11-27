@@ -1,15 +1,13 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 import { appRouter, createContext } from "@director_v2/api";
 import { generateTestToken } from "@director_v2/api/util/generate-test-token";
 import { env } from "@director_v2/config";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
 import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
-import { OpenAPIHandler } from "@orpc/openapi/node";
+import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
-import { CompressionPlugin, RPCHandler } from "@orpc/server/node";
+import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
 import {
   SimpleCsrfProtectionHandlerPlugin,
   StrictGetMethodPlugin,
@@ -117,10 +115,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
  * @param req - The incoming request
  * @returns Response if handled, null otherwise
  */
-export async function handleRPC(
-  req: Http2ServerRequest | IncomingMessage,
-  res: Http2ServerResponse | ServerResponse,
-) {
+export async function handleRPC(req: Request) {
   return Sentry.startSpan(
     {
       name: `RPC ${req.method} ${req.url}`,
@@ -134,21 +129,21 @@ export async function handleRPC(
         });
       }
 
-      const rpcResult = await rpcHandler.handle(req, res, {
+      const rpcResult = await rpcHandler.handle(req, {
         prefix: "/api/rpc",
         context,
       });
-      if (rpcResult.matched) return true;
+      if (rpcResult.response) return rpcResult.response;
 
-      const apiResult = await apiHandler.handle(req, res, {
+      const apiResult = await apiHandler.handle(req, {
         prefix: "/",
         context,
       });
-      if (apiResult.matched) {
+      if (apiResult.response) {
         span.updateName(`${req.method ?? "API"} ${req.url}`);
-        return true;
+        return apiResult.response;
       }
-      return false;
+      return null;
     },
   );
 }
