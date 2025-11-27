@@ -1,11 +1,13 @@
 import { eventContract } from "./event";
 import { healthContract } from "./health";
+import { messageContract } from "./live/message";
 import { odienceContract } from "./odience";
 import { streamContract } from "./stream";
 import { userContract } from "./user";
 import { webContract } from "./web";
 
 export const appContract = {
+  messages: messageContract,
   health: healthContract,
   events: eventContract,
   odience: odienceContract,

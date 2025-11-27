@@ -8,6 +8,7 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
+    "generate-router-zod-schemas": "bun ./scripts/generate-router-zod-schemas.ts",
     "lint": "biome check . && oxlint",
     "lint:types": "tsc -b"
   },
@@ -15,9 +16,12 @@
     "@director_v2/db": "workspace:*",
     "@orpc/contract": "catalog:",
     "@orpc/zod": "catalog:",
+    "arktype": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "json-refs": "^3.0.15",
+    "json-schema-to-zod": "git+https://github.com/tomeara/json-schema-to-zod#a1babbe70786421569cf2e30d91e59fd03cdf702",
     "tsdown": "catalog:"
   },
   "peerDependencies": {

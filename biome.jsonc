@@ -13,8 +13,11 @@
       "!**/dist",
       "!**/.turbo",
       "!**/generated",
+      "packages/contracts/generated",
       "!**/openapi/clients",
-      "!**/openapi/client-tests"
+      "!**/openapi/client-tests",
+      "!**/node_modules",
+      "!**/*.lock"
     ]
   },
   "formatter": {
