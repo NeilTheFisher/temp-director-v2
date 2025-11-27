@@ -58,11 +58,37 @@ async function convertFile(file: string) {
   console.log("Generated", target);
 }
 
+async function generateIndexFiles(dir: string) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const files = entries
+    .filter(
+      (e) => e.isFile() && e.name.endsWith(".ts") && e.name !== "index.ts",
+    )
+    .map((e) => e.name);
+  const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  // Only create index.ts when this directory actually contains schema files
+  if (files.length > 0) {
+    const contentLines: string[] = [];
+    files.sort();
+    for (const f of files) {
+      const base = f.replace(/\.ts$/, "");
+      contentLines.push(`export * from './${base}';`);
+    }
+    const out = `${contentLines.join("\n")}\n`;
+    await fs.writeFile(path.join(dir, "index.ts"), out, "utf-8");
+  }
+  // Recurse into subdirectories to generate their indexes too
+  for (const d of dirs) {
+    await generateIndexFiles(path.join(dir, d));
+  }
+}
+
 async function main() {
   await fs.mkdir(outDir, { recursive: true });
   const files = await getJsonFilesByShell(routerJsonSchemas);
   await Promise.all(files.map(convertFile));
-  await $`biome check --write ${outDir}`;
+  await generateIndexFiles(outDir);
+  await $`bun x biome check --write ${outDir}`;
 }
 
 if (import.meta.main) {
