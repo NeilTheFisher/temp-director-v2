@@ -41,7 +41,7 @@
     "db:pull": "turbo -F @director_v2/db db:pull",
     "db:studio": "turbo -F @director_v2/db db:studio",
     "dev": "cd apps/web && bun run dev",
-    "dev:native": "turbo -F native dev",
+    "dev:inspect": "cd apps/web && bun run dev:inspect",
     "dev:web": "turbo -F web dev",
     "format": "bun run format:sort-package-json; biome check --write",
     "format:sort-package-json": "bun x sort-package-json 'package.json' 'apps/web/package.json' 'packages/*/package.json'",

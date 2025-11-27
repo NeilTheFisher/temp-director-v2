@@ -86,10 +86,14 @@ function recordError(eventName: string, reason: unknown) {
 
 process.on("uncaughtException", (reason) => {
   recordError("uncaughtException", reason);
+  Sentry.captureException(reason);
+  console.error("Uncaught Exception:\n", reason);
 });
 
 process.on("unhandledRejection", (reason) => {
   recordError("unhandledRejection", reason);
+  Sentry.captureException(reason);
+  console.error("Unhandled Rejection:\n", reason);
 });
 
 Sentry.validateOpenTelemetrySetup();

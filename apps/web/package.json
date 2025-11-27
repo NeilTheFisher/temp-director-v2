@@ -5,7 +5,8 @@
   "scripts": {
     "_dev:next": "NODE_ENV=development bun --bun next dev --port=3001 --experimental-https",
     "build": "NODE_ENV=production bun --bun next build && cp -r .next/static .next/standalone/.next/",
-    "dev": "NODE_ENV=development bun --watch server.ts",
+    "dev": "NODE_ENV=development bun server.ts",
+    "dev:inspect": "NODE_ENV=development bun --inspect=127.0.0.1:6499 server.ts",
     "lint": "biome check . && oxlint --type-aware",
     "lint:types": "tsc -b",
     "otel:start": "docker run --rm --name jaeger -d -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4318:4318 jaegertracing/all-in-one:latest",
@@ -30,6 +31,7 @@
     "@orpc/openapi": "catalog:",
     "@orpc/otel": "^1.11.3",
     "@orpc/server": "catalog:",
+    "@orpc/tanstack-query": "^1.11.3",
     "@orpc/zod": "catalog:",
     "@polar-sh/better-auth": "catalog:",
     "@prisma/client": "catalog:",
