@@ -17,9 +17,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["node"],
+    "types": ["bun"],
     "paths": {
-      "~/router/*": ["../router/*"]
+      "~/router/*": ["../../../router/*"]
     }
   },
   "exclude": ["**/dist", "node_modules"]

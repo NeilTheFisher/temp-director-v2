@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 import { appRouter, createContext } from "@director_v2/api";
 import { generateTestToken } from "@director_v2/api/util/generate-test-token";
 import { env } from "@director_v2/config";
@@ -17,7 +18,7 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import * as Sentry from "@sentry/node";
 import pino from "pino";
 import pretty from "pino-pretty";
-import { version } from "../../package.json";
+import { version } from "../package.json";
 
 const stream = pretty({
   colorize: true,
@@ -74,13 +75,12 @@ const apiHandler = new OpenAPIHandler(appRouter, {
     new OpenAPIReferencePlugin({
       docsPath: "/api-reference",
       schemaConverters,
-      specGenerateOptions: ({ request }) => ({
+      specGenerateOptions: {
         info: {
           title: "Director API Reference",
           version: version,
         },
         servers: [
-          { url: `${request.url.origin}` },
           { url: `${env.DIRECTOR_URL}` },
           { url: "https://director.odience.com" },
         ],
@@ -93,7 +93,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
             },
           },
         },
-      }),
+      },
       docsConfig: {
         persistAuth: true,
         authentication: {
@@ -117,7 +117,10 @@ const apiHandler = new OpenAPIHandler(appRouter, {
  * @param req - The incoming request
  * @returns Response if handled, null otherwise
  */
-export async function handleRPC(req: IncomingMessage, res: ServerResponse) {
+export async function handleRPC(
+  req: Http2ServerRequest | IncomingMessage,
+  res: Http2ServerResponse | ServerResponse,
+) {
   return Sentry.startSpan(
     {
       name: `RPC ${req.method} ${req.url}`,

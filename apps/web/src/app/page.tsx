@@ -26,7 +26,7 @@ export default function Home() {
       <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
       <div className="grid gap-6">
         <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
+          <h2 className="mb-2 font-medium">API Staatus</h2>
           <div className="flex items-center gap-2">
             <div
               className={`h-2 w-2 rounded-full ${

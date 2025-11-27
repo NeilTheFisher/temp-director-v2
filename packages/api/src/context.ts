@@ -1,9 +1,8 @@
 // import { auth } from "@director_v2/auth";
-
-import type { IncomingMessage } from "node:http";
+import type { Http2ServerRequest } from "node:http2";
 import { verifyJWTToken } from "./lib/jwt-verifier";
 
-export async function createContext(req: IncomingMessage) {
+export async function createContext(req: Http2ServerRequest) {
   let session: { user: { id: string } } | null = null;
 
   // Try to get session from Better-Auth cookies

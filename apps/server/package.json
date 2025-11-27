@@ -1,0 +1,52 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "NODE_ENV=production bun build --target bun --minify --sourcemap ./src/index.ts --outdir ./out",
+    "dev": "NODE_ENV=development bun run --watch src/index.ts",
+    "dev:inspect": "NODE_ENV=development bun run --watch --inspect=0.0.0.0:6499 src/index.ts",
+    "lint": "biome check . && oxlint --type-aware",
+    "lint:types": "tsc -b",
+    "preview": "NODE_ENV=production bun ./src/index.ts",
+    "preview_node": "NODE_ENV=production bun x tsx ./src/index.ts",
+    "start": "NODE_ENV=production bun ./out/index.js",
+    "benchmark_health": "bun x autocannon -c 10 -d 5 https://localhost:3001/health",
+    "otel:start": "docker run --rm --name jaeger -d -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4318:4318 jaegertracing/all-in-one:latest && echo 'Jaeger UI: http://localhost:16686'",
+    "otel:stop": "docker stop jaeger"
+  },
+  "dependencies": {
+    "@director_v2/api": "workspace:*",
+    "@director_v2/config": "workspace:*",
+    "@director_v2/db": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.67.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.208.0",
+    "@opentelemetry/resources": "^2.2.0",
+    "@opentelemetry/sdk-node": "^0.208.0",
+    "@opentelemetry/sdk-trace-node": "^2.2.0",
+    "@orpc/arktype": "catalog:",
+    "@orpc/client": "catalog:",
+    "@orpc/experimental-pino": "catalog:",
+    "@orpc/json-schema": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/otel": "^1.11.3",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "@prisma/instrumentation": "^7.0.1",
+    "@sentry/node": "^10.27.0",
+    "@sentry/opentelemetry": "^10.27.0",
+    "@ungap/compression-stream": "^0.2.0",
+    "dotenv": "catalog:",
+    "http2-proxy": "^5.0.53",
+    "pino": "^10.1.0",
+    "pino-pretty": "^13.1.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.6",
+    "tsdown": "^0.16.5",
+    "typescript": "^5.8.2"
+  }
+}

@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
     preloadEntriesOnStart: true,
   },
   reactCompiler: true,
-  serverExternalPackages: ["pino", "pino-pretty"],
   env: envClean,
 };
 

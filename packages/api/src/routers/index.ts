@@ -8,6 +8,7 @@ import { userRouter } from "./user";
 import { webRouter } from "./web";
 
 export const appRouter = pub.router({
+  messages: {} as any, // TODO
   health: healthRouter,
   events: eventRouter,
   odience: odienceRouter,

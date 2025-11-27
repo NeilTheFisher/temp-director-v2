@@ -2,64 +2,56 @@
 import "@ungap/compression-stream/poly";
 
 // Initialize Sentry
-import "./src/server/sentry.server.config";
+import "./sentry.server.config";
 
-import fs from "node:fs";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import https from "node:https";
+import * as fs from "node:fs";
+import * as http2 from "node:http2";
 import { networkInterfaces } from "node:os";
 import { env } from "@director_v2/config";
-import { preconnectToDbAndRedis } from "@director_v2/db";
-import next from "next";
-import { handleRPC } from "@/server/rpc-handler";
-import nextConfig from "./next.config";
+// import proxy from "http2-proxy";
+import { handleRPC } from "./rpc-handler";
 
-const preconnectPromise = preconnectToDbAndRedis();
-
-const app = next({
-  dev: env.ENV === "development",
-  turbopack: true,
-  customServer: true,
-  conf: nextConfig,
-});
-await app.prepare();
-const upgradeHandler = app.getUpgradeHandler();
-const requestHandler = app.getRequestHandler();
-
-await preconnectPromise;
-
-const EMPTY_BUFFER = Buffer.alloc(0);
-
-const handleNext = async (req: IncomingMessage, res: ServerResponse) => {
-  // Check if it's a ws upgrade request
-  if (req.headers.connection === "Upgrade") {
-    await upgradeHandler(req, req.socket, EMPTY_BUFFER);
-    return;
-  }
-
-  await requestHandler(req, res);
-};
-
-const server = https.createServer(
+const server = http2.createSecureServer(
   {
     key: fs.readFileSync("./certificates/localhost-key.pem"),
     cert: fs.readFileSync("./certificates/localhost.pem"),
+    allowHTTP1: true,
   },
   async (req, res) => {
     const matched = await handleRPC(req, res);
 
     if (!matched) {
-      await handleNext(req, res);
+      // forward to web server
+      // await proxy.web(req, res, {
+      //   protocol: "https",
+      //   hostname: "localhost",
+      //   port: webPort,
+      //   onReq: async (r) => {
+      //     r.headers["x-forwarded-for"] = r.socket.remoteAddress;
+      //     r.headers["x-forwarded-host"] = r.headers.host;
+      //   },
+      // });
+      // return;
     }
+
+    res.statusCode = 404;
+    res.end();
   },
 );
 
 const port = Number(process.env.PORT) || 3001;
-server.listen(port, "0.0.0.0", () => {
-  if (env.ENV !== "production") {
-    printDevServerInfo();
-  }
-});
+server.listen(
+  {
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  },
+  () => {
+    if (env.ENV !== "production") {
+      printDevServerInfo();
+    }
+  },
+);
 
 function printDevServerInfo() {
   const protocol = "https:";
