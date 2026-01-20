@@ -63,6 +63,7 @@
     "require-yield": "warn",
     "use-isnan": "warn",
     "valid-typeof": "warn",
+    "eslint/require-await": "warn",
     "oxc/bad-array-method-on-arguments": "warn",
     "oxc/bad-char-at-comparison": "warn",
     "oxc/bad-comparison-sequence": "warn",

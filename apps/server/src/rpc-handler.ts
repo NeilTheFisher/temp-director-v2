@@ -9,7 +9,8 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
 import {
-  SimpleCsrfProtectionHandlerPlugin,
+  CORSPlugin,
+  ResponseHeadersPlugin,
   StrictGetMethodPlugin,
 } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
@@ -29,7 +30,14 @@ declare global {
 globalThis.log = logger;
 
 const sharedPlugins = [
+  new ResponseHeadersPlugin(),
   new CompressionPlugin(),
+  new CORSPlugin({
+    origin: (origin, _options) => origin,
+    allowMethods: ["GET", "HEAD", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
   new LoggingHandlerPlugin({
     logger,
     generateId: ({ context }) =>
@@ -51,7 +59,6 @@ const rpcHandler = new RPCHandler(appRouter, {
   plugins: [
     ...sharedPlugins,
 
-    new SimpleCsrfProtectionHandlerPlugin(),
     new StrictGetMethodPlugin(),
   ],
 });

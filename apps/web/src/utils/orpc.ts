@@ -1,10 +1,7 @@
 import type { AppRouterClient } from "@director_v2/api";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
-import {
-  DedupeRequestsPlugin,
-  SimpleCsrfProtectionLinkPlugin,
-} from "@orpc/client/plugins";
+import { DedupeRequestsPlugin } from "@orpc/client/plugins";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -25,7 +22,8 @@ export const queryClient = new QueryClient({
 });
 
 export const link = new RPCLink({
-  url: `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3001"}/api/rpc`,
+  // TODO: use env variable, don't hard code this
+  url: "https://localhost:3001/api/rpc",
   fetch(url, options) {
     return fetch(url, {
       ...options,
@@ -41,7 +39,6 @@ export const link = new RPCLink({
     return Object.fromEntries(await headers());
   },
   plugins: [
-    new SimpleCsrfProtectionLinkPlugin(),
     new DedupeRequestsPlugin({
       filter: ({ request }) => request.method === "GET",
       groups: [

@@ -40,7 +40,7 @@
     "db:migrate": "turbo -F @director_v2/db db:migrate",
     "db:pull": "turbo -F @director_v2/db db:pull",
     "db:studio": "turbo -F @director_v2/db db:studio",
-    "dev": "turbo dev",
+    "dev": "turbo dev --ui stream",
     "dev:inspect": "turbo dev:inspect",
     "dev:server": "turbo -F server dev",
     "dev:web": "turbo -F web dev",

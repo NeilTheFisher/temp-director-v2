@@ -62,7 +62,11 @@
         "useNumberNamespace": "error",
         "noInferrableTypes": "error",
         "noUselessElse": "error",
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useNodejsImportProtocol": {
+          "fix": "safe",
+          "level": "info"
+        }
       },
       "suspicious": {
         "noAssignInExpressions": "off"

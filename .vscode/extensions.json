@@ -5,7 +5,9 @@
     "gruntfuggly.todo-tree",
     "arktypeio.arkdark",
     "YoavBls.pretty-ts-errors",
-    "mhutchie.git-graph"
+    "mhutchie.git-graph",
+    "foxundermoon.shell-format",
+    "bradlc.vscode-tailwindcss"
   ],
   "unwantedRecommendations": [
     "dbaeumer.vscode-eslint",

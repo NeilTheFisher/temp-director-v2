@@ -1,8 +1,7 @@
-// import { auth } from "@director_v2/auth";
-import type { Http2ServerRequest } from "node:http2";
+import type { ResponseHeadersPluginContext } from "@orpc/server/plugins";
 import { verifyJWTToken } from "./lib/jwt-verifier";
 
-export async function createContext(req: Http2ServerRequest) {
+export async function createContext(req: Request) {
   let session: { user: { id: string } } | null = null;
 
   // Try to get session from Better-Auth cookies
@@ -17,7 +16,7 @@ export async function createContext(req: Http2ServerRequest) {
 
   // Fallback to JWT token verification if no Better-Auth session
   if (!session) {
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers.get("Authorization");
     if (authHeader) {
       const userId = await verifyJWTToken(authHeader);
       if (userId && userId !== "false") {
@@ -31,7 +30,8 @@ export async function createContext(req: Http2ServerRequest) {
     }
   }
 
-  const clientIp = req.headers["x-real-ip"] || req.headers["x-forwarded-for"];
+  const clientIp =
+    req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for");
 
   return {
     session,
@@ -39,4 +39,5 @@ export async function createContext(req: Http2ServerRequest) {
   };
 }
 
-export type Context = Awaited<ReturnType<typeof createContext>>;
+export type Context = Awaited<ReturnType<typeof createContext>> &
+  ResponseHeadersPluginContext;
