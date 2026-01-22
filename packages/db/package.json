@@ -35,9 +35,7 @@
   "devDependencies": {
     "@types/bun": "catalog:",
     "prisma": "^7.3.0",
-    "tsdown": "catalog:"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
   }
 }

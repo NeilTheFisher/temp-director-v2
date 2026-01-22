@@ -11,5 +11,8 @@
     "arkenv": "catalog:",
     "dotenv": "catalog:",
     "dotenv-expand": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
   }
 }
