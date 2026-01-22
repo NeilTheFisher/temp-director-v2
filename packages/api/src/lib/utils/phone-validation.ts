@@ -1,6 +1,6 @@
 import { type CountryCode, parsePhoneNumberWithError } from "libphonenumber-js";
 
-export async function validateAndFormatPhoneNumber(strMsisdn: string, strCountryCode = "") {
+export function validateAndFormatPhoneNumber(strMsisdn: string, strCountryCode = "") {
   const normalizedCountryCode = (strCountryCode.toUpperCase() || "US") as CountryCode;
   const strFormattedMsisdn = strMsisdn.replace(/\D/g, "");
 
@@ -20,8 +20,8 @@ export async function validateAndFormatPhoneNumber(strMsisdn: string, strCountry
       normalizedCountryCode
     );
     if (!phoneNumber.isValid?.()) {
-      result.error = "Phone number is not valid for the region";
-      result.code = 400;
+      result.error = "Not_Valid_Phone_Number";
+      result.code = 200;
       return result;
     }
 
