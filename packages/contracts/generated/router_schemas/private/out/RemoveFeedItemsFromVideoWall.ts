@@ -6,6 +6,4 @@ export const RemoveFeedItemsFromVideoWall = z.object({
     .describe("Event when presentor wants to remove items from video wall")
     .optional(),
 });
-export type RemoveFeedItemsFromVideoWall = z.infer<
-  typeof RemoveFeedItemsFromVideoWall
->;
+export type RemoveFeedItemsFromVideoWall = z.infer<typeof RemoveFeedItemsFromVideoWall>;

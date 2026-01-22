@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+
 import * as eventRepository from "../lib/repositories/events";
 import * as userRepository from "../lib/user-handlers";
 import { authed, pub } from "../orpc";
@@ -34,7 +35,7 @@ export const eventRouter = pub.events.router({
     return result;
   }),
 
-  get: authed.events.get.handler(async ({ input }) => {
+  get: authed.events.get.handler(({ input }) => {
     console.log("EventController.get:", input.id);
 
     throw new ORPCError("NOT_IMPLEMENTED");
@@ -94,37 +95,35 @@ export const eventRouter = pub.events.router({
     });
   }),
 
-  listPartialEvents: authed.events.listPartialEvents.handler(
-    async ({ input, context }) => {
-      console.log("EventController.listPartial:");
+  listPartialEvents: authed.events.listPartialEvents.handler(async ({ input, context }) => {
+    console.log("EventController.listPartial:");
 
-      // Extract user ID from authenticated session
-      const userId = Number(context.session.user.id);
+    // Extract user ID from authenticated session
+    const userId = Number(context.session.user.id);
 
-      // Get user info for event filtering (roles, orgs, contacts)
-      const userInfo = await userRepository.getUserInfoForEvents(userId);
+    // Get user info for event filtering (roles, orgs, contacts)
+    const userInfo = await userRepository.getUserInfoForEvents(userId);
 
-      if (!userInfo) {
-        throw new ORPCError("UNAUTHORIZED", {
-          message: "User not found or not authenticated",
-        });
-      }
-
-      // Fetch all events visible to this user based on permissions
-      const result = await eventRepository.getVisibleEvents(userInfo, {
-        category: input.category,
-        date: input.date,
-        location: input.location,
-        per_page: input.per_page,
-        current_page: input.current_page,
-        isPartial: true,
-        isWeb: false,
-        clientIp: context.clientIp,
+    if (!userInfo) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message: "User not found or not authenticated",
       });
+    }
 
-      return result as never;
-    },
-  ),
+    // Fetch all events visible to this user based on permissions
+    const result = await eventRepository.getVisibleEvents(userInfo, {
+      category: input.category,
+      date: input.date,
+      location: input.location,
+      per_page: input.per_page,
+      current_page: input.current_page,
+      isPartial: true,
+      isWeb: false,
+      clientIp: context.clientIp,
+    });
+
+    return result as never;
+  }),
 
   categories: authed.events.categories.handler(async ({ context }) => {
     console.log("EventController.categories:");

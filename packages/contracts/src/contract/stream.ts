@@ -1,4 +1,5 @@
 import z from "zod";
+
 import { base } from "./base";
 
 export const streamContract = base.prefix("/api").router({
@@ -10,7 +11,7 @@ export const streamContract = base.prefix("/api").router({
     .input(
       z.object({
         streamUrlId: z.string(),
-      }),
+      })
     )
     .output(
       z
@@ -19,6 +20,6 @@ export const streamContract = base.prefix("/api").router({
           error: z.string().optional().default(""),
         })
         .partial()
-        .loose(),
+        .loose()
     ),
 });

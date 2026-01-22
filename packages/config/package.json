@@ -6,10 +6,7 @@
   "exports": {
     ".": "./index.ts"
   },
-  "scripts": {
-    "lint": "biome check . && oxlint --type-aware",
-    "lint:types": "tsc -b"
-  },
+  "scripts": {},
   "dependencies": {
     "arkenv": "catalog:",
     "dotenv": "catalog:",

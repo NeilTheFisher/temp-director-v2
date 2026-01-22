@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { base } from "./base";
 
 export const odienceContract = base.prefix("/").router({
@@ -11,13 +12,13 @@ export const odienceContract = base.prefix("/").router({
       z.object({
         msisdn: z.string(),
         country_code: z.string().optional(),
-      }),
+      })
     )
     .output(
       z.object({
         code: z.number(),
         message: z.string(),
-      }),
+      })
     ),
   validatePhoneNumber: base
     .route({
@@ -28,7 +29,7 @@ export const odienceContract = base.prefix("/").router({
       z.object({
         msisdn: z.string(),
         country_code: z.string().optional(),
-      }),
+      })
     )
     .output(
       z.object({
@@ -38,7 +39,7 @@ export const odienceContract = base.prefix("/").router({
         country_code: z.string(),
         error: z.string().optional().default(""),
         code: z.number(),
-      }),
+      })
     ),
   getCategoryList: base
     .route({

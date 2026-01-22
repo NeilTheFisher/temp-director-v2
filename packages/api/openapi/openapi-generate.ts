@@ -1,9 +1,8 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { $ } from "bun";
-import { version as directorVersion } from "../package.json" with {
-  type: "json",
-};
+
+import { version as directorVersion } from "../package.json" with { type: "json" };
 import { appRouter } from "../src/routers";
 
 const generator = new OpenAPIGenerator({
@@ -25,17 +24,11 @@ const spec = await generator.generate(appRouter, {
 // Add x-is-sse vendor extension to SSE endpoints
 for (const pathItem of Object.values(spec.paths || {})) {
   for (const operation of Object.values(pathItem || {})) {
-    if (
-      typeof operation === "object" &&
-      operation !== null &&
-      "responses" in operation
-    ) {
+    if (typeof operation === "object" && operation !== null && "responses" in operation) {
       const responses = operation.responses as Record<string, unknown>;
       for (const response of Object.values(responses)) {
         const responseObj = response as Record<string, unknown>;
-        const content = responseObj?.content as
-          | Record<string, unknown>
-          | undefined;
+        const content = responseObj?.content as Record<string, unknown> | undefined;
         if (content?.["text/event-stream"]) {
           (operation as Record<string, unknown>)["x-is-sse"] = true;
           break;

@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+
 import * as userRepository from "../lib/repositories/user";
 import { authed } from "../orpc";
 
@@ -26,34 +27,31 @@ export const userRouter = {
     return userInfo;
   }),
 
-  getUserInfoByMsisdn: authed.user.getUserInfoByMsisdn.handler(
-    async ({ input, context }) => {
-      const { msisdn } = input;
-      console.log(`UserController.getUserInfoByMsisdn: ${msisdn}`);
+  getUserInfoByMsisdn: authed.user.getUserInfoByMsisdn.handler(async ({ input, context }) => {
+    const { msisdn } = input;
+    console.log(`UserController.getUserInfoByMsisdn: ${msisdn}`);
 
-      if (!context.session?.user) {
+    if (!context.session?.user) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message: "Unauthorized",
+      });
+    }
+
+    try {
+      const userInfo = await userRepository.getUserInfoByMsisdn(msisdn);
+
+      if (!userInfo) {
         throw new ORPCError("UNAUTHORIZED", {
-          message: "Unauthorized",
+          message: "User not found or not authenticated",
         });
       }
 
-      try {
-        const userInfo = await userRepository.getUserInfoByMsisdn(msisdn);
-
-        if (!userInfo) {
-          throw new ORPCError("UNAUTHORIZED", {
-            message: "User not found or not authenticated",
-          });
-        }
-
-        return userInfo;
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-        throw new ORPCError("INTERNAL_SERVER_ERROR", {
-          message: `UserController.getUserInfoByMsisdn: failed with error: ${errorMessage}`,
-        });
-      }
-    },
-  ),
+      return userInfo;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        message: `UserController.getUserInfoByMsisdn: failed with error: ${errorMessage}`,
+      });
+    }
+  }),
 };

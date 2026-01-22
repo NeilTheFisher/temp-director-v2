@@ -1,14 +1,13 @@
 #!/usr/bin/env bun
 import fs from "node:fs/promises";
 import path from "node:path";
+
 import { $ } from "bun";
 import { resolveRefs } from "json-refs";
+
 import jsonSchemaToZod from "../node_modules/json-schema-to-zod/src/index";
 
-const routerJsonSchemas = path.resolve(
-  __dirname,
-  "../../../../router/resources/json_schemas",
-);
+const routerJsonSchemas = path.resolve(__dirname, "../../../../router/resources/json_schemas");
 const outDir = path.resolve(__dirname, "../generated/router_schemas");
 
 async function getJsonFilesByShell(findRoot: string) {
@@ -40,10 +39,7 @@ async function convertFile(file: string) {
     throw new Error(`Failed to resolve schema refs for ${file}`);
   }
   // If schema has no type at root level and has properties, add type: "object"
-  if (
-    !resolvedSchema.type &&
-    (resolvedSchema.properties || resolvedSchema.required)
-  ) {
+  if (!resolvedSchema.type && (resolvedSchema.properties || resolvedSchema.required)) {
     resolvedSchema.type = "object";
   }
 
@@ -61,9 +57,7 @@ async function convertFile(file: string) {
 async function generateIndexFiles(dir: string) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = entries
-    .filter(
-      (e) => e.isFile() && e.name.endsWith(".ts") && e.name !== "index.ts",
-    )
+    .filter((e) => e.isFile() && e.name.endsWith(".ts") && e.name !== "index.ts")
     .map((e) => e.name);
   const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
   // Only create index.ts when this directory actually contains schema files

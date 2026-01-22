@@ -25,7 +25,7 @@ export function parseDomainDetails(url: string): {
 }
 
 export function getPhoneDetails(
-  msisdn: string,
+  msisdn: string
 ): { countryCode: number; regionCode: string } | null {
   if (!msisdn || msisdn.length < 3) {
     return null;
@@ -33,9 +33,7 @@ export function getPhoneDetails(
 
   try {
     // Try to parse the phone number (add + prefix if not present)
-    const phoneNumber = parsePhoneNumberWithError(
-      msisdn.startsWith("+") ? msisdn : `+${msisdn}`,
-    );
+    const phoneNumber = parsePhoneNumberWithError(msisdn.startsWith("+") ? msisdn : `+${msisdn}`);
 
     if (!phoneNumber) {
       return null;
@@ -44,7 +42,7 @@ export function getPhoneDetails(
     // Get country code and region from parsed phone number
     const countryCode = Number.parseInt(
       getCountryCallingCode(phoneNumber.country as CountryCode),
-      10,
+      10
     );
     const regionCode = phoneNumber.country || "US";
 
@@ -61,10 +59,7 @@ export function getPhoneDetails(
   }
 }
 
-export function concatenateAndConvertToHex(
-  length: number,
-  value: string,
-): string {
+export function concatenateAndConvertToHex(length: number, value: string): string {
   const paddedValue = value.padStart(length, "0");
   let hex = "";
   for (let i = 0; i < paddedValue.length; i++) {

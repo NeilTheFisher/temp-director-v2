@@ -8,21 +8,15 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Basic test to validate that the OpenAPI HTTP route matches the RPC procedure output
 describe("Odience OpenAPI vs RPC parity", () => {
   it("returns same category list from GET /mobile/categoryList and RPC odience.getCategoryList", async () => {
-    const apiResponse = await fetch(
-      new URL("/mobile/categoryList", env.DIRECTOR_URL),
-    );
+    const apiResponse = await fetch(new URL("/mobile/categoryList", env.DIRECTOR_URL));
     const apiJson = await apiResponse.json();
 
-    const rpcResponse = await call(
-      appRouter.odience.getCategoryList,
-      undefined,
-      {
-        context: {
-          session: null,
-          clientIp: "192.168.0.1",
-        },
+    const rpcResponse = await call(appRouter.odience.getCategoryList, undefined, {
+      context: {
+        session: null,
+        clientIp: "192.168.0.1",
       },
-    );
+    });
 
     expect(apiJson).toEqual(rpcResponse);
   });
@@ -32,10 +26,7 @@ describe("Odience OpenAPI vs RPC parity", () => {
     const testCountryCode = "CA";
 
     const apiResponse = await fetch(
-      new URL(
-        `/validatePhoneNumber/${testMsisdn}/${testCountryCode}`,
-        env.DIRECTOR_URL,
-      ),
+      new URL(`/validatePhoneNumber/${testMsisdn}/${testCountryCode}`, env.DIRECTOR_URL)
     );
     const apiJson = await apiResponse.json();
 
@@ -47,7 +38,7 @@ describe("Odience OpenAPI vs RPC parity", () => {
           session: null,
           clientIp: "192.168.0.1",
         },
-      },
+      }
     );
 
     expect(rpcResponse).toEqual(apiJson);

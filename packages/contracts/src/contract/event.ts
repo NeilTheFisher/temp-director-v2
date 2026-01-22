@@ -1,6 +1,7 @@
 import { eventSchema } from "@director_v2/db/prisma/generated/zod/schemas/models/event.schema";
 import { eventIterator } from "@orpc/contract";
 import z from "zod";
+
 import { base } from "./base";
 
 // Query parameters for fetching events
@@ -17,10 +18,7 @@ const FeaturedCatalogue = z
   .object({ image_alignment: z.string(), blurred_background: z.boolean() })
   .partial()
   .loose();
-const EventCoordinates = z
-  .object({ lat: z.number(), lng: z.number() })
-  .partial()
-  .loose();
+const EventCoordinates = z.object({ lat: z.number(), lng: z.number() }).partial().loose();
 const Brand = z
   .object({
     show_brand_panel: z.boolean(),
@@ -104,7 +102,7 @@ export const categoriesResponseSchema = z.object({
       z.object({
         category: z.string(),
         image: z.string(),
-      }),
+      })
     )
     .nullable()
     .default([]),

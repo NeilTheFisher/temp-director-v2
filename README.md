@@ -23,6 +23,7 @@ First, install the dependencies:
 ```bash
 bun install
 ```
+
 ## Database Setup
 
 This project uses MySQL with Prisma.
@@ -31,10 +32,10 @@ This project uses MySQL with Prisma.
 2. Update your `apps/web/.env` file with your MySQL connection details.
 
 3. Generate the Prisma client and push the schema:
+
 ```bash
 bun run db:push
 ```
-
 
 Then, run the development server:
 
@@ -43,12 +44,6 @@ bun run dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see your fullstack application.
-
-
-
-
-
-
 
 ## Project Structure
 

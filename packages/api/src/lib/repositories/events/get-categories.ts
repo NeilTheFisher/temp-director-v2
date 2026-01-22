@@ -1,6 +1,7 @@
+import type { UserEventInfo } from "../user";
 import prisma from "@director_v2/db";
 import type { Prisma } from "@director_v2/db/prisma/generated/client";
-import type { UserEventInfo } from "../user";
+
 import { getS3Url } from "./utils/event-builders";
 
 /**
@@ -8,7 +9,7 @@ import { getS3Url } from "./utils/event-builders";
  * Based on event permissions and active/draft status
  */
 export async function getCategories(
-  userInfo: UserEventInfo,
+  userInfo: UserEventInfo
 ): Promise<Array<{ category: string; image: string }>> {
   try {
     const dateNow = Math.floor(Date.now() / 1000);
@@ -29,9 +30,7 @@ export async function getCategories(
                     // User is owner
                     { owner_id: userInfo.userId },
                     // User is in organization
-                    ...(userInfo.orgIds.length > 0
-                      ? [{ group_id: { in: userInfo.orgIds } }]
-                      : []),
+                    ...(userInfo.orgIds.length > 0 ? [{ group_id: { in: userInfo.orgIds } }] : []),
                     // User is invited
                     {
                       invite: {
@@ -56,10 +55,7 @@ export async function getCategories(
         is_draft: false,
         active: true,
         // Event must have active stream or simulation
-        OR: [
-          { event_stream: { some: {} } },
-          { event_simulation: { some: {} } },
-        ],
+        OR: [{ event_stream: { some: {} } }, { event_simulation: { some: {} } }],
         // Date filtering - event must not have ended
         AND: [
           {

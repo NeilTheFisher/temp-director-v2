@@ -1,5 +1,7 @@
 import prisma from "@director_v2/db";
+
 import { validateAndFormatPhoneNumber } from "../utils/phone-validation";
+
 import * as acs from "./acs";
 
 /**
@@ -10,16 +12,13 @@ import * as acs from "./acs";
 
 export async function provisionUser(
   rawMsisdn: string,
-  countryCode = "",
+  countryCode = ""
 ): Promise<{ code: number; message: string }> {
   let msisdn = rawMsisdn.replace(/\D/g, "");
 
   console.log("OdienceService.provisionUser: msisdn:", msisdn);
 
-  const objValidateMsisdn = await validateAndFormatPhoneNumber(
-    msisdn,
-    countryCode,
-  );
+  const objValidateMsisdn = await validateAndFormatPhoneNumber(msisdn, countryCode);
 
   if (!objValidateMsisdn.valid || objValidateMsisdn.error) {
     return {
@@ -46,10 +45,7 @@ export async function provisionUser(
     if (!user) {
       user = await createNewRegisteredUser(msisdn);
       if (!user) {
-        console.log(
-          "OdienceService.provisionUser: user created?:",
-          user != null,
-        );
+        console.log("OdienceService.provisionUser: user created?:", user != null);
         return {
           code: 500,
           message: "OdienceService.provisionUser: Failed to create a user",
@@ -68,14 +64,8 @@ export async function provisionUser(
       where: { msisdn: msisdn },
     });
 
-    if (
-      user &&
-      (!user.otp_created_at ||
-        new Date(user.otp_created_at).getTime() < Date.now())
-    ) {
-      console.log(
-        "OdienceService.provisionUser: otp_created_at was done earlier or is undefined",
-      );
+    if (user && (!user.otp_created_at || new Date(user.otp_created_at).getTime() < Date.now())) {
+      console.log("OdienceService.provisionUser: otp_created_at was done earlier or is undefined");
 
       const otp = crypto.randomUUID();
       console.log("OTP Created: ", otp);
@@ -98,27 +88,13 @@ export async function provisionUser(
       console.log("OdienceService.provisionUser: user updated with OTP");
 
       // Try to update user via ACS first
-      let objResponse = await acs.updateUser(
-        msisdn,
-        otp,
-        objValidateMsisdn.country_code,
-      );
-      console.log(
-        "OdienceService.provisionUser: updateUser result: ",
-        objResponse,
-      );
+      let objResponse = await acs.updateUser(msisdn, otp, objValidateMsisdn.country_code);
+      console.log("OdienceService.provisionUser: updateUser result: ", objResponse);
 
       if (objResponse.code !== 200) {
         // If update fails, try to create
-        objResponse = await acs.createUser(
-          msisdn,
-          otp,
-          objValidateMsisdn.country_code,
-        );
-        console.log(
-          "OdienceService.provisionUser: createUser result: ",
-          objResponse,
-        );
+        objResponse = await acs.createUser(msisdn, otp, objValidateMsisdn.country_code);
+        console.log("OdienceService.provisionUser: createUser result: ", objResponse);
       }
 
       return objResponse;
@@ -130,11 +106,8 @@ export async function provisionUser(
       message: `OdienceService.provisionUser validateMsisdn: ${msisdn} failed with error: ${objValidateMsisdn.error}`,
     };
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    console.error(
-      `OdienceService.provisionUser: for msisdn: ${msisdn}, error => ${errorMessage}`,
-    );
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error(`OdienceService.provisionUser: for msisdn: ${msisdn}, error => ${errorMessage}`);
     return {
       code: 500,
       message: `OdienceService.provisionUser. msisdn: ${msisdn} failed with error: ${errorMessage}`,
@@ -167,8 +140,7 @@ export async function createNewRegisteredUser(msisdn: string) {
 
     return newUser;
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("OdienceService.createNewRegisteredUser:", errorMessage);
     return null;
   }
@@ -187,9 +159,7 @@ export async function setupPersonalGroup(user: {
   try {
     // Check if personal group already exists
     if (user.personal_group_id) {
-      console.log(
-        "OdienceService.setupPersonalGroup: Personal group already exists for user",
-      );
+      console.log("OdienceService.setupPersonalGroup: Personal group already exists for user");
       return;
     }
 
@@ -213,8 +183,7 @@ export async function setupPersonalGroup(user: {
 
     console.log("OdienceService.setupPersonalGroup: Personal group created");
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("OdienceService.setupPersonalGroup:", errorMessage);
   }
 }

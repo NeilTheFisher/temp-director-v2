@@ -1,5 +1,6 @@
 import { eventIterator } from "@orpc/contract";
 import z from "zod";
+
 import { base } from "./base";
 
 export const healthContract = base.prefix("/").router({
@@ -14,8 +15,4 @@ export const healthContract = base.prefix("/").router({
     .route({ method: "GET" })
     .input(z.object({ max_outputs: z.number().optional() }))
     .output(eventIterator(z.string())),
-  livePing: base
-    // .route({ method: "POST" })
-    .input(eventIterator(z.object({ ping: z.number() })))
-    .output(eventIterator(z.object({ pong: z.number() }))),
 });

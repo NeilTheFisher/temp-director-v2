@@ -18,7 +18,7 @@ export const deleteProps = (obj: unknown, propsToDelete: string[]): unknown => {
     for (const key in copy) {
       (copy as Record<string, unknown>)[key] = deleteProps(
         (copy as Record<string, unknown>)[key],
-        propsToDelete,
+        propsToDelete
       );
     }
     return copy;
@@ -45,7 +45,7 @@ export const getAuthToken = async (): Promise<string> => {
   } catch (error) {
     console.error("Error parsing JSON:", error);
     console.log(
-      "Make sure the director_web container is started, or `docker restart director_web`/`dev-run-with-v2.sh` in director",
+      "Make sure the director_web container is started, or `docker restart director_web`/`dev-run-with-v2.sh` in director"
     );
     throw error;
   }

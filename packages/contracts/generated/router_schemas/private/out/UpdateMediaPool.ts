@@ -11,9 +11,7 @@ export const UpdateMediaPool = z
     videowall: z
       .object({
         value: z.boolean().describe("videowall media pool on/of"),
-        info: z
-          .record(z.string(), z.any())
-          .describe("videowall media pool info"),
+        info: z.record(z.string(), z.any()).describe("videowall media pool info"),
       })
       .describe("Videowall Media pool properties"),
     content: z

@@ -8,9 +8,7 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "generate-router-zod-schemas": "bun ./scripts/generate-router-zod-schemas.ts",
-    "lint": "biome check . && oxlint",
-    "lint:types": "tsc -b"
+    "generate-router-zod-schemas": "bun ./scripts/generate-router-zod-schemas.ts"
   },
   "dependencies": {
     "@director_v2/db": "workspace:*",

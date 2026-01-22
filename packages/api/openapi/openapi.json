@@ -503,12 +503,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "total_events",
-                    "per_page",
-                    "current_page",
-                    "events"
-                  ]
+                  "required": ["total_events", "per_page", "current_page", "events"]
                 }
               }
             }
@@ -1660,12 +1655,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "total_events",
-                    "per_page",
-                    "current_page",
-                    "events"
-                  ]
+                  "required": ["total_events", "per_page", "current_page", "events"]
                 }
               }
             }
@@ -1814,13 +1804,7 @@
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "msisdn",
-                    "valid",
-                    "formatted",
-                    "country_code",
-                    "code"
-                  ]
+                  "required": ["msisdn", "valid", "formatted", "country_code", "code"]
                 }
               }
             }

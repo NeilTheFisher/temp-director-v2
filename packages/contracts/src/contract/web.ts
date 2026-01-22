@@ -1,4 +1,5 @@
 import z from "zod";
+
 import { base } from "./base";
 
 const WebEvent = z
@@ -68,7 +69,7 @@ export const webContract = base.prefix("/").router({
         location: z.string().optional(),
         per_page: z.number().int().optional(),
         current_page: z.number().int().optional(),
-      }),
+      })
     )
     .output(webEventsListResponseSchema),
 });

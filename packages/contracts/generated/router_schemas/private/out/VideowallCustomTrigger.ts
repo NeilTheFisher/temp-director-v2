@@ -6,7 +6,5 @@ export const VideowallCustomTrigger = z
     name: z.string().describe("trigger name"),
     wallId: z.string().describe("wall id associated to trigger"),
   })
-  .describe(
-    "Event when we want to trigger a custom videowall event from template",
-  );
+  .describe("Event when we want to trigger a custom videowall event from template");
 export type VideowallCustomTrigger = z.infer<typeof VideowallCustomTrigger>;

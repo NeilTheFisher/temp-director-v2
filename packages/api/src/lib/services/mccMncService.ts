@@ -14,7 +14,7 @@ export async function getMccMncRulesUrl(
   msisdn = "",
   city = "",
   countryCode = 0,
-  regionCode = "",
+  regionCode = ""
 ) {
   let rules: Record<string, unknown> = { static: "", city: "", msisdn: "" };
   const result = {
@@ -39,26 +39,19 @@ export async function getMccMncRulesUrl(
     const networkType = mcc === 0 && mnc === 0 ? "wifi" : "mobile";
     const msisdnRules = (rules.msisdn || {}) as Record<string, unknown>;
     const cityRules = (rules.city || {}) as Record<string, unknown>;
-    const countryCodeRules = (rules.country_code || {}) as Record<
-      string,
-      Record<string, unknown>
-    >;
-    const regionCodeRules = ((
-      countryCodeRules[strCountryCode] as Record<string, unknown>
-    )?.region || {}) as Record<string, unknown>;
+    const countryCodeRules = (rules.country_code || {}) as Record<string, Record<string, unknown>>;
+    const regionCodeRules = ((countryCodeRules[strCountryCode] as Record<string, unknown>)
+      ?.region || {}) as Record<string, unknown>;
 
     // Process MSISDN-specific rules
     if (msisdn in msisdnRules) {
-      const msisdnRule = msisdnRules[msisdn] as
-        | Record<string, unknown>
-        | undefined;
+      const msisdnRule = msisdnRules[msisdn] as Record<string, unknown> | undefined;
       if (msisdnRule && typeof msisdnRule.url === "string") {
         result.url = msisdnRule.url;
         result.description = `Msisdn specific ${networkType} rule for msisdn: ${msisdn} was applied`;
         return result;
       }
-      const cityData =
-        (msisdnRule?.city as Record<string, Record<string, unknown>>) || {};
+      const cityData = (msisdnRule?.city as Record<string, Record<string, unknown>>) || {};
       if (strCity in cityData && typeof cityData[strCity]?.url === "string") {
         result.url = cityData[strCity].url as string;
         result.description = `Msisdn specific ${networkType} rule for msisdn: ${msisdn} for a city ${strCity} was applied`;
@@ -77,13 +70,8 @@ export async function getMccMncRulesUrl(
     }
 
     // Process country and region-specific rules
-    if (
-      strCountryCode in countryCodeRules &&
-      strRegionCode in regionCodeRules
-    ) {
-      const regionRule = regionCodeRules[strRegionCode] as
-        | Record<string, unknown>
-        | undefined;
+    if (strCountryCode in countryCodeRules && strRegionCode in regionCodeRules) {
+      const regionRule = regionCodeRules[strRegionCode] as Record<string, unknown> | undefined;
       if (regionRule && typeof regionRule.url === "string") {
         result.url = regionRule.url;
         result.description = `${networkType.charAt(0).toUpperCase() + networkType.slice(1)} rule for country code: ${strCountryCode} and region: ${strRegionCode} and msisdn: ${msisdn} was applied`;

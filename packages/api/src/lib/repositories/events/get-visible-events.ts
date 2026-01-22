@@ -1,9 +1,10 @@
+import type { UserEventInfo } from "../user";
 import { env } from "@director_v2/config";
 import type { listEventsResponseSchema } from "@director_v2/contracts/contract/event";
 import prisma, { redis } from "@director_v2/db";
 import type { Prisma } from "@director_v2/db/prisma/generated/client";
 import { regex } from "arkregex";
-import type { UserEventInfo } from "../user";
+
 import {
   getBrandData,
   getInvitationMessage,
@@ -17,12 +18,7 @@ import {
   getMinPrice,
   isIpAllowed,
 } from "./utils/event-calculations";
-import {
-  getOnLocation,
-  getOnLocationLock,
-  getOrgName,
-  hasUserInvite,
-} from "./utils/event-helpers";
+import { getOnLocation, getOnLocationLock, getOrgName, hasUserInvite } from "./utils/event-helpers";
 
 /**
  * Check location-based access for events with location restrictions
@@ -33,7 +29,7 @@ async function checkLocationAccess(
     location_info: Prisma.JsonValue;
   },
   userInfo: UserEventInfo,
-  clientIp: string,
+  clientIp: string
 ) {
   const locationInfo = event.location_info as Record<string, unknown> | null;
   const boolLocked = locationInfo?.location_lock ?? false;
@@ -44,18 +40,14 @@ async function checkLocationAccess(
 
   // Check IP-based access
   if (locationInfo?.location_ips) {
-    const allowed = isIpAllowed(
-      locationInfo.location_ips as string | string[],
-      clientIp,
-    );
+    const allowed = isIpAllowed(locationInfo.location_ips as string | string[], clientIp);
     if (allowed) return true;
   }
 
   try {
     const eventLatitude = (locationInfo?.location_latitude as number) || 0;
     const eventLongitude = (locationInfo?.location_longitude as number) || 0;
-    const eventAccessRange =
-      (locationInfo?.location_access_range as number) || 100;
+    const eventAccessRange = (locationInfo?.location_access_range as number) || 100;
 
     if (!eventLatitude || !eventLongitude) {
       return false;
@@ -77,7 +69,7 @@ async function checkLocationAccess(
       eventLatitude,
       eventLongitude,
       coordinates.latitude,
-      coordinates.longitude,
+      coordinates.longitude
     );
 
     return distance <= eventAccessRange;
@@ -97,7 +89,7 @@ async function getInvitationAccepted(
     invites: Array<{ recipient: string }>;
   },
   userInfo: UserEventInfo,
-  clientIp = "",
+  clientIp = ""
 ): Promise<boolean> {
   let invitationAccepted = hasUserInvite(event.invites || [], userInfo);
 
@@ -111,9 +103,7 @@ async function getInvitationAccepted(
 /**
  * Filter settings to only include specific keys used by frontend
  */
-function getFilteredSettings(
-  settings: Record<string, unknown>,
-): Record<string, unknown> {
+function getFilteredSettings(settings: Record<string, unknown>): Record<string, unknown> {
   const SETTINGS_KEYS = [
     "event_feature_chat",
     "message_interval",
@@ -192,7 +182,7 @@ export async function getVisibleEvents(
     isWeb?: boolean;
     id?: string;
     isWebApi?: boolean;
-  } = {},
+  } = {}
 ): Promise<listEventsResponseSchema> {
   const startTime = Date.now();
   const searchInitTimestamp = queryParams.date ?? 0;
@@ -256,10 +246,7 @@ export async function getVisibleEvents(
   }
 
   // Events must have streams or simulations
-  whereConditions.OR = [
-    { event_stream: { some: {} } },
-    { event_simulation: { some: {} } },
-  ];
+  whereConditions.OR = [{ event_stream: { some: {} } }, { event_simulation: { some: {} } }];
 
   // Public/private visibility logic
   if (isWebApi) {
@@ -307,9 +294,7 @@ export async function getVisibleEvents(
     },
   });
 
-  console.log(
-    `Main query: ${Date.now() - startMain}ms, Events: ${events.length}`,
-  );
+  console.log(`Main query: ${Date.now() - startMain}ms, Events: ${events.length}`);
 
   if (events.length === 0) {
     return { total_events: 0, per_page: 0, current_page: 0, events: [] };
@@ -400,9 +385,7 @@ export async function getVisibleEvents(
         const sponsorMap = new Map(sponsors.map((s) => [s.id, s]));
         return adEvents.map((ae) => ({
           ...ae,
-          sponsor: ae.ad.sponsor_id
-            ? sponsorMap.get(BigInt(ae.ad.sponsor_id))
-            : null,
+          sponsor: ae.ad.sponsor_id ? sponsorMap.get(BigInt(ae.ad.sponsor_id)) : null,
         }));
       }),
 
@@ -467,7 +450,7 @@ export async function getVisibleEvents(
             ...shortUrl,
             eventId,
           };
-        }),
+        })
       ),
   ]);
 
@@ -532,10 +515,7 @@ export async function getVisibleEvents(
     });
   }
 
-  const settingsMap = new Map<
-    bigint,
-    Array<{ id: bigint; key: string; value: string | null }>
-  >();
+  const settingsMap = new Map<bigint, Array<{ id: bigint; key: string; value: string | null }>>();
   for (const s of settings) {
     if (s.configurable_id !== null) {
       settingsMap.set(BigInt(s.configurable_id), [
@@ -549,9 +529,7 @@ export async function getVisibleEvents(
   }
 
   // User data maps
-  const createUserMap = (
-    data: Array<{ event_id: bigint; msisdn: string | null }>,
-  ) => {
+  const createUserMap = (data: Array<{ event_id: bigint; msisdn: string | null }>) => {
     const map = new Map<bigint, Array<{ msisdn: string }>>();
     for (const item of data) {
       if (!item.msisdn) continue;
@@ -588,7 +566,7 @@ export async function getVisibleEvents(
           invites: eventInvites,
         },
         userInfo,
-        clientIp,
+        clientIp
       );
 
       // Parse settings JSON
@@ -611,19 +589,12 @@ export async function getVisibleEvents(
         typeof parsedSettings.eventbrite_event_url === "string"
           ? parsedSettings.eventbrite_event_url
           : "";
-      const ticketUrl = getTicketUrl(
-        event.id,
-        event.payed,
-        ticketPlatform,
-        eventbriteUrl,
-      );
+      const ticketUrl = getTicketUrl(event.id, event.payed, ticketPlatform, eventbriteUrl);
 
       // Build organization name
       const orgName = getOrgName(event.group.name, null);
 
-      const appCode = shortUrls.find(
-        (shortUrl) => shortUrl.eventId === event.id,
-      )?.key;
+      const appCode = shortUrls.find((shortUrl) => shortUrl.eventId === event.id)?.key;
       const appUrl = `${env.DIRECTOR_URL}/o/${event.id}${appCode ? `/${appCode}` : ""}`;
 
       // Get brand data
@@ -633,7 +604,7 @@ export async function getVisibleEvents(
         event.brand_image_url,
         event.brand_background_image_url,
         event.brand_ad_image_url,
-        parsedSettings,
+        parsedSettings
       );
 
       // Get invitation message
@@ -645,7 +616,7 @@ export async function getVisibleEvents(
         orgName,
         event.group_id,
         parsedSettings,
-        appUrl,
+        appUrl
       );
 
       // Calculate event label
@@ -657,7 +628,7 @@ export async function getVisibleEvents(
         event.is_draft,
         eventStreams,
         eventSimulations.length > 0,
-        event.restream,
+        event.restream
       );
 
       // Get featured catalogue settings
@@ -666,20 +637,14 @@ export async function getVisibleEvents(
           ? parsedSettings.eatured_catalog_image_alignment
           : "scalefit";
       const blurredBackground =
-        typeof parsedSettings.featured_catalog_blurred_background ===
-          "string" ||
+        typeof parsedSettings.featured_catalog_blurred_background === "string" ||
         typeof parsedSettings.featured_catalog_blurred_background === "number"
-          ? Number.parseInt(
-              String(parsedSettings.featured_catalog_blurred_background),
-              10,
-            ) === 1
+          ? Number.parseInt(String(parsedSettings.featured_catalog_blurred_background), 10) === 1
           : false;
 
       // Check if event is complete (at capacity)
       const registeredCount = (registeredMap.get(event.id) || []).length;
-      const isComplete = event.capacity
-        ? registeredCount >= event.capacity
-        : false;
+      const isComplete = event.capacity ? registeredCount >= event.capacity : false;
 
       // Get owner user data for host
       const ownerUser = await prisma.user.findUnique({
@@ -689,9 +654,7 @@ export async function getVisibleEvents(
       const ownerMsisdn = ownerUser?.msisdn ?? "";
       const assistantPhone = parsedSettings.event_assistant_phone_number;
       const host =
-        typeof assistantPhone === "string" && assistantPhone
-          ? assistantPhone
-          : ownerMsisdn;
+        typeof assistantPhone === "string" && assistantPhone ? assistantPhone : ownerMsisdn;
 
       // Get location lock status
       const locationInfo = event.location_info;
@@ -722,9 +685,7 @@ export async function getVisibleEvents(
         organization_id: String(event.group_id),
         description: event.description ?? "",
         category: event.category ?? "",
-        categoryImage: event.category
-          ? `${env.AWS_URL}/tags/${event.category}.png`
-          : "",
+        categoryImage: event.category ? `${env.AWS_URL}/tags/${event.category}.png` : "",
         capacity: event.capacity ?? 0,
         coordinates: {
           lat: event.latitude ? Number(event.latitude) : 0,
@@ -742,9 +703,7 @@ export async function getVisibleEvents(
           event.promo_video_url && event.promo_video_aspect_ratio
             ? event.promo_video_aspect_ratio
             : "",
-        has_ricoh_stream: eventStreams.some(
-          (s) => s.code !== null && s.code.trim() !== "",
-        ),
+        has_ricoh_stream: eventStreams.some((s) => s.code !== null && s.code.trim() !== ""),
         payed: event.payed,
         invitation_message: invitationMessage,
         event_url: appUrl,
@@ -753,21 +712,13 @@ export async function getVisibleEvents(
         complete: isComplete,
         invitation_accepted: invitationAccepted,
         invitation_requested: (requestsMap.get(event.id) || []).some(
-          (r) => r.msisdn === userInfo.msisdn,
+          (r) => r.msisdn === userInfo.msisdn
         ),
-        registered: (registeredMap.get(event.id) || []).some(
-          (r) => r.msisdn === userInfo.msisdn,
-        ),
+        registered: (registeredMap.get(event.id) || []).some((r) => r.msisdn === userInfo.msisdn),
         usersInterestedCount: (interestedMap.get(event.id) || []).length,
-        banned: (removedMap.get(event.id) || []).some(
-          (r) => r.msisdn === userInfo.msisdn,
-        ),
-        blocked: (blockedMap.get(event.id) || []).some(
-          (r) => r.msisdn === userInfo.msisdn,
-        ),
-        opened: (openedMap.get(event.id) || []).some(
-          (r) => r.msisdn === userInfo.msisdn,
-        ),
+        banned: (removedMap.get(event.id) || []).some((r) => r.msisdn === userInfo.msisdn),
+        blocked: (blockedMap.get(event.id) || []).some((r) => r.msisdn === userInfo.msisdn),
+        opened: (openedMap.get(event.id) || []).some((r) => r.msisdn === userInfo.msisdn),
         pre_access:
           userInfo.isSuperAdmin ||
           event.owner_id === userInfo.userId ||
@@ -790,11 +741,11 @@ export async function getVisibleEvents(
         onLocationLock,
         streams: [],
       };
-    }),
+    })
   );
 
   console.log(
-    `${Date.now() - startTime}ms time took to get events list for user ${userInfo.msisdn}`,
+    `${Date.now() - startTime}ms time took to get events list for user ${userInfo.msisdn}`
   );
 
   return {

@@ -1,5 +1,6 @@
 import { env } from "@director_v2/config";
 import prisma from "@director_v2/db";
+
 import { getAggregatorUrls } from "../services/awsAuthorizationService";
 import { getMobileUserInfo } from "../services/geoipService";
 import { getMccMncRulesUrl } from "../services/mccMncService";
@@ -21,7 +22,7 @@ export async function getStreamUrls(
   streamUrlId: number,
   userId: number,
   clientIp: string,
-  maxResults = 10,
+  maxResults = 10
 ) {
   console.log({ streamUrlId, userId, clientIp, maxResults });
   const urlsWithTokens: Array<{ url: string; description: string }> = [];
@@ -94,7 +95,7 @@ export async function getStreamUrls(
           user.msisdn || "",
           city,
           countryCode,
-          phoneIso,
+          phoneIso
         );
         console.log("mccMncUrl", mccMncUrl);
         const mccMncDomain = mccMncUrl.url;
@@ -117,16 +118,14 @@ export async function getStreamUrls(
                   url: streamUrl.url.replace(currentDomain, result.url),
                   description: result.description,
                 });
-              },
+              }
             );
           }
         }
 
         if (urls.length === 0) {
           urls.push({
-            url: mccMncDomain
-              ? streamUrl.url.replace(currentDomain, mccMncDomain)
-              : streamUrl.url,
+            url: mccMncDomain ? streamUrl.url.replace(currentDomain, mccMncDomain) : streamUrl.url,
             description: "Edge discovery not possible or yielded no URLs",
           });
         }
@@ -157,9 +156,7 @@ export async function getStreamUrls(
         const EXPIRATION_INTERVAL = 300; // 5 minutes in seconds
 
         if (existingToken) {
-          const isExpired =
-            Date.now() / 1000 - Number(existingToken.date) >=
-            EXPIRATION_INTERVAL;
+          const isExpired = Date.now() / 1000 - Number(existingToken.date) >= EXPIRATION_INTERVAL;
           if (!isExpired) {
             url = existingToken.url;
           } else {
@@ -203,9 +200,7 @@ export async function getStreamUrls(
       // Create discovery log
       const joinedStreamUrls = urlsWithTokens.map((u) => u.url).join(",");
       const streamUrlTruncated =
-        joinedStreamUrls.length > 190
-          ? joinedStreamUrls.slice(0, 190)
-          : joinedStreamUrls;
+        joinedStreamUrls.length > 190 ? joinedStreamUrls.slice(0, 190) : joinedStreamUrls;
 
       await prisma.discovery_logs.create({
         data: {

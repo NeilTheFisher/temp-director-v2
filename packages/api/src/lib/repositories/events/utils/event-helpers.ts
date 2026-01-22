@@ -1,12 +1,12 @@
-import type { Prisma } from "@director_v2/db/prisma/generated/client";
 import type { UserEventInfo } from "../../user";
+import type { Prisma } from "@director_v2/db/prisma/generated/client";
 
 /**
  * Check if user has an invitation to an event
  */
 export function hasUserInvite(
   invites: Array<{ recipient: string }>,
-  userInfo: UserEventInfo,
+  userInfo: UserEventInfo
 ): boolean {
   const recipients = new Set(invites.map((i) => i.recipient));
   if (recipients.has(userInfo.msisdn)) return true;
@@ -16,10 +16,7 @@ export function hasUserInvite(
 /**
  * Get organization name (handle private groups)
  */
-export function getOrgName(
-  groupName: string,
-  ownerName: string | null,
-): string {
+export function getOrgName(groupName: string, ownerName: string | null): string {
   if (groupName.includes("PrivateGroup:[") && ownerName) {
     return ownerName;
   }
@@ -45,10 +42,7 @@ export function getOnLocation(locationInfo: Prisma.JsonValue): boolean {
 /**
  * Get host (assistant) phone number from settings or fallback to owner
  */
-export function getHost(
-  settings: Record<string, unknown>,
-  ownerMsisdn: string,
-): string {
+export function getHost(settings: Record<string, unknown>, ownerMsisdn: string): string {
   const assistantPhone = settings.event_assistant_phone_number;
   if (assistantPhone && typeof assistantPhone === "string") {
     return assistantPhone;

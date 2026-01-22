@@ -1,4 +1,5 @@
 import { ORPCError, onError, ValidationError } from "@orpc/server";
+
 import { base } from "./1_base";
 
 export const errorMiddleware = base.middleware(
@@ -27,5 +28,5 @@ export const errorMiddleware = base.middleware(
         cause: error.cause,
       });
     }
-  }),
+  })
 );

@@ -42,54 +42,25 @@ export const User = z
       ])
       .describe("Device type linked to this user")
       .optional(),
-    deviceActiveTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Device active timestamp"),
-    deviceLinkedTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Device linked timestamp"),
-    blockingTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Device blocked timestamp"),
+    deviceActiveTimestamp: z.number().int().gte(0).describe("Device active timestamp"),
+    deviceLinkedTimestamp: z.number().int().gte(0).describe("Device linked timestamp"),
+    blockingTimestamp: z.number().int().gte(0).describe("Device blocked timestamp"),
     flagsCounterMessage: z
       .number()
       .int()
       .gte(0)
       .describe("Counter for flagged messages")
       .optional(),
-    flagsCounterVideo: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Counter for flagged videos")
-      .optional(),
+    flagsCounterVideo: z.number().int().gte(0).describe("Counter for flagged videos").optional(),
     flagsCounterUser: z
       .number()
       .int()
       .gte(0)
       .describe("Counter for flagged by other users")
       .optional(),
-    userJoinedTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("User joined timestamp"),
-    userDisconnectedTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("User disconnected timestamp"),
-    lastPreviewTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("User lastPreview timestamp"),
+    userJoinedTimestamp: z.number().int().gte(0).describe("User joined timestamp"),
+    userDisconnectedTimestamp: z.number().int().gte(0).describe("User disconnected timestamp"),
+    lastPreviewTimestamp: z.number().int().gte(0).describe("User lastPreview timestamp"),
     lastMessageSentTimestamp: z
       .number()
       .int()

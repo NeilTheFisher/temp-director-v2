@@ -1,4 +1,5 @@
 import z from "zod";
+
 import { base } from "./base";
 
 // Full user info response schema (mirrors director-api UserService.getUserInfo)
@@ -26,7 +27,7 @@ export const userInfoResponseSchema = z.object({
       avatar: z.string().nullable(),
       sip: z.string(),
       type: z.string(),
-    }),
+    })
   ),
   usersBlockedBy: z.array(z.string().nullable()),
   roles: z.object({
@@ -61,7 +62,7 @@ export const userContract = base.prefix("/api").router({
     .input(
       z.object({
         msisdn: z.string(),
-      }),
+      })
     )
     .output(userInfoByMsisdnResponseSchema),
 });

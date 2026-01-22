@@ -27,10 +27,7 @@ export const UserSimple = z
       .optional(),
     is_muted: z.boolean().describe("if the user is muted").optional(),
     is_featured: z.boolean().describe("if the user is featured").optional(),
-    poorConnection: z
-      .boolean()
-      .describe("if the user has poor connection")
-      .optional(),
+    poorConnection: z.boolean().describe("if the user has poor connection").optional(),
     type: z.string().describe("User's type").optional(),
     deviceId: z
       .union([
@@ -46,60 +43,30 @@ export const UserSimple = z
       ])
       .describe("Device type linked to this user")
       .optional(),
-    deviceActiveTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Device active timestamp")
-      .optional(),
-    deviceLinkedTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Device linked timestamp")
-      .optional(),
-    blockingTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Device blocked timestamp")
-      .optional(),
+    deviceActiveTimestamp: z.number().int().gte(0).describe("Device active timestamp").optional(),
+    deviceLinkedTimestamp: z.number().int().gte(0).describe("Device linked timestamp").optional(),
+    blockingTimestamp: z.number().int().gte(0).describe("Device blocked timestamp").optional(),
     flagsCounterMessage: z
       .number()
       .int()
       .gte(0)
       .describe("Counter for flagged messages")
       .optional(),
-    flagsCounterVideo: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("Counter for flagged videos")
-      .optional(),
+    flagsCounterVideo: z.number().int().gte(0).describe("Counter for flagged videos").optional(),
     flagsCounterUser: z
       .number()
       .int()
       .gte(0)
       .describe("Counter for flagged by other users")
       .optional(),
-    userJoinedTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("User joined timestamp")
-      .optional(),
+    userJoinedTimestamp: z.number().int().gte(0).describe("User joined timestamp").optional(),
     userDisconnectedTimestamp: z
       .number()
       .int()
       .gte(0)
       .describe("User disconnected timestamp")
       .optional(),
-    lastPreviewTimestamp: z
-      .number()
-      .int()
-      .gte(0)
-      .describe("User lastPreview timestamp")
-      .optional(),
+    lastPreviewTimestamp: z.number().int().gte(0).describe("User lastPreview timestamp").optional(),
     lastMessageSentTimestamp: z
       .number()
       .int()

@@ -29,13 +29,8 @@ export const UsersList = z
               ])
               .describe("User's status"),
             is_muted: z.boolean().describe("if the user is muted"),
-            is_featured: z
-              .boolean()
-              .describe("if the user is featured")
-              .optional(),
-            poorConnection: z
-              .boolean()
-              .describe("if the user has poor connection"),
+            is_featured: z.boolean().describe("if the user is featured").optional(),
+            poorConnection: z.boolean().describe("if the user has poor connection"),
             platform: z.string().describe("Users platform").optional(),
             type: z.string().describe("User's type"),
             deviceId: z
@@ -51,21 +46,9 @@ export const UsersList = z
               ])
               .describe("Device type linked to this user")
               .optional(),
-            deviceActiveTimestamp: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("Device active timestamp"),
-            deviceLinkedTimestamp: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("Device linked timestamp"),
-            blockingTimestamp: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("Device blocked timestamp"),
+            deviceActiveTimestamp: z.number().int().gte(0).describe("Device active timestamp"),
+            deviceLinkedTimestamp: z.number().int().gte(0).describe("Device linked timestamp"),
+            blockingTimestamp: z.number().int().gte(0).describe("Device blocked timestamp"),
             flagsCounterMessage: z
               .number()
               .int()
@@ -84,21 +67,13 @@ export const UsersList = z
               .gte(0)
               .describe("Counter for flagged by other users")
               .optional(),
-            userJoinedTimestamp: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("User joined timestamp"),
+            userJoinedTimestamp: z.number().int().gte(0).describe("User joined timestamp"),
             userDisconnectedTimestamp: z
               .number()
               .int()
               .gte(0)
               .describe("User disconnected timestamp"),
-            lastPreviewTimestamp: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("User lastPreview timestamp"),
+            lastPreviewTimestamp: z.number().int().gte(0).describe("User lastPreview timestamp"),
             lastMessageSentTimestamp: z
               .number()
               .int()
@@ -107,13 +82,10 @@ export const UsersList = z
             os_name: z.string().describe("OS name"),
             os_version: z.string().describe("OS version"),
             device_model: z.string().describe("Device model"),
-            volume: z
-              .record(z.string(), z.any())
-              .describe("User's volume")
-              .optional(),
+            volume: z.record(z.string(), z.any()).describe("User's volume").optional(),
           })
-          .describe("User"),
-      ),
+          .describe("User")
+      )
     ),
     total: z.number().int().optional(),
   })

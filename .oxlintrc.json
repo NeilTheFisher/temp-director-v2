@@ -1,13 +1,5 @@
 {
-  "plugins": [
-    "unicorn",
-    "typescript",
-    "oxc",
-    "import",
-    "eslint",
-    "react",
-    "react-perf"
-  ],
+  "plugins": ["unicorn", "typescript", "oxc", "import", "eslint", "react", "react-perf"],
   "categories": {},
   "rules": {
     "import/no-cycle": "error",
@@ -127,7 +119,8 @@
     },
     "react": {
       "formComponents": [],
-      "linkComponents": []
+      "linkComponents": [],
+      "version": null
     },
     "jsdoc": {
       "ignorePrivate": false,

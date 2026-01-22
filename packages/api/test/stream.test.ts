@@ -2,6 +2,7 @@ import { appRouter } from "@director_v2/api";
 import { env } from "@director_v2/config";
 import { call } from "@orpc/server";
 import { beforeAll, describe, expect, it } from "vitest";
+
 import { getAuthToken } from "./utils";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -20,27 +21,23 @@ describe("Stream OpenAPI vs RPC parity", () => {
     const testStreamUrlId = process.env.TEST_STREAM_URL_ID;
 
     if (!testStreamUrlId) {
-      console.warn(
-        "No TEST_STREAM_URL_ID env var set, skipping stream URL test",
-      );
+      console.warn("No TEST_STREAM_URL_ID env var set, skipping stream URL test");
       return;
     }
 
-    const streamUrlId = Number.parseInt(testStreamUrlId, 10);
-
     const apiResponse = await fetch(
-      new URL(`/api/getStreamUrls/${streamUrlId}`, env.DIRECTOR_URL),
+      new URL(`/api/getStreamUrls/${testStreamUrlId}`, env.DIRECTOR_URL),
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
-      },
+      }
     );
     const apiJson = await apiResponse.json();
 
     const rpcResponse = await call(
       appRouter.stream.getStreamUrls,
-      { streamUrlId },
+      { streamUrlId: testStreamUrlId },
       {
         context: {
           session: {
@@ -48,7 +45,7 @@ describe("Stream OpenAPI vs RPC parity", () => {
           },
           clientIp: "192.168.0.1",
         },
-      },
+      }
     );
 
     expect(rpcResponse).toEqual(apiJson);

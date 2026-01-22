@@ -16,29 +16,18 @@ export const Configuration = z
               .describe("Event Namespace")
               .optional(),
             name: z.string().describe("Event Name").optional(),
-            label: z
-              .string()
-              .describe("Event's Label if its live, re-stream, etc...")
-              .optional(),
+            label: z.string().describe("Event's Label if its live, re-stream, etc...").optional(),
             location: z.string().describe("Event Location").optional(),
             category: z.string().describe("Event category").optional(),
-            categoryImage: z
-              .string()
-              .describe("Event category's image")
-              .optional(),
+            categoryImage: z.string().describe("Event category's image").optional(),
             imageUrl: z.string().describe("Event image url").optional(),
             map_image_url: z.string().describe("Event map image").optional(),
-            promo_video_url: z
-              .string()
-              .describe("Event promo video url")
-              .optional(),
+            promo_video_url: z.string().describe("Event promo video url").optional(),
             promo_video_aspect_ratio: z
               .string()
               .describe("Event promo video aspect ratio")
               .optional(),
-            downloads: z
-              .array(z.string().describe("Event stream file urls"))
-              .optional(),
+            downloads: z.array(z.string().describe("Event stream file urls")).optional(),
             sponsors: z
               .object({
                 custom: z.record(
@@ -53,8 +42,8 @@ export const Configuration = z
                       location: z.string(),
                       sponsor_name: z.string(),
                       clickUrl: z.string(),
-                    }),
-                  ),
+                    })
+                  )
                 ),
                 external: z.array(
                   z.object({
@@ -62,7 +51,7 @@ export const Configuration = z
                     name: z.string(),
                     image_url: z.string(),
                     config: z.record(z.string(), z.any()),
-                  }),
+                  })
                 ),
                 settings: z.object({
                   event_in_stream: z.object({
@@ -81,9 +70,7 @@ export const Configuration = z
                   }),
                 }),
               })
-              .describe(
-                "Event sponsors with ads grouped by location under 'custom'",
-              )
+              .describe("Event sponsors with ads grouped by location under 'custom'")
               .optional(),
             brand: z
               .union([
@@ -91,26 +78,14 @@ export const Configuration = z
                   .object({
                     brand_title: z.string().describe("Brand title"),
                     brand_subtitle: z.string().describe("Brand subtitle"),
-                    show_brand_panel: z
-                      .boolean()
-                      .describe("show or hide brand panel"),
-                    brand_background_color: z
-                      .string()
-                      .describe("Brand background color"),
+                    show_brand_panel: z.boolean().describe("show or hide brand panel"),
+                    brand_background_color: z.string().describe("Brand background color"),
                     brand_text_color: z.string().describe("Brand text color"),
                     brand_image_url: z.string().describe("Brand image url"),
-                    brand_background_image_url: z
-                      .string()
-                      .describe("Brand background image url"),
-                    brand_ad_image_url: z
-                      .string()
-                      .describe("Brand ad image url"),
-                    brand_background_opacity: z
-                      .number()
-                      .describe("Brand background opacity"),
-                    brand_logo_padding: z
-                      .number()
-                      .describe("Brand logo padding"),
+                    brand_background_image_url: z.string().describe("Brand background image url"),
+                    brand_ad_image_url: z.string().describe("Brand ad image url"),
+                    brand_background_opacity: z.number().describe("Brand background opacity"),
+                    brand_logo_padding: z.number().describe("Brand logo padding"),
                   })
                   .describe("Event's Brand"),
                 z.null().describe("Event's Brand"),
@@ -122,9 +97,7 @@ export const Configuration = z
                 z
                   .object({
                     image_alignment: z.string().describe("catalogue title"),
-                    blurred_background: z
-                      .boolean()
-                      .describe("catalogue subtblurred_background"),
+                    blurred_background: z.boolean().describe("catalogue subtblurred_background"),
                   })
                   .describe("Event's Featured catalogue image settings"),
                 z.null().describe("Event's Featured catalogue image settings"),
@@ -136,15 +109,9 @@ export const Configuration = z
                 z
                   .object({
                     id: z.string().describe("Chatbot ID"),
-                    action_image_url: z
-                      .string()
-                      .describe("Chatbot Image Url")
-                      .optional(),
+                    action_image_url: z.string().describe("Chatbot Image Url").optional(),
                     name: z.string().describe("Chatbot Name").optional(),
-                    display_name: z
-                      .string()
-                      .describe("Chatbot Display Name")
-                      .optional(),
+                    display_name: z.string().describe("Chatbot Display Name").optional(),
                     bot_id: z.string().describe("Chatbot sip ID"),
                     type: z.string().describe("Chatbot Type").optional(),
                     payload: z.string().describe("Chatbot Payload").optional(),
@@ -156,20 +123,13 @@ export const Configuration = z
                       .record(z.string(), z.any())
                       .describe("Richcard Theme")
                       .optional(),
-                    started: z
-                      .boolean()
-                      .describe("If this chatbot has been started")
-                      .optional(),
+                    started: z.boolean().describe("If this chatbot has been started").optional(),
                     results_displayed: z
                       .object({
-                        value: z
-                          .boolean()
-                          .describe("If chatbot results are displayed or not"),
+                        value: z.boolean().describe("If chatbot results are displayed or not"),
                         expanded: z
                           .boolean()
-                          .describe(
-                            "If the chatbot results are expanded or not",
-                          )
+                          .describe("If the chatbot results are expanded or not")
                           .optional(),
                       })
                       .describe("If this chatbot's results have been displayed")
@@ -178,35 +138,19 @@ export const Configuration = z
                       .string()
                       .describe("Chatbot image alignment")
                       .optional(),
-                    chatbot_image_style: z
-                      .string()
-                      .describe("Chatbot image style")
-                      .optional(),
+                    chatbot_image_style: z.string().describe("Chatbot image style").optional(),
                     chatbot_blurred_background: z
                       .boolean()
                       .describe("Chatbot blurred background")
                       .optional(),
-                    user_seen: z
-                      .boolean()
-                      .describe("If user has seen the chatbot")
-                      .optional(),
+                    user_seen: z.boolean().describe("If user has seen the chatbot").optional(),
                   })
-                  .describe("Chatbot"),
+                  .describe("Chatbot")
               )
               .optional(),
             description: z.string().describe("Event description").optional(),
-            capacity: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("Event capacity")
-              .optional(),
-            min_price: z
-              .number()
-              .int()
-              .gte(0)
-              .describe("Event minimum price")
-              .optional(),
+            capacity: z.number().int().gte(0).describe("Event capacity").optional(),
+            min_price: z.number().int().gte(0).describe("Event minimum price").optional(),
             duration: z
               .union([
                 z.number().int().describe("Event Duration in seconds"),
@@ -230,78 +174,34 @@ export const Configuration = z
             active: z.boolean().describe("Event is active").optional(),
             is_5g: z.boolean().describe("Event's 5g feature").optional(),
             host: z.string().describe("Event host msisdn").optional(),
-            onLocation: z
-              .boolean()
-              .describe("If on location is enabled")
-              .optional(),
-            onLocationLock: z
-              .boolean()
-              .describe("If on location lock is enabled")
-              .optional(),
-            ai_detection: z
-              .boolean()
-              .describe("If event's stream scans for objects")
-              .optional(),
-            profanity: z
-              .boolean()
-              .describe("Event's profanity feature")
-              .optional(),
+            onLocation: z.boolean().describe("If on location is enabled").optional(),
+            onLocationLock: z.boolean().describe("If on location lock is enabled").optional(),
+            ai_detection: z.boolean().describe("If event's stream scans for objects").optional(),
+            profanity: z.boolean().describe("Event's profanity feature").optional(),
             poll_started: z
               .boolean()
-              .describe(
-                "If event's poll started (deprecated, use chatbot.started instead)",
-              )
+              .describe("If event's poll started (deprecated, use chatbot.started instead)")
               .optional(),
-            event_started: z
-              .boolean()
-              .describe("If presenter started the event")
-              .optional(),
+            event_started: z.boolean().describe("If presenter started the event").optional(),
             live_stream_switching: z
               .boolean()
               .describe("If event's live stream switching is on")
               .optional(),
-            ask_question: z
-              .boolean()
-              .describe("If event's ask question is on")
-              .optional(),
-            is_public: z
-              .boolean()
-              .describe("If event is public or private")
-              .optional(),
-            invitations_only: z
-              .boolean()
-              .describe("If event is invitation only")
-              .optional(),
-            organization: z
-              .string()
-              .describe("Group name of the event")
-              .optional(),
-            organization_image_url: z
-              .string()
-              .describe("Group image url")
-              .optional(),
+            ask_question: z.boolean().describe("If event's ask question is on").optional(),
+            is_public: z.boolean().describe("If event is public or private").optional(),
+            invitations_only: z.boolean().describe("If event is invitation only").optional(),
+            organization: z.string().describe("Group name of the event").optional(),
+            organization_image_url: z.string().describe("Group image url").optional(),
             organization_id: z.string().describe("Group id").optional(),
             ticket_url: z.string().describe("Purchase ticket url").optional(),
-            ticket_platform: z
-              .string()
-              .describe("Purchase ticket platform")
-              .optional(),
+            ticket_platform: z.string().describe("Purchase ticket platform").optional(),
             settings: z
               .union([
                 z
                   .object({
-                    event_feature_chat: z
-                      .boolean()
-                      .describe("Event feature chat")
-                      .optional(),
-                    message_interval: z
-                      .number()
-                      .describe("Message interval")
-                      .optional(),
-                    reminder_interval: z
-                      .number()
-                      .describe("Reminder interval")
-                      .optional(),
+                    event_feature_chat: z.boolean().describe("Event feature chat").optional(),
+                    message_interval: z.number().describe("Message interval").optional(),
+                    reminder_interval: z.number().describe("Reminder interval").optional(),
                     event_end_reminder_interval: z
                       .number()
                       .describe("Reminder interval")
@@ -316,10 +216,7 @@ export const Configuration = z
                       .optional(),
                     nft_bot: z.string().describe("nft_bot").optional(),
                     hq_zoom: z.boolean().describe("hq zoom").optional(),
-                    automatic_sms_items: z
-                      .string()
-                      .describe("Automatic sms items")
-                      .optional(),
+                    automatic_sms_items: z.string().describe("Automatic sms items").optional(),
                     maximum_stream_messages: z
                       .number()
                       .describe("Maximum stream messages")
@@ -370,10 +267,7 @@ export const Configuration = z
                       .union([
                         z
                           .object({
-                            ask_question: z
-                              .boolean()
-                              .describe("ask question feature")
-                              .optional(),
+                            ask_question: z.boolean().describe("ask question feature").optional(),
                             ask_question_section_name: z
                               .string()
                               .describe("Ask question section name")
@@ -394,10 +288,7 @@ export const Configuration = z
               ])
               .describe("Event settings")
               .optional(),
-            silent_mode: z
-              .boolean()
-              .describe("If event's silent mode is on")
-              .optional(),
+            silent_mode: z.boolean().describe("If event's silent mode is on").optional(),
             picture_in_picture_mode: z
               .boolean()
               .describe("If event's picture in picture mode is on")
@@ -409,20 +300,10 @@ export const Configuration = z
               })
               .describe("Picture in picture parameters")
               .optional(),
-            has_ricoh_stream: z
-              .boolean()
-              .describe("If event has a ricoh stream")
-              .default(false),
+            has_ricoh_stream: z.boolean().describe("If event has a ricoh stream").default(false),
             owner_id: z.string().describe("Event Owner Id").optional(),
-            last_updated: z
-              .number()
-              .int()
-              .describe("Last updated timestamp")
-              .optional(),
-            payed: z
-              .boolean()
-              .describe("If event requires payment")
-              .default(false),
+            last_updated: z.number().int().describe("Last updated timestamp").optional(),
+            payed: z.boolean().describe("If event requires payment").default(false),
             featured: z
               .boolean()
               .describe("If event is featured to show on top of the list")
@@ -433,16 +314,10 @@ export const Configuration = z
                 z
                   .object({
                     id: z.string().describe("Stream Id"),
-                    order: z
-                      .number()
-                      .describe("The order of the stream")
-                      .optional(),
+                    order: z.number().describe("The order of the stream").optional(),
                     name: z.string().describe("Stream name").optional(),
                     code: z.string().describe("Code").optional(),
-                    selected: z
-                      .boolean()
-                      .describe("If the stream was selected")
-                      .optional(),
+                    selected: z.boolean().describe("If the stream was selected").optional(),
                     position: z
                       .string()
                       .describe("If the stream is in pip mode its position")
@@ -451,31 +326,16 @@ export const Configuration = z
                       .array(
                         z.object({
                           url: z.string().describe("Stream Url"),
-                          download_url: z
-                            .string()
-                            .describe("Download Url")
-                            .optional(),
-                          is_running: z
-                            .boolean()
-                            .describe("is stream is running")
-                            .optional(),
-                          publishing_url: z
-                            .string()
-                            .describe("Publishing Url")
-                            .optional(),
+                          download_url: z.string().describe("Download Url").optional(),
+                          is_running: z.boolean().describe("is stream is running").optional(),
+                          publishing_url: z.string().describe("Publishing Url").optional(),
                           resolution: z.string().describe("Stream resolution"),
-                        }),
+                        })
                       )
                       .describe("Stream URL")
                       .optional(),
                     type: z
-                      .enum([
-                        "standard",
-                        "pre-event",
-                        "post-event",
-                        "in-picture",
-                        "floater",
-                      ])
+                      .enum(["standard", "pre-event", "post-event", "in-picture", "floater"])
                       .describe("Stream Name")
                       .optional(),
                     video_format: z
@@ -510,46 +370,20 @@ export const Configuration = z
                       ])
                       .describe("Loop stream or play only once")
                       .optional(),
-                    is_equirectangular: z
-                      .boolean()
-                      .describe("Is EquiRectangular")
-                      .optional(),
+                    is_equirectangular: z.boolean().describe("Is EquiRectangular").optional(),
                     is_stereo: z.boolean().describe("Is Stereo").optional(),
                     is_360: z.boolean().describe("Is 360").optional(),
-                    access_type: z
-                      .string()
-                      .describe("Stream access")
-                      .optional(),
-                    saturation_mod: z
-                      .number()
-                      .int()
-                      .gte(0)
-                      .describe("Saturation Mod")
-                      .optional(),
-                    gamma_mod: z
-                      .number()
-                      .int()
-                      .gte(0)
-                      .describe("Gamma Mod")
-                      .optional(),
-                    users: z
-                      .array(z.string())
-                      .describe("Stream Assigned Users")
-                      .optional(),
-                    updated_at: z
-                      .number()
-                      .describe("Last updated at timestamp")
-                      .optional(),
+                    access_type: z.string().describe("Stream access").optional(),
+                    saturation_mod: z.number().int().gte(0).describe("Saturation Mod").optional(),
+                    gamma_mod: z.number().int().gte(0).describe("Gamma Mod").optional(),
+                    users: z.array(z.string()).describe("Stream Assigned Users").optional(),
+                    updated_at: z.number().describe("Last updated at timestamp").optional(),
                   })
-                  .describe("Streams configuration from the director"),
+                  .describe("Streams configuration from the director")
               )
               .optional(),
-            invites: z
-              .array(z.string().describe("Guests Invited to the event"))
-              .optional(),
-            requests: z
-              .array(z.string().describe("Guests Requested to join the event"))
-              .optional(),
+            invites: z.array(z.string().describe("Guests Invited to the event")).optional(),
+            requests: z.array(z.string().describe("Guests Requested to join the event")).optional(),
             registrations: z
               .array(z.string().describe("Guests registered to the event"))
               .optional(),
@@ -581,37 +415,17 @@ export const Configuration = z
               .gte(0)
               .describe("Number of interested users")
               .optional(),
-            mini_carousel_open: z
-              .boolean()
-              .describe("If event's mini_carousel is on")
-              .optional(),
-            mini_carousel_orientation: z
-              .string()
-              .describe("mini carousel orientation")
-              .optional(),
+            mini_carousel_open: z.boolean().describe("If event's mini_carousel is on").optional(),
+            mini_carousel_orientation: z.string().describe("mini carousel orientation").optional(),
             welcome_message: z
               .string()
               .describe("Message sent when presenter starts the event")
               .optional(),
-            opened_list: z
-              .array(z.string().describe("Guests viewed the event"))
-              .optional(),
-            banned: z
-              .boolean()
-              .describe("If user is banned from event")
-              .optional(),
-            blocked: z
-              .boolean()
-              .describe("If user is blocked from event")
-              .optional(),
-            opened: z
-              .boolean()
-              .describe("If user has opened the event")
-              .optional(),
-            interested: z
-              .boolean()
-              .describe("If user is interested in the event")
-              .optional(),
+            opened_list: z.array(z.string().describe("Guests viewed the event")).optional(),
+            banned: z.boolean().describe("If user is banned from event").optional(),
+            blocked: z.boolean().describe("If user is blocked from event").optional(),
+            opened: z.boolean().describe("If user has opened the event").optional(),
+            interested: z.boolean().describe("If user is interested in the event").optional(),
             banned_list: z.record(z.string(), z.any()).optional(),
             blocked_list: z.record(z.string(), z.any()).optional(),
             invite_categories_list: z.any().optional(),
@@ -619,40 +433,25 @@ export const Configuration = z
             interested_list: z
               .array(z.string().describe("Guests interested in the event"))
               .optional(),
-            event_ended: z
-              .boolean()
-              .describe("If event ended was triggered")
-              .optional(),
+            event_ended: z.boolean().describe("If event ended was triggered").optional(),
             recording_started_timestamp: z
               .number()
               .describe("Timestamp when recording started")
               .optional(),
-            invitation_accepted: z
-              .boolean()
-              .describe("If user was invited to event")
-              .optional(),
+            invitation_accepted: z.boolean().describe("If user was invited to event").optional(),
             invitation_requested: z
               .boolean()
               .describe("If user requested to join event")
               .optional(),
-            registered: z
-              .boolean()
-              .describe("If user registered to the event")
-              .optional(),
-            complete: z
-              .boolean()
-              .describe("If event is full or not")
-              .default(false),
-            pre_access: z
-              .boolean()
-              .describe("If user have access to preview")
-              .default(false),
+            registered: z.boolean().describe("If user registered to the event").optional(),
+            complete: z.boolean().describe("If event is full or not").default(false),
+            pre_access: z.boolean().describe("If user have access to preview").default(false),
             web_allowed: z.boolean().describe("If app allowed").default(true),
             app_allowed: z.boolean().describe("If app allowed").default(true),
             appUrl: z.string().describe("Event category").optional(),
           })
-          .describe("Event configuration from the director"),
-      ),
+          .describe("Event configuration from the director")
+      )
     ),
   })
   .strict();

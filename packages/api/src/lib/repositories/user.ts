@@ -1,4 +1,5 @@
 import prisma from "@director_v2/db";
+
 import { getPnsSettings } from "../redis";
 
 /**
@@ -57,10 +58,7 @@ export async function getUserInfoForEvents(userId: number) {
       const roleName = userRole.roles?.name || "";
 
       // Check if SUPER_ADMIN role (common patterns: "super-admin", "Super Admin", "SUPER_ADMIN")
-      if (
-        roleName.toLowerCase().includes("super") &&
-        roleName.toLowerCase().includes("admin")
-      ) {
+      if (roleName.toLowerCase().includes("super") && roleName.toLowerCase().includes("admin")) {
         isSuperAdmin = true;
       }
 
@@ -89,9 +87,7 @@ export async function getUserInfoForEvents(userId: number) {
   };
 }
 
-export type UserEventInfo = NonNullable<
-  Awaited<ReturnType<typeof getUserInfoForEvents>>
->;
+export type UserEventInfo = NonNullable<Awaited<ReturnType<typeof getUserInfoForEvents>>>;
 
 /**
  * Get full user info including relationships
@@ -141,7 +137,7 @@ export async function getFullUserInfo(userId: number) {
               type: "user",
             }
           : null;
-      }),
+      })
     );
 
     // Get users who blocked this user
@@ -164,10 +160,8 @@ export async function getFullUserInfo(userId: number) {
     const userRolesObject = user.roles_user_group || [];
     const userRoles = await Promise.all(
       userRolesObject.map(async (userRole) => {
-        return userRole.roles
-          ? { groupId: userRole.group_id, name: userRole.roles.name }
-          : null;
-      }),
+        return userRole.roles ? { groupId: userRole.group_id, name: userRole.roles.name } : null;
+      })
     );
 
     userRoles.forEach((groupRole) => {

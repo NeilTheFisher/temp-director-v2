@@ -33,9 +33,7 @@ export const webRouter = pub.web.router({
 
       // Helper to handle coordinates
       const coordinates =
-        event.coordinates &&
-        event.coordinates.lat === 0 &&
-        event.coordinates.lng === 0
+        event.coordinates && event.coordinates.lat === 0 && event.coordinates.lng === 0
           ? null
           : event.coordinates;
 

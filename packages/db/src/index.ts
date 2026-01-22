@@ -1,6 +1,7 @@
 import { env } from "@director_v2/config";
 import { PrismaMariaDb as PrismaMySQL } from "@prisma/adapter-mariadb";
 import Redis from "ioredis";
+
 import { PrismaClient } from "../prisma/generated/client";
 
 const dbURL = new URL(env.DATABASE_URL);

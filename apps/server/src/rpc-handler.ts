@@ -3,20 +3,17 @@ import { generateTestToken } from "@director_v2/api/util/generate-test-token";
 import { env } from "@director_v2/config";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
-import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from "@orpc/json-schema";
+import { SmartCoercionPlugin } from "@orpc/json-schema";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
-import {
-  CORSPlugin,
-  ResponseHeadersPlugin,
-  StrictGetMethodPlugin,
-} from "@orpc/server/plugins";
+import { CORSPlugin, ResponseHeadersPlugin, StrictGetMethodPlugin } from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import * as Sentry from "@sentry/node";
 import pino from "pino";
 import pretty from "pino-pretty";
+
 import { version } from "../package.json";
 
 const stream = pretty({
@@ -63,10 +60,7 @@ const rpcHandler = new RPCHandler(appRouter, {
   ],
 });
 
-const schemaConverters = [
-  new ZodToJsonSchemaConverter(),
-  new ArkTypeToJsonSchemaConverter(),
-];
+const schemaConverters = [new ZodToJsonSchemaConverter(), new ArkTypeToJsonSchemaConverter()];
 const apiHandler = new OpenAPIHandler(appRouter, {
   interceptors: [
     onError((error) => {
@@ -85,10 +79,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
           title: "Director API Reference",
           version: version,
         },
-        servers: [
-          { url: `${env.DIRECTOR_URL}` },
-          { url: "https://director.odience.com" },
-        ],
+        servers: [{ url: `${env.DIRECTOR_URL}` }, { url: "https://director.odience.com" }],
         security: [{ bearerAuth: [] }],
         components: {
           securitySchemes: {
@@ -104,8 +95,7 @@ const apiHandler = new OpenAPIHandler(appRouter, {
         authentication: {
           securitySchemes: {
             bearerAuth: {
-              token:
-                env.ENV === "development" ? generateTestToken() : undefined,
+              token: env.ENV === "development" ? generateTestToken() : undefined,
             },
           },
         },
@@ -151,6 +141,6 @@ export async function handleRPC(req: Request) {
         return apiResult.response;
       }
       return null;
-    },
+    }
   );
 }

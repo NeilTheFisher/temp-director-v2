@@ -1,5 +1,7 @@
 import path from "node:path";
+
 import { defineConfig } from "prisma/config";
+
 import { env } from "../config";
 
 export default defineConfig({

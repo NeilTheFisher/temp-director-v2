@@ -45,7 +45,7 @@ export async function setPnsSettings(
     pns_event_updated: boolean;
     pns_event_registered: boolean;
     pns_event_mention: boolean;
-  },
+  }
 ): Promise<void> {
   const cacheKey = `pns_settings:${userId}`;
 

@@ -1,8 +1,4 @@
-import {
-  createConfiguration,
-  DefaultApi,
-  RequestContext,
-} from "../../clients/typescript";
+import { createConfiguration, DefaultApi, RequestContext } from "../../clients/typescript";
 
 const configuration = createConfiguration({
   baseServer: {
@@ -23,17 +19,14 @@ const apiInstance = new DefaultApi(configuration);
   await apiInstance.healthLiveOk(
     3, // max_outputs: only get 3 events
     (message: unknown) => {
-      console.log(
-        `[${new Date().toISOString()}] SSE Message received:`,
-        message,
-      );
+      console.log(`[${new Date().toISOString()}] SSE Message received:`, message);
     },
     (error: Error) => {
       console.error(`[${new Date().toISOString()}] SSE Error received:`, error);
     },
     () => {
       console.log(`[${new Date().toISOString()}] SSE Stream completed`);
-    },
+    }
   );
   console.log(`[${new Date().toISOString()}] === SSE test finished ===`);
 })();

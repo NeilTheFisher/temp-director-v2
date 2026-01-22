@@ -2,18 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
+    "//#lint:biome": {},
+    "//#lint:oxfmt": {},
+    "//#lint:oxlint": {},
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**"]
-    },
-    "lint": {
-      "cache": false,
-      "outputs": []
-    },
-    "lint:types": {
-      "cache": false,
-      "outputs": []
     },
     "openapi:generate": {
       "cache": false,

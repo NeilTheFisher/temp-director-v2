@@ -11,8 +11,8 @@ export const ModeratorsList = z
             role: z.literal("moderator").describe("Moderator Role"),
             avatar: z.string().describe("Moderator avatar"),
           })
-          .describe("Moderator"),
-      ),
+          .describe("Moderator")
+      )
     ),
   })
   .describe("Event sent to share the list of all moderators");

@@ -1,11 +1,7 @@
 import { type CountryCode, parsePhoneNumberWithError } from "libphonenumber-js";
 
-export async function validateAndFormatPhoneNumber(
-  strMsisdn: string,
-  strCountryCode = "",
-) {
-  const normalizedCountryCode = (strCountryCode.toUpperCase() ||
-    "US") as CountryCode;
+export async function validateAndFormatPhoneNumber(strMsisdn: string, strCountryCode = "") {
+  const normalizedCountryCode = (strCountryCode.toUpperCase() || "US") as CountryCode;
   const strFormattedMsisdn = strMsisdn.replace(/\D/g, "");
 
   const result = {
@@ -21,7 +17,7 @@ export async function validateAndFormatPhoneNumber(
     // Try to parse the phone number with country code
     const phoneNumber = parsePhoneNumberWithError(
       strMsisdn.startsWith("+") ? strMsisdn : `+${strMsisdn}`,
-      normalizedCountryCode,
+      normalizedCountryCode
     );
     if (!phoneNumber.isValid?.()) {
       result.error = "Phone number is not valid for the region";
@@ -36,11 +32,8 @@ export async function validateAndFormatPhoneNumber(
     result.error = "";
     result.country_code = phoneNumber.country || normalizedCountryCode;
   } catch (objException: unknown) {
-    const errorMessage =
-      objException instanceof Error ? objException.message : "Unknown error";
-    console.error(
-      `Phone validation error for number: ${strMsisdn}, error: ${errorMessage}`,
-    );
+    const errorMessage = objException instanceof Error ? objException.message : "Unknown error";
+    console.error(`Phone validation error for number: ${strMsisdn}, error: ${errorMessage}`);
     result.code = 500;
     result.error = errorMessage;
     result.valid = false;

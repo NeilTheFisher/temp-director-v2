@@ -3,9 +3,7 @@ import { z } from "zod";
 export const StreamSettings = z
   .object({
     selected_stream_id: z.string().describe("selected stream id"),
-    live_stream_switching: z
-      .boolean()
-      .describe("if live switching mode is on/off"),
+    live_stream_switching: z.boolean().describe("if live switching mode is on/off"),
     picture_in_picture_mode: z.boolean().describe("If the pip is on/off"),
     picture_in_picture_params: z
       .object({

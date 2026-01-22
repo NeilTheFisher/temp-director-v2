@@ -4,18 +4,11 @@ import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentation
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import { NodeSDK } from "@opentelemetry/sdk-node";
-import {
-  BatchSpanProcessor,
-  SimpleSpanProcessor,
-} from "@opentelemetry/sdk-trace-node";
+import { BatchSpanProcessor, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
 import { ORPCInstrumentation } from "@orpc/otel";
 import { PrismaInstrumentation } from "@prisma/instrumentation";
 import * as Sentry from "@sentry/node";
-import {
-  SentryPropagator,
-  SentrySampler,
-  SentrySpanProcessor,
-} from "@sentry/opentelemetry";
+import { SentryPropagator, SentrySampler, SentrySpanProcessor } from "@sentry/opentelemetry";
 
 const sentryClient = Sentry.init({
   dsn: env.SENTRY_DSN,

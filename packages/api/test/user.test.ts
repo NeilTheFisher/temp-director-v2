@@ -2,6 +2,7 @@ import { appRouter } from "@director_v2/api";
 import { env } from "@director_v2/config";
 import { call } from "@orpc/server";
 import { beforeAll, describe, expect, it } from "vitest";
+
 import { deleteProps, getAuthToken } from "./utils";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -15,14 +16,11 @@ describe("User OpenAPI vs RPC parity", () => {
   });
 
   it("returns same user data from GET /api/getUserInfo and RPC user.getUserInfo", async () => {
-    const apiResponse = await fetch(
-      new URL("/api/getUserInfo", env.DIRECTOR_URL),
-      {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+    const apiResponse = await fetch(new URL("/api/getUserInfo", env.DIRECTOR_URL), {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
       },
-    );
+    });
     const apiJson = await apiResponse.json();
 
     const rpcResponse = await call(appRouter.user.getUserInfo, undefined, {
@@ -34,12 +32,7 @@ describe("User OpenAPI vs RPC parity", () => {
       },
     });
 
-    const propsToDelete = [
-      "avatar",
-      "image_uid",
-      "organizations",
-      "super_admin",
-    ];
+    const propsToDelete = ["avatar", "image_uid", "organizations", "super_admin"];
     const cleanApiJson = deleteProps(apiJson, propsToDelete);
     const cleanRpcResponse = deleteProps(rpcResponse, propsToDelete);
 
@@ -60,7 +53,7 @@ describe("User OpenAPI vs RPC parity", () => {
           },
           clientIp: "192.168.0.1",
         },
-      },
+      }
     );
 
     // Verify structure

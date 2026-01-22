@@ -56,11 +56,7 @@ export async function getMobileUserInfo(ip: string): Promise<MobileUserInfo> {
     error = mccMncUserInfo.error;
 
     // Update cache
-    await redis.setex(
-      cacheKey,
-      CACHE_TTL,
-      JSON.stringify({ mcc, mnc, city, country }),
-    );
+    await redis.setex(cacheKey, CACHE_TTL, JSON.stringify({ mcc, mnc, city, country }));
   } catch (err: unknown) {
     error = err instanceof Error ? err.message : "Unknown error";
     console.error(error);
@@ -110,15 +106,12 @@ async function checkIpMccMnc(ip: string): Promise<{
 
     const authHeader = `Basic ${Buffer.from(usernamePassword).toString("base64")}`;
 
-    const response = await fetch(
-      `https://geoip.maxmind.com/geoip/v2.1/city/${ip}`,
-      {
-        headers: {
-          Authorization: authHeader,
-          "Content-Type": "application/json",
-        },
+    const response = await fetch(`https://geoip.maxmind.com/geoip/v2.1/city/${ip}`, {
+      headers: {
+        Authorization: authHeader,
+        "Content-Type": "application/json",
       },
-    );
+    });
 
     const data = (await response.json()) as {
       traits?: { mobile_country_code?: number; mobile_network_code?: number };
@@ -139,11 +132,7 @@ async function checkIpMccMnc(ip: string): Promise<{
       country = data.country.names.en.toLowerCase();
     }
 
-    await redis.setex(
-      cacheKey,
-      CACHE_TTL,
-      JSON.stringify({ mcc, mnc, city, country }),
-    );
+    await redis.setex(cacheKey, CACHE_TTL, JSON.stringify({ mcc, mnc, city, country }));
   } catch (err: unknown) {
     error = err instanceof Error ? err.message : "Unknown error";
     console.error(`checkIpMccMnc: ${error}`);

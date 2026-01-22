@@ -1,4 +1,5 @@
 import type { ResponseHeadersPluginContext } from "@orpc/server/plugins";
+
 import { verifyJWTToken } from "./lib/jwt-verifier";
 
 export async function createContext(req: Request) {
@@ -30,8 +31,7 @@ export async function createContext(req: Request) {
     }
   }
 
-  const clientIp =
-    req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for");
+  const clientIp = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for");
 
   return {
     session,
@@ -39,5 +39,4 @@ export async function createContext(req: Request) {
   };
 }
 
-export type Context = Awaited<ReturnType<typeof createContext>> &
-  ResponseHeadersPluginContext;
+export type Context = Awaited<ReturnType<typeof createContext>> & ResponseHeadersPluginContext;

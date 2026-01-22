@@ -3,12 +3,14 @@
 ## Architecture Overview
 
 **Turborepo Monorepo Structure:**
+
 - `apps/web/` - Next.js 16 fullstack app (port 3001)
 - `packages/api/` - oRPC business logic layer
 - `packages/auth/` - Better-Auth with Polar.sh payment integration
 - `packages/db/` - Prisma ORM with MySQL + generated Zod schemas
 
 **Technology Stack:**
+
 - Runtime: Bun (package manager + runtime)
 - Framework: Next.js 16 with React 19
 - API: oRPC (type-safe RPC with OpenAPI) - NOT tRPC
@@ -80,6 +82,7 @@ export const appRouter = {
 **Prisma Location:** Schema files in `packages/db/prisma/schema/`, generated client in `packages/db/prisma/generated/`.
 
 **Key Commands:**
+
 - `bun run db:studio` - Open Prisma Studio
 - `bun run db:generate` - Generate Prisma client + Zod schemas
 - `bun run db:migrate` - Run migrations
@@ -95,6 +98,7 @@ export const appRouter = {
 ## Development Workflow
 
 **Start Dev Server:** `bun run dev` (runs all packages via Turborepo)
+
 - Web app: http://localhost:3001
 - API reference: http://localhost:3001/api/rpc/api-reference
 
@@ -109,20 +113,23 @@ export const appRouter = {
 **Formatting:** Tab indentation, double quotes (enforced by Biome)
 
 **Imports:** Use workspace aliases:
+
 - `@director_v2/api` - API package
-- `@director_v2/auth` - Auth package  
+- `@director_v2/auth` - Auth package
 - `@director_v2/db` - Database package
 - `@director_v2/config` - Config package
 
 **Error Handling:** Use `ORPCError` from `@orpc/server` with error codes like `"UNAUTHORIZED"`, `"BAD_REQUEST"`, `"INTERNAL_SERVER_ERROR"`.
 
 **Type Safety:**
+
 - Always use `unknown` for catch blocks, not `any`
 - Try to avoid adding typescript types and rather let things type themselves. like function return types for example, try to avoid them.
 
 ## Migration Context (Important)
 
 This is a **v2 rewrite** of legacy Odience platform:
+
 - **director/** - PHP Laravel app (v1)
 - **router/** - Node.js/TypeScript WebSocket router (v1)
 - **director-api/** - Express.js API (v1)

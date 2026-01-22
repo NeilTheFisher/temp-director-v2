@@ -8,7 +8,7 @@ interface SoapResponse {
 export async function createUser(
   msisdn: string,
   otp: string,
-  countryCode = "CA",
+  countryCode = "CA"
 ): Promise<SoapResponse> {
   console.info(`AcsService.createUser: creating user ${msisdn}`);
 
@@ -16,8 +16,7 @@ export async function createUser(
     const response = await sendSoapRequest("create", msisdn, otp, countryCode);
     return response;
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("AcsService.createUser:", errorMessage);
     return {
       code: 500,
@@ -29,7 +28,7 @@ export async function createUser(
 export async function updateUser(
   msisdn: string,
   otp: string,
-  countryCode = "CA",
+  countryCode = "CA"
 ): Promise<SoapResponse> {
   console.info(`AcsService.updateUser: updating user ${msisdn}`);
 
@@ -37,8 +36,7 @@ export async function updateUser(
     const response = await sendSoapRequest("update", msisdn, otp, countryCode);
     return response;
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("AcsService.updateUser: error ->", errorMessage);
     return {
       code: 500,
@@ -51,7 +49,7 @@ async function sendSoapRequest(
   method: "create" | "update",
   msisdn: string,
   otp: string,
-  countryCode: string,
+  countryCode: string
 ): Promise<SoapResponse> {
   const endpoint = env.ACS_API_ENDPOINT ?? "";
   const provisioningPath = env.ACS_PROVISIONING_PATH ?? "/soap/?wsdl";
@@ -61,14 +59,12 @@ async function sendSoapRequest(
   if (!impuTemplate || !impiTemplate) {
     return {
       code: 500,
-      message:
-        "Missing one or more required configs: ACS_API_IMPU_TEMPLATE, ACS_API_IMPI_TEMPLATE",
+      message: "Missing one or more required configs: ACS_API_IMPU_TEMPLATE, ACS_API_IMPI_TEMPLATE",
     };
   }
 
   const url = `${endpoint}${provisioningPath}`;
-  const soapMethod =
-    method === "create" ? "createSubscriber" : "updateSubscriber";
+  const soapMethod = method === "create" ? "createSubscriber" : "updateSubscriber";
 
   const xmlPayload = buildSoapRequest(
     method,
@@ -77,7 +73,7 @@ async function sendSoapRequest(
     otp,
     countryCode,
     impuTemplate,
-    impiTemplate,
+    impiTemplate
   );
 
   console.info(`AcsService.sendSoapRequest: ${method} to ${url}`);
@@ -104,8 +100,7 @@ async function sendSoapRequest(
     const result = parseSoapResponse(responseBody);
     return result;
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`SOAP request failed: ${errorMessage}`);
   }
 }
@@ -117,12 +112,10 @@ function buildSoapRequest(
   otp: string,
   countryCode: string,
   impuTemplate: string,
-  impiTemplate: string,
+  impiTemplate: string
 ): string {
   const impi = impiTemplate.replace("<MDN>", msisdn);
-  const impu = impuTemplate
-    .split(",")
-    .map((item) => item.replace("<MDN>", msisdn));
+  const impu = impuTemplate.split(",").map((item) => item.replace("<MDN>", msisdn));
 
   let subscriberElement = `
     <SubscriberData xsi:type="ns1:Subscriber">
@@ -164,16 +157,10 @@ function buildSoapRequest(
 function parseSoapResponse(xmlString: string): SoapResponse {
   // Simple XML parsing for error code and message
   const errorCodeMatch = xmlString.match(/<errorCode[^>]*>(\d+)<\/errorCode>/);
-  const errorMessageMatch = xmlString.match(
-    /<errorMessage[^>]*>([^<]+)<\/errorMessage>/,
-  );
+  const errorMessageMatch = xmlString.match(/<errorMessage[^>]*>([^<]+)<\/errorMessage>/);
 
-  const errorCode = errorCodeMatch
-    ? Number.parseInt(errorCodeMatch[1]!, 10)
-    : -1;
-  const errorMessage = errorMessageMatch
-    ? errorMessageMatch[1]
-    : "Unknown error";
+  const errorCode = errorCodeMatch ? Number.parseInt(errorCodeMatch[1]!, 10) : -1;
+  const errorMessage = errorMessageMatch ? errorMessageMatch[1] : "Unknown error";
 
   if (errorCode === 0) {
     return { code: 200, message: "User provisioned successfully" };
@@ -186,8 +173,7 @@ function parseSoapResponse(xmlString: string): SoapResponse {
 }
 
 function randomString(length: number): string {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));

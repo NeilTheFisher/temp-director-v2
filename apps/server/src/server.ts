@@ -1,11 +1,12 @@
 // polyfill for CompressionStream https://github.com/oven-sh/bun/issues/1723
 import "@ungap/compression-stream/poly";
-
 // Initialize Sentry
 import "./sentry.server.config";
 
 import { networkInterfaces } from "node:os";
+
 import { env } from "@director_v2/config";
+
 import { handleRPC } from "./rpc-handler";
 
 const port = Number(process.env.PORT) || 3001;

@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
 import "../index.css";
+
+import type { Metadata } from "next";
 import { Suspense } from "react";
+
 import Header from "@/components/header";
 import Providers from "@/components/providers";
 
@@ -22,9 +24,7 @@ export default function RootLayout({
             <Header />
             <Suspense
               fallback={
-                <div className="flex h-full w-full items-center justify-center">
-                  Loading...
-                </div>
+                <div className="flex h-full w-full items-center justify-center">Loading...</div>
               }
             >
               {children}

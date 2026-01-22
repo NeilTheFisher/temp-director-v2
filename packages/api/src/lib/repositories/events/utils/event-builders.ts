@@ -71,7 +71,7 @@ export function getTicketUrl(
   eventId: bigint,
   payed: boolean,
   ticketPlatform: string,
-  eventbriteUrl: string,
+  eventbriteUrl: string
 ): string {
   if (!payed) return "";
 
@@ -93,7 +93,7 @@ export function getBrandData(
   brandImageUrl: string | null,
   brandBackgroundImageUrl: string | null,
   brandAdImageUrl: string | null,
-  settings: Record<string, unknown>,
+  settings: Record<string, unknown>
 ) {
   const date = eventDate ? new Date(eventDate * 1000) : new Date();
   const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -104,25 +104,18 @@ export function getBrandData(
 
   const showBrandPanel = settingToNumber(settings.show_brand_panel, 1) === 1;
   const brandTitle = settingToString(settings.brand_title) || eventName;
-  const brandSubtitle =
-    settingToString(settings.brand_subtitle) || formattedDate;
+  const brandSubtitle = settingToString(settings.brand_subtitle) || formattedDate;
 
   return {
     show_brand_panel: showBrandPanel,
     brand_title: brandTitle,
     brand_subtitle: brandSubtitle,
-    brand_background_color: settingToString(
-      settings.brand_background_color,
-      "#DF2C48",
-    ),
+    brand_background_color: settingToString(settings.brand_background_color, "#DF2C48"),
     brand_text_color: settingToString(settings.brand_text_color, "#FFFFFF"),
     brand_image_url: brandImageUrl || getS3Url("default/odience.png"),
     brand_background_image_url: brandBackgroundImageUrl || "",
     brand_ad_image_url: brandAdImageUrl || "",
-    brand_background_opacity: settingToFloat(
-      settings.brand_background_opacity,
-      1,
-    ),
+    brand_background_opacity: settingToFloat(settings.brand_background_opacity, 1),
     brand_logo_padding: settingToFloat(settings.brand_logo_padding, 0.4),
   };
 }
@@ -138,7 +131,7 @@ export function getInvitationMessage(
   orgName: string,
   groupId: bigint,
   settings: Record<string, unknown>,
-  appUrl: string,
+  appUrl: string
 ): string {
   const message = settingToString(settings.event_invitation_message);
 
@@ -184,7 +177,7 @@ export function getInvitationMessage(
         default:
           return _match;
       }
-    },
+    }
   );
 }
 
@@ -192,37 +185,31 @@ export function getInvitationMessage(
  * Get sponsor settings from event settings
  */
 export function getSponsorSettings(
-  settings: Record<string, unknown>,
+  settings: Record<string, unknown>
 ): Record<string, Record<string, number>> {
   const sponsorSettings: Record<string, Record<string, number>> = {
     event_brand_panel: {
       ad_brand_panel_display_interval: settingToNumber(
         settings.ad_brand_panel_display_interval,
-        10,
+        10
       ),
     },
     event_details: {
       ad_event_details_display_interval: settingToNumber(
         settings.ad_event_details_display_interval,
-        10,
+        10
       ),
     },
     event_in_stream: {
       ad_inisde_stream_show_interval:
         settingToNumber(settings.ad_inisde_stream_show_interval, 15) * 60,
-      ad_inside_stream_display_delay: settingToNumber(
-        settings.ad_inside_stream_display_delay,
-        0,
-      ),
-      ad_inside_stream_skip_after: settingToNumber(
-        settings.ad_inside_stream_skip_after,
-        5,
-      ),
+      ad_inside_stream_display_delay: settingToNumber(settings.ad_inside_stream_display_delay, 0),
+      ad_inside_stream_skip_after: settingToNumber(settings.ad_inside_stream_skip_after, 5),
     },
     event_invitation: {
       ad_invitation_page_display_interval: settingToNumber(
         settings.ad_invitation_page_display_interval,
-        10,
+        10
       ),
     },
   };

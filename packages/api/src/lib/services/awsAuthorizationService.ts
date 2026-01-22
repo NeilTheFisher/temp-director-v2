@@ -5,10 +5,8 @@
 
 import { createHash, createHmac } from "node:crypto";
 import { resolve } from "node:dns/promises";
-import {
-  DescribeAvailabilityZonesCommand,
-  EC2Client,
-} from "@aws-sdk/client-ec2";
+
+import { DescribeAvailabilityZonesCommand, EC2Client } from "@aws-sdk/client-ec2";
 import { env } from "@director_v2/config";
 import { redis } from "@director_v2/db";
 
@@ -30,7 +28,7 @@ interface ZoneResponse {
  */
 export async function getAggregatorUrls(
   ip: string,
-  maxResults = 10,
+  maxResults = 10
 ): Promise<{ urls: Record<number, AggregatorUrl> }> {
   const proteusId = env.PROTEUS_IAM_ACCESS_KEY_ID;
   const proteusKey = env.PROTEUS_IAM_SECRET_ACCESS_KEY;
@@ -54,9 +52,7 @@ export async function getAggregatorUrls(
 
     const region = process.env.PROTEUS_IAM_DEFAULT_REGION || "us-east-1";
     const service = process.env.PROTEUS_SERVICE || "proteus-preprod";
-    const host =
-      process.env.PROTEUS_HOST ||
-      "discovery.us-east-1.gamma.proteus.ec2.aws.dev";
+    const host = process.env.PROTEUS_HOST || "discovery.us-east-1.gamma.proteus.ec2.aws.dev";
     const uri = process.env.PROTEUS_URI || "/discover-zones";
 
     // Get authorization header with AWS SigV4 signing
@@ -67,7 +63,7 @@ export async function getAggregatorUrls(
       region,
       service,
       host,
-      uri,
+      uri
     );
 
     const rawDate = new Date().toISOString();
@@ -112,7 +108,7 @@ function getAuthorizationHeader(
   region: string,
   service: string,
   host: string,
-  uri: string,
+  uri: string
 ): string {
   const algorithm = "AWS4-HMAC-SHA256";
   const method = "POST";
@@ -125,9 +121,7 @@ function getAuthorizationHeader(
 
   // Prepare payload
   const payloadString = JSON.stringify({ clientIp: ip });
-  const hashedPayload = createHash("sha256")
-    .update(payloadString)
-    .digest("hex");
+  const hashedPayload = createHash("sha256").update(payloadString).digest("hex");
 
   // Prepare canonical request
   const canonicalHeaders = `host:${host}\nx-amz-date:${amzDate}\n`;
@@ -157,12 +151,8 @@ function getAuthorizationHeader(
   const kDate = createHmac("sha256", kSecret).update(dateStamp).digest();
   const kRegion = createHmac("sha256", kDate).update(region).digest();
   const kService = createHmac("sha256", kRegion).update(service).digest();
-  const kSigning = createHmac("sha256", kService)
-    .update("aws4_request")
-    .digest();
-  const signature = createHmac("sha256", kSigning)
-    .update(stringToSign)
-    .digest("hex");
+  const kSigning = createHmac("sha256", kService).update("aws4_request").digest();
+  const signature = createHmac("sha256", kSigning).update(stringToSign).digest("hex");
 
   // Authorization header
   return `${algorithm} Credential=${awsAccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
@@ -173,7 +163,7 @@ function getAuthorizationHeader(
  */
 async function getAvailableZoneUrls(
   response: ZoneResponse,
-  maxResults: number,
+  maxResults: number
 ): Promise<{ urls: Record<number, AggregatorUrl> }> {
   const results: AggregatorUrl[] = [];
   const directorSocketAddress = process.env.DIRECTOR_PUBLIC_IP || "default-ip";
@@ -187,22 +177,13 @@ async function getAvailableZoneUrls(
         const zoneRegion = zone.regionName || "DEFAULT_REGION";
         const zoneType = zone.zoneType || "";
 
-        if (
-          zoneType === "availability-zone" ||
-          zoneType === "wavelength-zone"
-        ) {
+        if (zoneType === "availability-zone" || zoneType === "wavelength-zone") {
           for (const zoneId of zoneIds) {
             if (results.length >= maxResults) break;
 
-            const zoneName = await getAvailabilityZonesNameById(
-              zoneRegion,
-              zoneId,
-              zoneType,
-            );
+            const zoneName = await getAvailabilityZonesNameById(zoneRegion, zoneId, zoneType);
             if (zoneName) {
-              const urlEnding = directorSocketAddress.includes("eu")
-                ? "de"
-                : "org";
+              const urlEnding = directorSocketAddress.includes("eu") ? "de" : "org";
               const recordName = `agg.${zoneName}.odience.${urlEnding}`;
 
               try {
@@ -214,12 +195,8 @@ async function getAvailableZoneUrls(
                 }
               } catch (dnsError: unknown) {
                 const dnsMessage =
-                  dnsError instanceof Error
-                    ? dnsError.message
-                    : "Unknown DNS error";
-                console.warn(
-                  `DNS resolution failed for ${recordName}: ${dnsMessage}`,
-                );
+                  dnsError instanceof Error ? dnsError.message : "Unknown DNS error";
+                console.warn(`DNS resolution failed for ${recordName}: ${dnsMessage}`);
               }
             }
           }
@@ -246,7 +223,7 @@ async function getAvailableZoneUrls(
 async function getAvailabilityZonesNameById(
   region: string,
   zoneId: string,
-  zoneType: string,
+  zoneType: string
 ): Promise<string> {
   const cacheTTL = 60 * 60; // 1 hour in seconds
   const cacheKey = `zone:${region}:${zoneId}:${zoneType}`;

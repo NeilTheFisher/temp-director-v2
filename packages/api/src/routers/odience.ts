@@ -1,5 +1,6 @@
 import { env } from "@director_v2/config";
 import { ORPCError } from "@orpc/server";
+
 import * as odienceService from "../lib/services/odience";
 import { validateAndFormatPhoneNumber } from "../lib/utils/phone-validation";
 import { pub } from "../orpc";
@@ -29,21 +30,15 @@ export const odienceRouter = {
     const rawMsisdn = input.msisdn;
 
     try {
-      const objResponse = await odienceService.provisionUser(
-        rawMsisdn,
-        input.country_code || "",
-      );
+      const objResponse = await odienceService.provisionUser(rawMsisdn, input.country_code || "");
       return {
         code: objResponse.code,
         message: objResponse.message || "",
       };
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       console.error(
-        `OdienceController.odience: for msisdn: ${
-          rawMsisdn || ""
-        }, error => ${errorMessage}`,
+        `OdienceController.odience: for msisdn: ${rawMsisdn || ""}, error => ${errorMessage}`
       );
       throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: `OdienceController.odience. msisdn: ${
@@ -53,37 +48,28 @@ export const odienceRouter = {
     }
   }),
 
-  validatePhoneNumber: pub.odience.validatePhoneNumber.handler(
-    async ({ input }) => {
-      const { msisdn, country_code } = input;
-      console.log(
-        `OdienceController.validatePhoneNumber: msisdn: ${msisdn || ""}`,
-      );
+  validatePhoneNumber: pub.odience.validatePhoneNumber.handler(async ({ input }) => {
+    const { msisdn, country_code } = input;
+    console.log(`OdienceController.validatePhoneNumber: msisdn: ${msisdn || ""}`);
 
-      if (!msisdn) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: `OdienceController.validatePhoneNumber. msisdn: ${
-            msisdn || ""
-          } country_code: ${
-            country_code || ""
-          } failed with error: missing request params`,
-        });
-      }
+    if (!msisdn) {
+      throw new ORPCError("BAD_REQUEST", {
+        message: `OdienceController.validatePhoneNumber. msisdn: ${msisdn || ""} country_code: ${
+          country_code || ""
+        } failed with error: missing request params`,
+      });
+    }
 
-      const objResponse = await validateAndFormatPhoneNumber(
-        msisdn,
-        country_code,
-      );
+    const objResponse = await validateAndFormatPhoneNumber(msisdn, country_code);
 
-      if (objResponse.code !== 200) {
-        throw new ORPCError("BAD_REQUEST", {
-          message: objResponse.error || "Invalid phone number",
-        });
-      }
+    if (objResponse.code !== 200) {
+      throw new ORPCError("BAD_REQUEST", {
+        message: objResponse.error || "Invalid phone number",
+      });
+    }
 
-      return objResponse;
-    },
-  ),
+    return objResponse;
+  }),
 
   getCategoryList: pub.odience.getCategoryList.handler(async () => {
     try {
@@ -94,11 +80,8 @@ export const odienceRouter = {
       }
       return categoryUrlMap;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      console.error(
-        `OdienceController.getCategoryList: error => ${errorMessage}`,
-      );
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error(`OdienceController.getCategoryList: error => ${errorMessage}`);
       throw new ORPCError("INTERNAL_SERVER_ERROR", {
         message: `OdienceController.getCategoryList: failed with error: ${errorMessage}`,
       });

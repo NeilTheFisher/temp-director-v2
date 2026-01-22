@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
 import jwt from "jsonwebtoken";
 
 let publicKey: string | null = null;
@@ -11,7 +12,7 @@ function getPublicKey(): string {
       fileURLToPath(new URL(import.meta.url)),
       "../../../../../",
       "priv",
-      "public.key",
+      "public.key"
     );
     publicKey = fs.readFileSync(keyPath, "utf8");
   }
@@ -25,9 +26,7 @@ function getPublicKey(): string {
  * @param authHeader The Authorization header value
  * @returns The user ID from the token's 'sub' claim, or null if verification fails
  */
-export async function verifyJWTToken(
-  authHeader: string,
-): Promise<string | null> {
+export async function verifyJWTToken(authHeader: string): Promise<string | null> {
   try {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       console.warn("Invalid authorization header format");
@@ -42,9 +41,7 @@ export async function verifyJWTToken(
 
     const publicKey = getPublicKey();
 
-    const { resolve, promise } = Promise.withResolvers<
-      string | jwt.JwtPayload | undefined
-    >();
+    const { resolve, promise } = Promise.withResolvers<string | jwt.JwtPayload | undefined>();
     jwt.verify(
       token,
       publicKey,
@@ -59,7 +56,7 @@ export async function verifyJWTToken(
           return;
         }
         resolve(decoded);
-      },
+      }
     );
     const decodedToken = await promise;
 
@@ -80,10 +77,7 @@ export async function verifyJWTToken(
     return userId;
   } catch (error: unknown) {
     if (error instanceof jwt.JsonWebTokenError) {
-      console.error(
-        "verifyJWTToken error:",
-        (error as jwt.JsonWebTokenError).message,
-      );
+      console.error("verifyJWTToken error:", (error as jwt.JsonWebTokenError).message);
     } else {
       console.error("Unexpected error during JWT verification:", error);
     }

@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import arkenv, { type } from "arkenv";
+
+import arkenv from "arkenv";
+import { type } from "arkenv/arktype";
 import dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
 
@@ -13,7 +15,7 @@ const dotenvResult = dotenvExpand.expand(
   dotenv.config({
     path: baseEnvPath,
     quiet: true,
-  }),
+  })
 );
 
 if (!dotenvResult.parsed) {
@@ -50,5 +52,7 @@ const envType = type({
   DIRECTOR_PUBLIC_IP: type("string").optional(),
 });
 
-export const envClean = arkenv(envType, dotenvResult.parsed);
-export const env = arkenv(envType, process.env);
+export const envClean = arkenv(envType, {
+  env: dotenvResult.parsed,
+});
+export const env = arkenv(envType, { env: process.env });

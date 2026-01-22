@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+
 import { authed, pub } from "../../orpc";
 
 /**
@@ -28,22 +29,20 @@ export const messageRouter = pub.messages.router({
    * @see router/src/app/event/publicFacade.ts messageNew()
    * @see router/src/app/event/message.ts
    */
-  sendMessage: authed.messages.sendMessage.handler(
-    async ({ context: _context, input }) => {
-      // TODO: Implement socket.io client proxy to router
-      // 1. Get event namespace from user's current event (need eventId in context/input)
-      // 2. Connect to router socket if not connected
-      // 3. Emit "MessageNew" event with { content: input.content }
-      // 4. Wait for "MessagePending" response
-      // 5. Return the pending message
+  sendMessage: authed.messages.sendMessage.handler(async ({ context: _context, input }) => {
+    // TODO: Implement socket.io client proxy to router
+    // 1. Get event namespace from user's current event (need eventId in context/input)
+    // 2. Connect to router socket if not connected
+    // 3. Emit "MessageNew" event with { content: input.content }
+    // 4. Wait for "MessagePending" response
+    // 5. Return the pending message
 
-      throw new ORPCError("NOT_IMPLEMENTED", {
-        message:
-          "Socket.io client proxy to router not yet implemented. Input received: " +
-          JSON.stringify(input),
-      });
-    },
-  ),
+    throw new ORPCError("NOT_IMPLEMENTED", {
+      message:
+        "Socket.io client proxy to router not yet implemented. Input received: " +
+        JSON.stringify(input),
+    });
+  }),
 
   /**
    * Get list of messages for the current event.
@@ -67,6 +66,6 @@ export const messageRouter = pub.messages.router({
       throw new ORPCError("NOT_IMPLEMENTED", {
         message: "Socket.io client proxy to router not yet implemented",
       });
-    },
+    }
   ),
 });

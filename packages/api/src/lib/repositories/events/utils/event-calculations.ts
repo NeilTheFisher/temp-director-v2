@@ -2,11 +2,7 @@
  * Convert IP to long
  */
 export function ipToLong(ip: string): number {
-  return (
-    ip
-      .split(".")
-      .reduce((acc, octet) => (acc << 8) + Number.parseInt(octet, 10), 0) >>> 0
-  );
+  return ip.split(".").reduce((acc, octet) => (acc << 8) + Number.parseInt(octet, 10), 0) >>> 0;
 }
 
 /**
@@ -49,12 +45,7 @@ export function isIpAllowed(allowedIps: string | string[], clientIp: string) {
  * Calculate distance between two lat/lng points in meters
  * Uses Haversine formula
  */
-export function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-) {
+export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   return (
     6371 *
     2000 *
@@ -62,7 +53,7 @@ export function calculateDistance(
       Math.sin(((lat1 - lat2) * Math.PI) / 360) ** 2 +
         Math.cos((lat1 * Math.PI) / 180) *
           Math.cos((lat2 * Math.PI) / 180) *
-          Math.sin(((lon1 - lon2) * Math.PI) / 360) ** 2,
+          Math.sin(((lon1 - lon2) * Math.PI) / 360) ** 2
     )
   );
 }
@@ -77,7 +68,7 @@ export function getEventLabel(
   isDraft: boolean,
   streams: Array<{ recordedType: number }>,
   hasSimulations: boolean,
-  restream: boolean,
+  restream: boolean
 ): string {
   const EVENT_STATUS_LIVE = "live";
   const EVENT_STATUS_RE_STREAM = "re-stream";
@@ -100,8 +91,7 @@ export function getEventLabel(
 
   if (!hasStreams && !hasSimulations) return EVENT_STATUS_DRAFT;
 
-  const isWithinWindow =
-    !!date && date <= now && (duration === null || date + duration > now);
+  const isWithinWindow = !!date && date <= now && (duration === null || date + duration > now);
 
   if (isWithinWindow && (restream || (!hasType0 && hasType1))) {
     return EVENT_STATUS_RE_STREAM;

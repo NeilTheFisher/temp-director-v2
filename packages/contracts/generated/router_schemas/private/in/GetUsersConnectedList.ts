@@ -9,11 +9,7 @@ export const GetUsersConnectedList = z.object({
     ])
     .describe("Number of users requested")
     .optional(),
-  indexStart: z
-    .number()
-    .int()
-    .describe("index from which user list starts")
-    .optional(),
+  indexStart: z.number().int().describe("index from which user list starts").optional(),
   indexEnd: z
     .union([
       z.number().int().describe("index from where user list ends"),
@@ -22,10 +18,7 @@ export const GetUsersConnectedList = z.object({
     .describe("index from where user list ends")
     .optional(),
   search: z
-    .union([
-      z.string().describe("user search term"),
-      z.null().describe("user search term"),
-    ])
+    .union([z.string().describe("user search term"), z.null().describe("user search term")])
     .describe("user search term")
     .optional(),
   mostActiveUsers: z.boolean().describe("show most active users").optional(),
