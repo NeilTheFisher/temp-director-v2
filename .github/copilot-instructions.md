@@ -145,6 +145,15 @@ This is a **v2 rewrite** of legacy Odience platform:
 
 **Catalog Dependencies:** Shared versions defined in root `package.json` workspace catalog (Next.js, oRPC, Prisma, etc.).
 
+## Documentation Hygiene (Keep Repo Clean)
+
+- Do not create new `.md` files anywhere in the repo unless explicitly requested by the user for a specific path and purpose.
+- Do not generate ad-hoc summaries or change logs as repository files (e.g., `QUICKSTART.md`, `IMPLEMENTATION.md`, `ARCHITECTURE.md`). If a summary is needed, include it in the PR description or the task response, not as a committed file.
+- Prefer updating existing documentation files only when the user asks for it; otherwise, keep changes limited to code related to the task.
+- Use `get_changed_files` solely to inspect changes; never emit companion Markdown artifacts summarizing diffs.
+- Keep diffs minimal and scoped: only touch files directly relevant to the requested change.
+- Single source of process guidance is this file. NEVER add instructions, summaries, or meta-docs elsewhere in the codebase.
+
 ## Common Pitfalls
 
 1. **Don't use tRPC patterns** - this uses oRPC (different API)

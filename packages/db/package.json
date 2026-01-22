@@ -27,6 +27,7 @@
     "@prisma/adapter-mariadb": "^7.3.0",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0",
+    "arktype": "catalog:",
     "ioredis": "^5.9.2",
     "prisma-zod-generator": "^2.1.2",
     "zod": "catalog:",

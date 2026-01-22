@@ -45,3 +45,7 @@ export async function preconnectToDbAndRedis() {
   await Promise.all([preconnectRedis(), preconnectToDb()]);
   console.timeEnd("connected to db and redis");
 }
+
+// Export settings utilities
+export * from "./settings";
+export * from "./settings-repository";
