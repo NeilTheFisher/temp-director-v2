@@ -1,4 +1,4 @@
-import { envClean } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     preloadEntriesOnStart: true,
   },
   reactCompiler: true,
-  env: envClean,
+  env: env,
 };
 
 export default withSentryConfig(nextConfig, {

@@ -5,7 +5,7 @@ import "./sentry.server.config";
 
 import { networkInterfaces } from "node:os";
 
-import { env } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 
 import { handleRPC } from "./rpc-handler";
 

@@ -1,4 +1,4 @@
-import { env } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 
 interface SoapResponse {
   code: number;

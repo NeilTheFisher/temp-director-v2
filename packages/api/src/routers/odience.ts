@@ -1,4 +1,4 @@
-import { env } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 import { ORPCError } from "@orpc/server";
 
 import * as odienceService from "../lib/services/odience";

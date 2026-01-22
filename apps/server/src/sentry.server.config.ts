@@ -1,4 +1,4 @@
-import { env } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 import { SpanStatusCode, trace } from "@opentelemetry/api";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";

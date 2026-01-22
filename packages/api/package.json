@@ -13,9 +13,9 @@
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.973.0",
     "@director_v2/auth": "workspace:*",
-    "@director_v2/config": "workspace:*",
     "@director_v2/contracts": "workspace:*",
     "@director_v2/db": "workspace:*",
+    "@director_v2/env": "workspace:*",
     "@openapitools/openapi-generator-cli": "^2.28.0",
     "@opentelemetry/sdk-node": "^0.211.0",
     "@orpc/client": "catalog:",

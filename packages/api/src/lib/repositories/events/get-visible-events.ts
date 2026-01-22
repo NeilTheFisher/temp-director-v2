@@ -1,8 +1,8 @@
 import type { UserEventInfo } from "../user";
-import { env } from "@director_v2/config";
 import type { listEventsResponseSchema } from "@director_v2/contracts/contract/event";
 import prisma, { redis } from "@director_v2/db";
 import type { Prisma } from "@director_v2/db/prisma/generated/client";
+import { env } from "@director_v2/env/server";
 import { regex } from "arkregex";
 
 import {

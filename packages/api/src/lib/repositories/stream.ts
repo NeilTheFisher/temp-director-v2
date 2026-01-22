@@ -1,5 +1,5 @@
-import { env } from "@director_v2/config";
 import prisma from "@director_v2/db";
+import { env } from "@director_v2/env/server";
 
 import { getAggregatorUrls } from "../services/awsAuthorizationService";
 import { getMobileUserInfo } from "../services/geoipService";

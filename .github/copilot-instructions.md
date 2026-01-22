@@ -117,7 +117,7 @@ export const appRouter = {
 - `@director_v2/api` - API package
 - `@director_v2/auth` - Auth package
 - `@director_v2/db` - Database package
-- `@director_v2/config` - Config package
+- `@director_v2/env` - Environment variables package
 
 **Error Handling:** Use `ORPCError` from `@orpc/server` with error codes like `"UNAUTHORIZED"`, `"BAD_REQUEST"`, `"INTERNAL_SERVER_ERROR"`.
 

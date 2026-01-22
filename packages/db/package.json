@@ -23,7 +23,7 @@
     "db:studio": "prisma studio --browser none"
   },
   "dependencies": {
-    "@director_v2/config": "workspace:*",
+    "@director_v2/env": "workspace:*",
     "@prisma/adapter-mariadb": "^7.3.0",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0",

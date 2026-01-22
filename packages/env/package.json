@@ -1,0 +1,19 @@
+{
+  "name": "@director_v2/env",
+  "version": "0.0.1",
+  "description": "Environment variables for Director v2",
+  "type": "module",
+  "exports": {
+    "./server": "./src/server.ts",
+    "./web": "./src/web.ts"
+  },
+  "scripts": {},
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.1",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

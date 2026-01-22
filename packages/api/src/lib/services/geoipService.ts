@@ -3,8 +3,8 @@
  * Fetches mobile user information (MCC, MNC) from IP addresses
  */
 
-import { env } from "@director_v2/config";
 import { redis } from "@director_v2/db";
+import { env } from "@director_v2/env/server";
 
 interface MobileUserInfo {
   mcc: number;

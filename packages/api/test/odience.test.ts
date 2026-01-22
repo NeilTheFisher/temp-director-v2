@@ -1,5 +1,5 @@
 import { appRouter } from "@director_v2/api";
-import { env } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 import { call } from "@orpc/server";
 import { describe, expect, it } from "vitest";
 

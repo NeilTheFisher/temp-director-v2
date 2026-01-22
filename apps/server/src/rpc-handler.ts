@@ -1,6 +1,6 @@
 import { appRouter, createContext } from "@director_v2/api";
 import { generateTestToken } from "@director_v2/api/util/generate-test-token";
-import { env } from "@director_v2/config";
+import { env } from "@director_v2/env/server";
 import { experimental_ArkTypeToJsonSchemaConverter as ArkTypeToJsonSchemaConverter } from "@orpc/arktype";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
 import { SmartCoercionPlugin } from "@orpc/json-schema";

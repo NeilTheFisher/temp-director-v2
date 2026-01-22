@@ -7,8 +7,8 @@ import { createHash, createHmac } from "node:crypto";
 import { resolve } from "node:dns/promises";
 
 import { DescribeAvailabilityZonesCommand, EC2Client } from "@aws-sdk/client-ec2";
-import { env } from "@director_v2/config";
 import { redis } from "@director_v2/db";
+import { env } from "@director_v2/env/server";
 
 interface AggregatorUrl {
   url: string;

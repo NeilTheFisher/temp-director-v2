@@ -1,8 +1,7 @@
 import path from "node:path";
 
+import { env } from "@director_v2/env/server";
 import { defineConfig } from "prisma/config";
-
-import { env } from "../config";
 
 export default defineConfig({
   schema: path.join("prisma", "schema"),
