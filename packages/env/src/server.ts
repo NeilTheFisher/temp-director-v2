@@ -1,19 +1,19 @@
-import "dotenv/config";
-
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
+import { loadEnv } from "./load-env";
+
 export const env = createEnv({
   server: {
-    AWS_URL: z.string().url(),
-    DATABASE_URL: z.string().url(),
-    DIRECTOR_URL: z.string().url(),
-    DIRECTOR_TEST_USER_EMAIL: z.string().email().optional(),
+    AWS_URL: z.url(),
+    DATABASE_URL: z.url(),
+    DIRECTOR_URL: z.url(),
+    DIRECTOR_TEST_USER_EMAIL: z.email().optional(),
     DIRECTOR_TEST_USER_PASSWORD: z.string().optional(),
-    REDIS_URL: z.string().url(),
+    REDIS_URL: z.url(),
     ENV: z.enum(["development", "production", "test"]).default("development"),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-    SENTRY_DSN: z.union([z.string().url(), z.literal("")]).optional(),
+    SENTRY_DSN: z.union([z.url(), z.literal("")]).optional(),
     ACS_API_ENDPOINT: z.string().optional(),
     ACS_PROVISIONING_PATH: z.string().optional(),
     ACS_API_IMPU_TEMPLATE: z.string().optional(),
@@ -27,6 +27,6 @@ export const env = createEnv({
     PROTEUS_URI: z.string().optional(),
     DIRECTOR_PUBLIC_IP: z.string().optional(),
   },
-  runtimeEnv: process.env,
+  runtimeEnv: loadEnv(),
   emptyStringAsUndefined: true,
 });
