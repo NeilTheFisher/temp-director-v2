@@ -24,6 +24,23 @@ First, install the dependencies:
 bun install
 ```
 
+### tsgo Language Server Configuration
+
+Set `GOMEMLIMIT` for the Go language server (gopls) to prevent excessive memory usage:
+
+```bash
+export GOMEMLIMIT=2048MiB
+```
+
+See [Go environment variables documentation](https://pkg.go.dev/runtime#hdr-Environment_Variables) for more information.
+
+**To apply this persistently**, add it to your `~/.bashrc` and restart the editor:
+
+```bash
+echo 'export GOMEMLIMIT=2048MiB' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ## Database Setup
 
 This project uses MySQL with Prisma.

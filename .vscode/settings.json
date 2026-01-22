@@ -1,11 +1,15 @@
 {
-  "biome.requireConfiguration": true,
-  "biome.suggestInstallingGlobally": false,
   "typescript.preferences.preferTypeOnlyAutoImports": true,
   "js/ts.hover.maximumLength": 1000,
   "deno.enable": false,
   "typescript.tsdk": "./node_modules/typescript/lib",
+  // consider using native-preview for better performance
+  // these settings may have to be applied to user settings if you are using a vscode workspace
+  "typescript.native-preview.tsdk": "./node_modules/@typescript/native-preview/lib",
   "typescript.experimental.useTsgo": true,
+  "typescript.native-preview.goMemLimit": "2048MiB",
+  "biome.requireConfiguration": true,
+  "biome.suggestInstallingGlobally": false,
   "oxc.enable": true,
   "oxc.lint.run": "onType",
   "eslint.run": "onSave",
