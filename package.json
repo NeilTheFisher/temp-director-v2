@@ -45,6 +45,7 @@
     "dev": "turbo dev --ui stream",
     "dev:inspect": "turbo dev:inspect",
     "dev:server": "turbo -F server dev",
+    "dev:server:inspect": "turbo -F server dev:inspect",
     "dev:web": "turbo -F web dev",
     "fmt": "oxfmt",
     "lint": "turbo lint:oxlint lint:biome lint:oxfmt",

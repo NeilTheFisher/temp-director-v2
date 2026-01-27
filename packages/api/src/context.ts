@@ -36,6 +36,7 @@ export async function createContext(req: Request) {
   return {
     session,
     clientIp: clientIp as string | undefined,
+    req: req as typeof req | undefined,
   };
 }
 

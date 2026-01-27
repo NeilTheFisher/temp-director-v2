@@ -20,6 +20,7 @@ describe("Web Events OpenAPI vs RPC parity", () => {
         context: {
           session: null,
           clientIp: "192.168.0.1",
+          req: undefined,
         },
       }
     );

@@ -15,6 +15,7 @@ describe("Odience OpenAPI vs RPC parity", () => {
       context: {
         session: null,
         clientIp: "192.168.0.1",
+        req: undefined,
       },
     });
 
@@ -37,6 +38,7 @@ describe("Odience OpenAPI vs RPC parity", () => {
         context: {
           session: null,
           clientIp: "192.168.0.1",
+          req: undefined,
         },
       }
     );

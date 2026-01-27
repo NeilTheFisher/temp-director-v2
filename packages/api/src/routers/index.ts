@@ -5,6 +5,7 @@ import { pub } from "../orpc";
 import { eventRouter } from "./event";
 import { healthRouter } from "./health";
 import { messageRouter } from "./live/messages";
+import { oauthRouter } from "./oauth";
 import { odienceRouter } from "./odience";
 import { streamRouter } from "./stream";
 import { userRouter } from "./user";
@@ -18,6 +19,7 @@ export const appRouter = pub.router({
   stream: streamRouter,
   user: userRouter,
   web: webRouter,
+  oauth: oauthRouter,
 });
 
 export type AppRouterClient = RouterClient<typeof appRouter>;

@@ -7,7 +7,7 @@
     "benchmark_health": "bun x autocannon -c 10 -d 5 https://localhost:3001/health",
     "build": "NODE_ENV=production bun build --target bun --minify --sourcemap ./src/index.ts --outdir ./out",
     "dev": "NODE_ENV=development bun run --hot src/index.ts",
-    "dev:inspect": "NODE_ENV=development bun run --watch --inspect=0.0.0.0:6499 src/index.ts",
+    "dev:inspect": "NODE_ENV=development bun run --watch --inspect=127.0.0.1:6499/debugger src/index.ts",
     "otel:start": "docker run --rm --name jaeger -d -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4318:4318 jaegertracing/all-in-one:latest && echo 'Jaeger UI: http://localhost:16686'",
     "otel:stop": "docker stop jaeger",
     "preview": "NODE_ENV=production bun ./src/index.ts",

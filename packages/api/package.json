@@ -31,13 +31,17 @@
     "decimal.js": "catalog:",
     "dotenv": "catalog:",
     "dotenv-expand": "catalog:",
-    "jsonwebtoken": "catalog:",
+    "fetch-to-node": "^2.1.0",
+    "jsonwebtoken": "^9.0.3",
     "libphonenumber-js": "^1.12.35",
     "next": "catalog:",
+    "oauth2-server": "^3.1.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/oauth2-server": "^3.0.18",
     "tsdown": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

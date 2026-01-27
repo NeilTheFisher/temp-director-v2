@@ -29,6 +29,7 @@ describe("User OpenAPI vs RPC parity", () => {
           user: { id: "1" },
         },
         clientIp: "192.168.0.1",
+        req: undefined,
       },
     });
 
@@ -52,6 +53,7 @@ describe("User OpenAPI vs RPC parity", () => {
             user: { id: "1" },
           },
           clientIp: "192.168.0.1",
+          req: undefined,
         },
       }
     );
